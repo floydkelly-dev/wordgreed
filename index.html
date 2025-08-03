@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Greed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Lobster+Two:ital,wght@1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #a78bfa; --primary-color-dark: #8b5cf6; --primary-color-light: #c4b5fd; --primary-text-dark: #1e1b4b; --panel-bg: rgba(55, 25, 85, 0.4); --panel-border: rgba(167, 139, 250, 0.3);
+        }
+        body.theme-red { --primary-color: #f87171; --primary-color-dark: #ef4444; --primary-color-light: #fca5a5; --primary-text-dark: #7f1d1d; --panel-bg: rgba(127, 29, 29, 0.4); --panel-border: rgba(239, 68, 68, 0.3); }
+        body.theme-green { --primary-color: #4ade80; --primary-color-dark: #22c55e; --primary-color-light: #86efac; --primary-text-dark: #14532d; --panel-bg: rgba(22, 101, 52, 0.4); --panel-border: rgba(34, 197, 94, 0.3); }
+        body.theme-blue { --primary-color: #60a5fa; --primary-color-dark: #3b82f6; --primary-color-light: #93c5fd; --primary-text-dark: #1e3a8a; --panel-bg: rgba(30, 58, 138, 0.4); --panel-border: rgba(59, 130, 246, 0.3); }
+        @keyframes move-gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(125deg, #000000, #0c1e42, #1e3a8a, #000000); background-size: 400% 400%; animation: move-gradient 20s ease infinite; overflow-x: hidden; }
+        
+        .game-title-style { 
+            font-family: 'Lobster Two', cursive; 
+            color: #FDD835; /* Brighter, richer gold */
+            font-weight: 700; 
+            font-style: italic; 
+            text-shadow: 
+                -3px -3px 0 #4a2c0f, 3px -3px 0 #4a2c0f, -3px 3px 0 #4a2c0f, 3px 3px 0 #4a2c0f,
+                4px 4px 2px rgba(0,0,0,0.6);
+        }
+
+        @keyframes fly-along-path { 0% { offset-distance: 0%; opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+        @keyframes coin-swirl-in {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: scale(0) rotate(360deg); opacity: 0; }
+        }
+        @keyframes diamond-vortex { 0% { transform: translate(var(--start-x), var(--start-y)) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--end-x), var(--end-y)) scale(0) rotate(720deg); opacity: 0; } }
+        @keyframes game-over-swirl { 0% { transform: translate(var(--start-x), var(--start-y)) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--end-x), var(--end-y)) scale(0) rotate(-360deg); opacity: 0; } }
+        @keyframes big-coin-tumble { 0% { transform: scale(8) rotate(0deg); opacity: 1; } 50% { transform: scale(5) rotate(360deg); } 100% { transform: scale(1) rotate(720deg); opacity: 1; } }
+        .coin { position: absolute; top: 0; left: 0; width: 20px; height: 20px; background-color: #FFD700; border-radius: 50%; border: 2px solid #B8860B; pointer-events: none; z-index: 100; }
+        @keyframes pulse-glow-red { 0%, 100% { box-shadow: 0 0 10px #f87171, 0 0 20px #f87171; } 50% { box-shadow: 0 0 15px #ef4444, 0 0 30px #ef4444; } }
+        @keyframes pulse-glow-fire { 0%, 100% { box-shadow: 0 0 10px #fb923c, 0 0 20px #fb923c; } 50% { box-shadow: 0 0 15px #f97316, 0 0 30px #f97316; } }
+        @keyframes wild-pulse-animation { 0%, 100% { transform: scale(1); box-shadow: 0 0 15px #F59E0B, 0 0 30px #F59E0B; } 50% { transform: scale(1.2) rotate(10deg); box-shadow: 0 0 25px #facc15, 0 0 50px #facc15; } }
+        @keyframes big-pulse-animation { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        #jackpot-square.wild-pulse { animation: wild-pulse-animation 0.5s infinite ease-in-out !important; }
+        #solve-button.big-pulse { animation: big-pulse-animation 0.5s infinite; }
+        .prize-tile { animation: pulse-glow-blue 1.5s infinite; cursor: pointer; font-size: 2rem; }
+        .prize-tile.red-bomb { background-color: #ef4444 !important; animation-name: pulse-glow-red; }
+        .prize-tile.green-bomb { background-color: #22c55e !important; animation-name: pulse-glow-green; cursor: grab; }
+        .prize-tile.fire-bomb { background-color: #f97316 !important; animation-name: pulse-glow-fire; }
+        .glass-panel { background-color: rgba(20, 20, 40, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+        #start-modal .glass-panel { box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 0 2px #f59e0b; } /* Gold outline for start modal */
+        .word-puzzle-tile { background-color: #FFFFFF !important; color: #111827 !important; border: 2px solid #d1d5db; cursor: grab; }
+        .word-puzzle-tile.dragging { opacity: 0.5; cursor: grabbing; }
+        .word-puzzle-tile.solved { background-color: #15803d !important; color: #FFFFFF !important; border-color: #14532d; box-shadow: inset 3px 3px 4px rgba(0, 0, 0, 0.5); cursor: default; }
+        .greed-panel { background-color: var(--panel-bg); border: 1px solid var(--panel-border); }
+        #solve-button { background-color: var(--primary-color); color: var(--primary-text-dark); border: 1px solid var(--primary-color-light); box-shadow: 0 2px 5px rgba(0,0,0,0.4); transition: all 0.2s ease; flex-shrink: 0; }
+        #solve-button:hover { background-color: var(--primary-color-dark); color: #FFFFFF; }
+        #solve-button:active { transform: translateY(1px); box-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+        #solve-button:disabled { background-color: #6b7280; color: #d1d5db; cursor: not-allowed; }
+        #solve-button.cooldown-timer { font-size: 1.25rem; font-family: 'Inter', sans-serif; }
+        
+        .event-text {
+            font-family: 'Lobster Two', cursive;
+            font-size: 5rem;
+            color: #FDD835; /* Unified Gold Color */
+            text-shadow: -3px -3px 0 #4a2c0f, 3px -3px 0 #4a2c0f, -3px 3px 0 #4a2c0f, 3px 3px 0 #4a2c0f, 4px 4px 2px rgba(0,0,0,0.6);
+            animation: event-flash 2s ease-out forwards;
+        }
+        .event-text.green-glow {
+            color: #4ade80;
+            text-shadow: -2px -2px 0 #14532d, 2px -2px 0 #14532d, -2px 2px 0 #14532d, 2px 2px 0 #14532d, 0 0 10px #4ade80, 0 0 20px #22c55e;
+        }
+
+        @keyframes event-flash { 0%, 100% { opacity: 0; transform: scale(0.8); } 20%, 80% { opacity: 1; transform: scale(1.1); } }
+        
+        /* --- Glassy Button Styles --- */
+        @keyframes button-shimmer { 0% { transform: translateX(-100%) skewX(-15deg); } 100% { transform: translateX(200%) skewX(-15deg); } }
+        .glassy-button {
+            border: 1px solid;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.1s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        .glassy-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: button-shimmer 4s infinite linear;
+        }
+        .glassy-button:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Start Game Button Specifics */
+        @keyframes start-button-pulse { 0%, 100% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 10px #60a5fa, 0 0 20px #60a5fa; } 5% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 20px #3b82f6, 0 0 40px #3b82f6; } 15% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 10px #60a5fa, 0 0 20px #60a5fa; } }
+        #start-game-button {
+            background: linear-gradient(145deg, #5c97f5, #3b82f6);
+            border-color: #93c5fd;
+            border-bottom: 4px solid #1e3a8a;
+            animation: start-button-pulse 15s infinite;
+        }
+
+        /* Close & Play Again Button Specifics */
+        #close-help-button, #play-again-button {
+             background: linear-gradient(145deg, #6b7280, #4b5563);
+             border-color: #9ca3af;
+             border-bottom: 4px solid #1f2937;
+        }
+
+        .theme-button { width: 2.5rem; height: 2.5rem; border-radius: 50%; background-color: var(--panel-bg); border: 1px solid var(--panel-border); color: white; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; padding: 0; position: relative; }
+        .theme-button:hover .tooltip { opacity: 1; visibility: visible; }
+        .theme-button.difficulty-active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.6); transform: translateY(1px); }
+        .theme-button svg { transform: scale(0.9); }
+        .tooltip { visibility: hidden; opacity: 0; width: 120px; background-color: black; color: #fff; text-align: center; border-radius: 6px; padding: 5px 0; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -60px; transition: opacity 0.3s; font-size: 0.75rem; }
+        .tooltip::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: black transparent transparent transparent; }
+        #help-button { font-size: 1.25rem; font-weight: bold; }
+        #difficulty-default .orb { fill: #8B5CF6; }
+        #difficulty-easy .orb { fill: #3B82F6; }
+        #difficulty-medium .orb { fill: #F59E0B; }
+        #difficulty-hard .orb { fill: #EF4444; }
+
+        /* --- New Feature Styles --- */
+        .score-decay { color: #ef4444 !important; }
+        .greed-icon {
+            width: 3rem; height: 3rem; background-color: var(--primary-color); border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 1.75rem; border: 1px solid var(--primary-color-light);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4); cursor: pointer;
+        }
+        @keyframes ice-shimmer { 0% { background-position: -100% 0; } 100% { background-position: 100% 0; } }
+        @keyframes crack-fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
+        @keyframes ice-fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(90deg); opacity: 0; } }
+        .ice-block {
+            position: absolute;
+            background: linear-gradient(145deg, rgba(173, 216, 230, 0.5), rgba(135, 206, 250, 0.6));
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 0.5rem;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.5), 0 4px 6px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 50;
+            overflow: hidden;
+        }
+        .ice-block::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: ice-shimmer 3s infinite linear;
+        }
+        .ice-block.cracked {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44"><path d="M 10 0 L 10 15 L 0 20 L 10 25 L 10 44 M 20 0 L 25 10 L 15 15 L 25 20 L 20 44 M 35 0 L 30 22 L 44 28" stroke="rgba(255,255,255,0.7)" stroke-width="1" fill="none"/></svg>'), linear-gradient(145deg, rgba(173, 216, 230, 0.6), rgba(135, 206, 250, 0.7));
+            background-size: cover;
+            animation: crack-fade-in 0.2s forwards;
+        }
+        #bomb-drag-preview {
+            position: absolute;
+            border: 3px dashed #22c55e;
+            background-color: rgba(34, 197, 94, 0.3);
+            pointer-events: none;
+            z-index: 200;
+            display: none; /* Hidden by default */
+        }
+        @keyframes cash-money-pulse { 0%, 100% { box-shadow: 0 0 15px #4ade80, 0 0 30px #4ade80; } 50% { box-shadow: 0 0 25px #22c55e, 0 0 50px #22c55e; } }
+        .cash-money-prize {
+            background-color: #16a34a !important;
+            animation: cash-money-pulse 0.7s infinite ease-in-out;
+        }
+
+        /* Start Screen Animations */
+        @keyframes fall {
+            0% { transform: translateY(-100%) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        @keyframes twinkle {
+            0%, 100% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1); opacity: 1; }
+        }
+        .falling-coin {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: fall linear forwards;
+            pointer-events: none;
+        }
+        .sparkle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #fde047;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #fde047, 0 0 10px #facc15;
+            animation: twinkle ease-in-out infinite;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="text-white flex items-center justify-center min-h-screen p-4">
+
+    <div id="game-container" class="hidden flex-col md:flex-row gap-4 items-start justify-center">
+        <!-- Game Grid Section -->
+        <div class="flex flex-col gap-1 items-center">
+            <div class="relative">
+                <div id="game-grid" class="grid grid-cols-9 gap-1 bg-slate-800/70 p-3 rounded-xl shadow-2xl border border-slate-700/50"></div>
+                <div id="bomb-drag-preview"></div>
+            </div>
+            <!-- <div id="gjackvarnum-display" class="text-xs text-center text-slate-500">GJACKVARNUM: 0</div> -->
+        </div>
+
+        <!-- Score & Control Panel -->
+        <div id="score-panel" class="glass-panel p-4 rounded-xl w-full max-w-xs md:w-[17rem] flex flex-col justify-between gap-3 relative">
+            <div class="flex flex-col gap-2"> 
+                <!-- Title -->
+                <div class="relative w-full h-24 flex justify-center items-center">
+                    <h1 class="game-title-style text-6xl relative" style="width: 15rem; height: 7rem; left: 1rem;">
+                        <span class="absolute" style="top: 0; left: 0;">Word</span>
+                        <span class="absolute" style="top: 2.7rem; left: 2.5rem;">Greed</span>
+                    </h1>
+                </div>
+
+                <!-- Level & Timer -->
+                <div class="p-2 flex justify-around text-center">
+                    <div><span class="text-sm font-bold text-slate-300">LEVEL</span><div id="level-display" class="text-2xl font-bold text-white">1</div></div>
+                    <div><span class="text-sm font-bold text-slate-300">TIME</span><div id="timer-display" class="text-2xl font-bold text-white">10:00</div></div>
+                </div>
+
+                <!-- Main Score & Greed Section -->
+                <div id="score-container" class="greed-panel p-3 rounded-lg text-center flex flex-col gap-2">
+                    <!-- Coins and Bags -->
+                    <div class="grid grid-cols-2 gap-2 text-center">
+                        <div class="text-4xl" style="filter: drop-shadow(0 0 5px #fde047);">🪙</div>
+                        <div class="text-4xl" style="filter: drop-shadow(0 0 5px #fde047);">💰</div>
+                        <div id="coins-display" class="text-lg font-bold text-white">0</div>
+                        <div id="bags-of-money-display" class="text-lg font-bold text-green-400">0</div>
+                    </div>
+                    <hr class="border-violet-300/20">
+                    <!-- Greed Score & Solve Button -->
+                    <div id="greed-content" class="mx-auto flex flex-col items-center justify-center gap-1">
+                         <div class="flex items-center justify-center gap-2">
+                            <span class="text-sm font-bold text-violet-200">GREED SCORE</span>
+                         </div>
+                        <div class="flex items-center justify-center gap-2 mt-1">
+                            <button id="solve-button" class="w-12 h-12 rounded-full text-3xl font-black flex items-center justify-center">✅</button>
+                            <div id="greed-icons-container" class="flex items-center justify-center gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme/Control Buttons -->
+            <div id="theme-buttons-container" class="flex justify-around items-center">
+                <button id="help-button" class="theme-button">?</button>
+                <button id="difficulty-default" class="theme-button difficulty-button difficulty-active">
+                    <span class="tooltip">Default: Max 4</span>
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                        <defs>
+                            <radialGradient id="highlight1" cx="0.3" cy="0.3" r="0.4">
+                                <stop offset="0%" stop-color="white" stop-opacity="0.8"/>
+                                <stop offset="100%" stop-color="white" stop-opacity="0"/>
+                            </radialGradient>
+                             <radialGradient id="highlight2" cx="0.7" cy="0.7" r="0.3">
+                                <stop offset="0%" stop-color="white" stop-opacity="0.6"/>
+                                <stop offset="100%" stop-color="white" stop-opacity="0"/>
+                            </radialGradient>
+                        </defs>
+                        <circle class="orb" cx="50" cy="50" r="45"/>
+                        <circle cx="50" cy="50" r="45" fill="url(#highlight1)"/>
+                        <circle cx="50" cy="50" r="45" fill="url(#highlight2)"/>
+                    </svg>
+                </button>
+                <button id="difficulty-easy" class="theme-button difficulty-button">
+                     <span class="tooltip">Easy: Max 8</span>
+                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                        <circle class="orb" cx="50" cy="50" r="45"/>
+                        <circle cx="50" cy="50" r="45" fill="url(#highlight1)"/>
+                        <circle cx="50" cy="50" r="45" fill="url(#highlight2)"/>
+                    </svg>
+                </button>
+                <button id="difficulty-medium" class="theme-button difficulty-button">
+                     <span class="tooltip">Medium: Max 4</span>
+                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                        <circle class="orb" cx="50" cy="50" r="45"/>
+                        <circle cx="50" cy="50" r="45" fill="url(#highlight1)"/>
+                        <circle cx="50" cy="50" r="45" fill="url(#highlight2)"/>
+                    </svg>
+                </button>
+                <button id="difficulty-hard" class="theme-button difficulty-button">
+                     <span class="tooltip">Hard: Max 2</span>
+                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                        <circle class="orb" cx="50" cy="50" r="45"/>
+                        <circle cx="50" cy="50" r="45" fill="url(#highlight1)"/>
+                        <circle cx="50" cy="50" r="45" fill="url(#highlight2)"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Game Modal -->
+    <div id="start-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div class="glass-panel p-8 rounded-2xl text-center flex flex-col items-center gap-6 w-full max-w-md relative overflow-hidden">
+            <h1 class="game-title-style text-8xl relative" style="width: 22rem; height: 10rem;">
+                <span class="absolute" style="top: 0; left: 0;">Word</span>
+                <span class="absolute" style="top: 4rem; left: 4rem;">Greed</span>
+            </h1>
+            <p class="text-lg text-slate-300">Drag and drop letters to solve jumbled words. Grab Big Prizes and Get Greedy!</p>
+            <button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl">Start Game</button>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+        <div class="glass-panel p-8 rounded-2xl text-center flex flex-col items-center gap-6 w-full max-w-md relative overflow-hidden">
+             <h1 class="game-title-style text-6xl relative" style="width: 15rem; height: 7rem;">
+                <span class="absolute" style="top: 0; left: 0;">Word</span>
+                <span class="absolute" style="top: 2.7rem; left: 2.5rem;">Greed</span>
+            </h1>
+            <div id="leaderboard-container" class="w-full"></div>
+            <button id="play-again-button" class="glassy-button mt-2 text-white font-bold py-3 px-6 rounded-lg text-xl">Play Again</button>
+        </div>
+    </div>
+    
+    <!-- Event Text Overlay -->
+    <div id="event-text-container" class="hidden fixed inset-0 flex items-center justify-center pointer-events-none z-50">
+        <div id="event-text" class="event-text"></div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+        <div class="glass-panel p-6 rounded-2xl flex flex-col items-center gap-3 w-full max-w-lg relative">
+            <h2 class="text-2xl font-bold text-amber-300">How to Play</h2>
+            <table class="w-full text-sm my-2">
+                <tbody class="divide-y divide-slate-600">
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">📝</td><td class="py-0.5 pr-2 font-bold text-green-400">Solve Words</td><td class="py-0.5 text-slate-300">Drag letters to solve words for <span class="font-bold text-white">10,000</span> coins.</td></tr>
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">📈</td><td class="py-0.5 pr-2 font-bold text-green-400">Complete Level</td><td class="py-0.5 text-slate-300">Solve all 4 words for a <span class="font-bold text-white">100,000</span> coin bonus.</td></tr>
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">🎁</td><td class="py-0.5 pr-2 font-bold text-white">Present</td><td class="py-0.5 text-slate-300">+<span class="font-bold text-white">1,500,000</span> coins.</td></tr>
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">🏆</td><td class="py-0.5 pr-2 font-bold text-white">Trophy</td><td class="py-0.5 text-slate-300">+<span class="font-bold text-white">3,500,000</span> coins.</td></tr>
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">💎</td><td class="py-0.5 pr-2 font-bold text-white">Diamond</td><td class="py-0.5 text-slate-300">+<span class="font-bold text-white">20,000,000</span> coins & board clear.</td></tr>
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">⚡</td><td class="py-0.5 pr-2 font-bold text-white">Lightning</td><td class="py-0.5 text-slate-300">+<span class="font-bold text-white">20,000</span> coins, but <strong class="text-red-400">resets Bags of Money!</strong></td></tr>
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">💣</td><td class="py-0.5 pr-2 font-bold text-green-400">Green Bomb</td><td class="py-0.5 text-slate-300">Solves adjacent letters & collects prizes.</td></tr>
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">💣</td><td class="py-0.5 pr-2 font-bold text-red-400">Red Bomb</td><td class="py-0.5 text-slate-300">GAME OVER!</td></tr>
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">❄️</td><td class="py-0.5 pr-2 font-bold text-blue-300">Snowflake</td><td class="py-0.5 text-slate-300">Freezes all prizes for 1 minute.</td></tr>
+                </tbody>
+            </table>
+            <button id="close-help-button" class="glassy-button mt-2 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
+            <div class="absolute bottom-4 right-4 text-xs text-slate-500">v1.0</div>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const gridContainer = document.getElementById('game-grid');
+
+        // --- Game Data ---
+        let coins = 0;
+        let bagsOfMoney = 0;
+        const jackpotColors = ['#8B5CF6', '#EC4899', '#10B981', '#EF4444', '#3B82F6'];
+        let currentColorIndex = 0;
+        let draggedTile = null;
+
+        // --- Game State ---
+        let currentLevel = 1;
+        const totalGameTime = 600;
+        let timeRemaining = totalGameTime;
+        let mainTimerInterval = null;
+        let prizeSpawnerTimeout = null;
+        let diamondSequenceTimeout = null;
+        let puzzles = [];
+        let trophyCollectedThisLevel = false;
+        let diamondCollectedThisLevel = false;
+        let currentDiamondValue = 20000000; // Value persists across levels
+        let solveButtonClicks = 0;
+        let solveButtonCooldown = 0;
+        let solveButtonTimerInterval = null;
+        let isGamePaused = true; // Start game paused
+        let isGameOver = false;
+        let timeSinceLastSolve = 0;
+        let scoreDecayInterval = null;
+        let impTimeout = null;
+        let isFrozen = false;
+        let thawTimeout = null;
+        let jackpotEventAvailable = true; 
+        let specialJackpotTimeout = null;
+        let specialCashEmojiSpawned = false;
+        let impEvents = { sixMin: true, threeMin: true };
+        let isSpecialAnimationActive = false; // Prevents prize spawns during diamond vortex
+        let startModalAnimationInterval = null;
+        let maxSameEmoji = 4; // Default difficulty
+        let isDraggingBomb = false;
+
+        // --- Word Bank & Prize Data ---
+        const wordBank = ["ABROAD","ACCEPT","ACCESS","ACROSS","ACTION","ACTIVE","ADMIRE","ADVICE","AFFAIR","AFFECT","AFFORD","AGENCY","AGENDA","ALMOST","ALWAYS","AMOUNT","ANIMAL","ANNUAL","ANSWER","ANYONE","ANYWAY","APART","APPEAL","APPEAR","APPLY","APPROVE","AROUND","ARRIVE","ARTIST","ASLEEP","ASPECT","ASSESS","ASSIST","ASSUME","ATTACK","ATTEND","ATTRACT","AUTHOR","AWARD","BALANCE","BECOME","BEHAVE","BELIEF","BELONG","BENEATH","BENEFIT","BESIDE","BEYOND","BISHOP","BORDER","BOTTLE","BOTTOM","BRANCH","BREATH","BRIDGE","BRIEFLY","BRIGHT","BROKEN","BUDGET","BURDEN","CAMERA","CANCEL","CANCER","CANDLE","CAPITAL","CAREER","CAREFUL","CENTRAL","CENTURY","CERTAIN","CHAIR","CHALLENGE","CHANCE","CHANGE","CHARGE","CHOICE","CHOOSE","CHURCH","CIRCLE","CLIENT","CLIMB","CLOSELY","CLOSER","COFFEE","COLLECT","COLLEGE","COLUMN","COMBINE","COMFORT","COMMAND","COMMENT","COMMIT","COMMON","COMPARE","COMPETE","COMPLEX","CONCEPT","CONCERN","CONFIRM","CONFLICT","CONNECT","CONSENT","CONSIST","CONTACT","CONTAIN","CONTENT","CONTEST","CONTEXT","CONTROL","CONVERT","CORNER","COUNCIL","COUNTY","COUPLE","COVER","CREATE","CREDIT","CRISIS","CRITERION","CRITIC","CROWD","CULTURE","CURRENT","CUSTOM","DAMAGE","DANGER","DEALER","DEBATE","DECADE","DECIDE","DECLARE","DECREASE","DEEPLY","DEFAULT","DEFENCE","DEFEND","DEFINE","DEGREE","DELAY","DELIVER","DEMAND","DEPEND","DEPICT","DEPOSIT","DEPUTY","DERIVE","DESIGN","DESIRE","DESPITE","DESTROY","DETAIL","DETECT","DEVELOP","DEVICE","DEVOTE","DIFFER","DIFFICULT","DINNER","DIRECT","DISCUSS","DISEASE","DISMISS","DISPLAY","DISTANT","DIVIDE","DIVISION","DOCTOR","DOCUMENT","DOUBLE","DOUBT","DOZEN","DREAM","DRINK","DRIVE","EAGER","EARLY","EARTH","EASTERN","ECONOMIC","ECONOMY","EDITOR","EDUCATE","EFFECT","EFFORT","EIGHT","EITHER","ELDERLY","ELECT","ELEMENT","ELSE","EMERGE","EMPHASIS","EMPLOY","ENABLE","ENCOURAGE","ENGINE","ENJOY","ENOUGH","ENSURE","ENTER","ENTIRE","ENTITLE","EQUALLY","EQUIP","ESCAPE","ESSAY","ESSENTIAL","ESTATE","ETHNIC","EVENT","EVERY","EXACTLY","EXAMINE","EXAMPLE","EXCEED","EXCEPT","EXCHANGE","EXCITE","EXCLUDE","EXCUSE","EXERCISE","EXIST","EXPECT","EXPENSE","EXPERIENCE","EXPERT","EXPLAIN","EXPLORE","EXPOSE","EXPRESS","EXTEND","EXTENT","EXTERNAL","EXTRA","EXTREME","FACTOR","FACULTY","FAILED","FAILURE","FAIRLY","FAITH","FAMLIAR","FAMOUS","FARMER","FASHION","FATHER","FAVOUR","FEELING","FEMALE","FIFTEEN","FIGHT","FIGURE","FINANCE","FINALLY","FINGER","FINISH","FLIGHT","FLOWER","FOLLOW","FOOTBALL","FORCE","FOREIGN","FOREST","FORGET","FORMAL","FORMER","FORWARD","FOUND","FOURTH","FRAME","FREEDOM","FRIEND","FUNCTION","FUTURE","GARDEN","GATHER","GENERAL","GENERATION","GENTLE","GLOBAL","GOLDEN","GROUND","GROWTH","GUARD","GUILTY","HANDLE","HAPPEN","HARDLY","HEALTH","HEAVILY","HEIGHT","HENCE","HOLIDAY","HORSE","HOSPITAL","HOUSE","HOWEVER","HUMAN","HUSBAND","IMPACT","IMPLY","IMPORT","IMPOSE","IMPROVE","INCLUDE","INCREASE","INDEED","INDICATE","INDIVIDUAL","INDUSTRY","INFORM","INITIAL","INJURY","INSIDE","INSIST","INSTANCE","INSTEAD","INSTITUTE","INTEND","INTEREST","INTERNAL","INVOLVE","ISLAND","ISSUE","ITSELF","JOINT","JUDGE","JUDGMENT","JUNIOR","JUSTICE","LABOUR","LANGUAGE","LARGELY","LATTER","LAUGH","LAWYER","LEADER","LEAGUE","LEARN","LEAVE","LEGAL","LENGTH","LESSON","LETTER","LEVEL","LIBERAL","LIBRARY","LICENCE","LIMIT","LIMITED","LITTLE","LOCAL","LONDON","LONGER","MACHINE","MAJOR","MANAGE","MANAGER","MANNER","MANY","MARKET","MARRIAGE","MATCH","MATERIAL","MATTER","MEASURE","MEDIA","MEDICAL","MEETING","MEMBER","MEMORY","MENTAL","MENTION","MERELY","METHOD","MIDDLE","MIGHT","MILE","MILITARY","MINISTER","MINOR","MINORITY","MINUTE","MISSION","MISTAKE","MODEL","MODERN","MODULE","MOMENT","MONEY","MONTH","MORAL","MORNING","MOTHER","MOTION","MOTOR","MOUNTAIN","MOUTH","MOVEMENT","MOVIE","MUCH","MUSIC","MYSELF","NARROW","NATION","NATIONAL","NATIVE","NATURAL","NATURE","NEARLY","NECESSARY","NEEDLE","NEITHER","NERVE","NETWORK","NEVER","NEWLY","NIGHT","NOBODY","NORMAL","NORTHERN","NOTICE","NOTION","NOWHERE","NUMBER","OBJECT","OBSERVE","OBTAIN","OBVIOUS","OCCASION","OCCUR","OFFENCE","OFFER","OFFICE","OFFICER","OFFICIAL","OFTEN","ONCE","ONLINE","ONLY","ONTO","OPENING","OPERATE","OPPORTUNITY","OPPOSE","OPPOSITE","ORDER","ORDINARY","ORGANISE","ORIGIN","ORIGINAL","OTHER","OUGHT","OUTCOME","OUTSIDE","OVERALL","OWNER","PACKAGE","PAINT","PANEL","PARENT","PARISH","PARLIAMENT","PARTLY","PARTNER","PARTY","PASSAGE","PATIENT","PATTERN","PEACE","PEOPLE","PERFORM","PERHAPS","PERIOD","PERMIT","PERSON","PERSONAL","PHONE","PHOTO","PHYSICAL","PICTURE","PIECE","PLACE","PLANNING","PLANT","PLASTIC","PLAYER","POCKET","POINT","POLICE","POLICY","POLITICAL","POLLUTION","POPULAR","POSITION","POSITIVE","POSSIBLE","POSTER","POWER","PRACTICE","PREFER","PREPARE","PRESENCE","PRESENT","PRESIDENT","PRESS","PRESSURE","PRETTY","PREVIOUS","PRICE","PRIMARY","PRINCIPLE","PRINT","PRIOR","PRIORITY","PRISON","PRIVATE","PROBABLY","PROBLEM","PROCEDURE","PROCESS","PRODUCE","PRODUCT","PROFESSION","PROFILE","PROFIT","PROGRAM","PROGRESS","PROJECT","PROMISE","PROMOTE","PROPER","PROPERTY","PROPOSE","PROTECT","PROVIDE","PUBLIC","PUBLISH","PURPOSE","PUSH","QUALITY","QUARTER","QUESTION","QUICKLY","QUITE","RAISE","RANGE","RAPIDLY","RATELY","RATHER","REACH","REACTION","READER","READING","READY","REALISE","REALLY","REASON","RECALL","RECEIVE","RECENT","RECENTLY","RECOGNISE","RECORD","RECOVER","REDUCE","REFER","REFLECT","REFORM","REFUSE","REGARD","REGION","REGIONAL","REGULAR","RELATE","RELATION","RELATIVE","RELEASE","RELEVANT","RELIEF","RELIGION","REMAIN","REMEMBER","REMOVE","REPEAT","REPLACE","REPLY","REPORT","REPRESENT","REQUEST","REQUIRE","RESEARCH","RESOURCE","RESPECT","RESPOND","RESPONSE","RESULT","RETAIN","RETURN","REVEAL","REVENUE","REVIEW","REVOLUTION","RIGHT","RING","RISE","ROAD","ROLE","ROOM","ROUND","ROUTE","ROYAL","RULE","SAFETY","SALE","SAME","SAMPLE","SAVE","SCALE","SCENE","SCHEME","SCHOOL","SCIENCE","SCORE","SCREEN","SEARCH","SEASON","SECOND","SECRETARY","SECTION","SECTOR","SECURE","SEEM","SELECT","SENIOR","SENSE","SENSITIVE","SENTENCE","SEPARATE","SEQUENCE","SERIES","SERIOUS","SERVANT","SERVICE","SESSION","SETTLE","SEVEN","SEVERAL","SEVERE","SHARE","SHEET","SHOOT","SHORT","SHOT","SHOULD","SHOULDER","SHOUT","SHOW","SIDE","SIGHT","SIGN","SIGNAL","SILENCE","SIMPLE","SIMPLY","SINCE","SINGLE","SISTER","SITE","SITUATION","SIZE","SKILL","SKIN","SLEEP","SLIGHTLY","SLOWLY","SOCIAL","SOCIETY","SOLDIER","SOLUTION","SOME","SOMEHOW","SOMEONE","SOMETHING","SOMETIMES","SOMEWHAT","SOON","SORRY","SORT","SOUND","SOURCE","SOUTHERN","SPACE","SPEAK","SPECIAL","SPECIFIC","SPEECH","SPEED","SPEND","SPIRIT","SPORT","SPOT","SPREAD","SPRING","SQUARE","STAFF","STAGE","STAND","STANDARD","START","STATE","STATEMENT","STATION","STATUS","STAY","STEP","STILL","STOCK","STONE","STOP","STORE","STORY","STRAIGHT","STRANGE","STRATEGY","STREET","STRENGTH","STRESS","STRIKE","STRONG","STRUCTURE","STUDENT","STUDIO","STUDY","STYLE","SUBJECT","SUBMIT","SUCCEED","SUCCESS","SUCH","SUDDENLY","SUFFER","SUGGEST","SUMMER","SUPPORT","SUPPOSE","SURELY","SURFACE","SURVEY","SURVIVE","SWITCH","SYSTEM","TABLE","TAKE","TALK","TARGET","TASK","TEACH","TEACHER","TEAM","TECHNOLOGY","TELEPHONE","TELEVISION","TEMPERATURE","TERM","TERRIBLE","TEST","THANKS","THEATRE","THEIR","THEME","THEMSELVES","THEN","THEORY","THERE","THESE","THEY","THING","THINK","THIRD","THIRTY","THIS","THOSE","THOUGH","THOUSAND","THREAT","THREATEN","THREE","THROUGH","THROW","TICKET","TIME","TITLE","TODAY","TOGETHER","TOMORROW","TONE","TONIGHT","TOTAL","TOTALLY","TOUCH","TOUR","TOWARDS","TOWN","TRADE","TRADITION","TRAFFIC","TRAIN","TRAINING","TRANSFER","TRANSPORT","TRAVEL","TREAT","TREATMENT","TREATY","TREE","TREND","TRIAL","TRIP","TROOP","TROUBLE","TRUE","TRUST","TRUTH","TWENTY","TWICE","TYPE","UNDER","UNDERSTAND","UNION","UNIQUE","UNIT","UNITED","UNIVERSITY","UNLESS","UNLIKE","UNTIL","UPON","UPPER","URBAN","USER","USUAL","USUALLY","VALLEY","VALUE","VARIETY","VARIOUS","VEHICLE","VERSION","VERY","VIDEO","VIEW","VILLAGE","VIOLENCE","VISION","VISIT","VISITOR","VOICE","VOLUME","VOTE","WAIT","WALK","WALL","WANT","WAR","WATCH","WATER","WAY","WEALTH","WEAPON","WEAR","WEATHER","WEEK","WEEKEND","WEIGHT","WELCOME","WELL","WESTERN","WHAT","WHATEVER","WHEN","WHERE","WHETHER","WHICH","WHILE","WHITE","WHOLE","WHOM","WHOSE","WIDE","WIDELY","WIFE","WILD","WILL","WINDOW","WINE","WINTER","WISH","WITHIN","WITHOUT","WOMAN","WONDER","WOOD","WORD","WORK","WORKER","WORLD","WORRY","WORTH","WOULD","WRITE","WRITER","WRONG","YARD","YEAR","YOUNG","YOURSELF","YOUTH"];
+        const prizeEmojis = [
+            { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: '💣', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: '💰', value: 1000000, type: 'cash_money' }
+        ];
+        const puzzleLayouts = [
+            { length: 5, indices: [11, 12, 13, 14, 15] }, { length: 7, indices: [28, 29, 30, 31, 32, 33, 34] }, { length: 7, indices: [46, 47, 48, 49, 50, 51, 52] }, { length: 5, indices: [65, 66, 67, 68, 69] }
+        ];
+        
+        /**
+         * Generates the four word puzzles for the current level.
+         * It ensures no duplicate words are used.
+         */
+        function generatePuzzlesForLevel() {
+            puzzles = [];
+            let availableWords = [...wordBank];
+            puzzleLayouts.forEach(layout => {
+                const wordsOfLength = availableWords.filter(w => w.length === layout.length);
+                if (wordsOfLength.length > 0) {
+                    const word = wordsOfLength[Math.floor(Math.random() * wordsOfLength.length)];
+                    puzzles.push({ word: word, indices: layout.indices, solved: false });
+                    availableWords = availableWords.filter(w => w !== word); 
+                }
+            });
+        }
+        
+        /**
+         * Sets up the game for a new level.
+         * Resets level-specific variables and initializes the grid.
+         */
+        function startLevel() {
+            document.getElementById('level-display').textContent = currentLevel;
+            trophyCollectedThisLevel = false;
+            diamondCollectedThisLevel = false;
+            solveButtonClicks = 0;
+            timeSinceLastSolve = 0;
+            clearTimeout(diamondSequenceTimeout);
+            clearTimeout(thawTimeout);
+            const iconsContainer = document.getElementById('greed-icons-container');
+            iconsContainer.innerHTML = '';
+            generatePuzzlesForLevel();
+            initializeGrid();
+        }
+
+        /**
+         * Creates the game grid, placing puzzle tiles, the jackpot square, and empty tiles.
+         */
+        function initializeGrid() {
+            gridContainer.innerHTML = '';
+            puzzles.forEach(p => p.scrambled = shuffleWord(p.word));
+            const allPuzzleIndices = puzzles.flatMap(p => p.indices);
+
+            for (let i = 0; i < 81; i++) {
+                const tile = document.createElement('div');
+                tile.classList.add('w-10', 'h-10', 'md:w-11', 'md:h-11', 'flex', 'items-center', 'justify-center', 'text-2xl', 'font-bold', 'rounded-lg', 'select-none');
+                tile.id = `tile-${i}`;
+
+                if (allPuzzleIndices.includes(i)) {
+                    // This is a puzzle tile
+                    for (const puzzle of puzzles) {
+                        if (puzzle.indices.includes(i)) {
+                            const letterIndex = puzzle.indices.indexOf(i);
+                            tile.textContent = puzzle.scrambled[letterIndex];
+                            tile.classList.add('word-puzzle-tile');
+                            tile.dataset.puzzleIndex = puzzles.indexOf(puzzle);
+                            tile.draggable = true;
+                            addDragListeners(tile);
+                            break;
+                        }
+                    }
+                } else if (i === 40) {
+                    // This is the central jackpot square
+                    tile.id = 'jackpot-square';
+                    tile.classList.add('bg-amber-500', 'border-2', 'border-amber-300', 'text-4xl');
+                    tile.textContent = '💰';
+                    tile.addEventListener('click', onJackpotClick);
+                } else {
+                    // This is a standard empty tile
+                    tile.classList.add('bg-slate-900/50', 'border', 'border-slate-800/50');
+                }
+                gridContainer.appendChild(tile);
+            }
+        }
+
+        /**
+         * Shuffles the letters of a word using the Fisher-Yates algorithm.
+         * @param {string} word - The word to shuffle.
+         * @returns {string} The shuffled word.
+         */
+        function shuffleWord(word) {
+            let array = word.split('');
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            let shuffled = array.join('');
+            // Ensure the shuffled word isn't the same as the original
+            return shuffled === word ? shuffleWord(word) : shuffled;
+        }
+
+        /**
+         * Adds necessary drag-and-drop event listeners to a puzzle tile.
+         * @param {HTMLElement} tile - The tile element.
+         */
+        function addDragListeners(tile) {
+            tile.addEventListener('dragstart', handleDragStart);
+            tile.addEventListener('dragover', handleDragOver);
+            tile.addEventListener('drop', handleDrop);
+            tile.addEventListener('dragend', handleDragEnd);
+        }
+
+        function handleDragStart(e) {
+            if (timeRemaining <= 0) return;
+            draggedTile = e.target;
+            setTimeout(() => e.target.classList.add('dragging'), 0);
+
+            if (draggedTile.dataset.prizeType === 'green_bomb') {
+                isDraggingBomb = true;
+                document.getElementById('bomb-drag-preview').style.display = 'block';
+            }
+        }
+
+        function handleDragOver(e) { 
+            e.preventDefault(); 
+            if (isDraggingBomb) {
+                const targetTile = e.target.closest('#game-grid > div');
+                if (targetTile) {
+                    const preview = document.getElementById('bomb-drag-preview');
+                    const rect = targetTile.getBoundingClientRect();
+                    const gridRect = gridContainer.getBoundingClientRect();
+                    const size = rect.width;
+
+                    preview.style.width = `${size * 3}px`;
+                    preview.style.height = `${size * 3}px`;
+                    preview.style.left = `${rect.left - gridRect.left - size}px`;
+                    preview.style.top = `${rect.top - gridRect.top - size}px`;
+                }
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const dropTarget = e.target.closest('#game-grid > div');
+            if (!dropTarget) return;
+
+            if (isDraggingBomb && draggedTile) {
+                startGreenBombSequence(dropTarget);
+                draggedTile.textContent = '';
+                draggedTile.classList.remove('prize-tile', 'green-bomb');
+                draggedTile.draggable = false;
+            }
+            else if (dropTarget.classList.contains('word-puzzle-tile') && 
+                draggedTile && draggedTile.classList.contains('word-puzzle-tile') &&
+                dropTarget.dataset.puzzleIndex === draggedTile.dataset.puzzleIndex &&
+                draggedTile !== dropTarget && !dropTarget.classList.contains('solved')) {
+                // Swap the letters
+                const tempText = draggedTile.textContent;
+                draggedTile.textContent = dropTarget.textContent;
+                dropTarget.textContent = tempText;
+                checkAllPuzzles();
+            }
+        }
+        
+        function handleDragEnd(e) { 
+            e.target.classList.remove('dragging'); 
+            if (isDraggingBomb) {
+                isDraggingBomb = false;
+                document.getElementById('bomb-drag-preview').style.display = 'none';
+            }
+            draggedTile = null;
+        }
+
+        /**
+         * Checks all puzzles on the board to see if they are solved.
+         * Awards points and handles level completion.
+         */
+        function checkAllPuzzles() {
+            let allWordsOnBoardAreSolved = true;
+            puzzles.forEach((puzzle) => {
+                if (!puzzle.solved) {
+                    let currentWord = '';
+                    puzzle.indices.forEach(index => { currentWord += document.getElementById(`tile-${index}`).textContent; });
+
+                    if (currentWord === puzzle.word) {
+                        puzzle.solved = true;
+                        timeSinceLastSolve = 0; // Reset decay timer
+                        coins += 10000;
+                        updateScoreDisplay();
+                        flashScore('gain');
+                        const middleTileIndex = puzzle.indices[Math.floor(puzzle.indices.length / 2)];
+                        const startTile = document.getElementById(`tile-${middleTileIndex}`);
+                        if (!isFrozen) {
+                            triggerCoinAnimation(startTile, document.getElementById('coins-display'));
+                        }
+                        // Mark tiles as solved
+                        puzzle.indices.forEach(index => {
+                            const tile = document.getElementById(`tile-${index}`);
+                            tile.classList.add('solved');
+                            tile.draggable = false;
+                        });
+                    } else {
+                        allWordsOnBoardAreSolved = false;
+                    }
+                }
+            });
+
+            if (allWordsOnBoardAreSolved && puzzles.length > 0) {
+                if (isFrozen) endFreeze();
+                coins += 100000; // Level completion bonus
+                updateScoreDisplay();
+                flashScore('gain');
+                showEventText("Level Up!");
+                flashLevelPanel();
+                currentLevel++;
+                setTimeout(() => startLevel(), 1500);
+            }
+        }
+
+        /**
+         * Updates the coin and bags of money displays.
+         */
+        function updateScoreDisplay() {
+            bagsOfMoney = Math.floor(currentLevel * (Math.floor(coins / 1000) / 10));
+            const coinsDisplay = document.getElementById('coins-display');
+            coinsDisplay.textContent = coins.toLocaleString();
+            document.getElementById('bags-of-money-display').textContent = bagsOfMoney.toLocaleString();
+            coinsDisplay.classList.remove('score-decay');
+        }
+
+        /**
+         * Flashes the score display to indicate a change.
+         * @param {string} type - 'gain' or 'deduct'.
+         */
+        function flashScore(type = 'gain') {
+            const coinsDisplay = document.getElementById('coins-display');
+            const flashClass = type === 'gain' ? 'gain-flash' : 'deduct-flash';
+            coinsDisplay.classList.remove('gain-flash', 'deduct-flash');
+            void coinsDisplay.offsetWidth; // Trigger reflow
+            coinsDisplay.classList.add(flashClass);
+            setTimeout(() => { coinsDisplay.classList.remove(flashClass); }, 800);
+        }
+
+        function flashBagsPanel() {
+            const bagsDisplay = document.getElementById('bags-of-money-display');
+            bagsDisplay.classList.add('deduct-flash');
+            setTimeout(() => { bagsDisplay.classList.remove('deduct-flash'); }, 1200);
+        }
+
+        function flashLevelPanel() {
+            const levelDisplay = document.getElementById('level-display');
+            levelDisplay.classList.add('level-flash');
+            setTimeout(() => { levelDisplay.classList.remove('level-flash'); }, 1500);
+        }
+        
+        /**
+         * Main game timer loop. Also triggers timed events.
+         */
+        function updateTimer() {
+            if (timeRemaining > 0 && !isGamePaused) {
+                timeRemaining--;
+                timeSinceLastSolve++;
+                const minutes = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+                const seconds = (timeRemaining % 60).toString().padStart(2, '0');
+                document.getElementById('timer-display').textContent = `${minutes}:${seconds}`;
+
+                // Timed events
+                if (timeRemaining === 580 && !specialCashEmojiSpawned) {
+                    specialCashEmojiSpawned = true;
+                    spawnSpecialCashEmoji();
+                }
+                if (timeRemaining === 360 && impEvents.sixMin) {
+                    impEvents.sixMin = false;
+                    spawnImp();
+                }
+                if (timeRemaining === 180 && impEvents.threeMin) {
+                    impEvents.threeMin = false;
+                    spawnImp();
+                }
+                if (timeRemaining === 300 && jackpotEventAvailable) {
+                    jackpotEventAvailable = false;
+                    activateSpecialJackpot();
+                }
+            } else if (timeRemaining <= 0) {
+                endGame();
+            }
+        }
+        
+        /**
+         * Activates the special 50M coin jackpot event for a limited time.
+         */
+        function activateSpecialJackpot() {
+            const jackpotSquare = document.getElementById('jackpot-square');
+            jackpotSquare.classList.add('wild-pulse');
+            const specialJackpotHandler = () => {
+                coins += 50000000;
+                updateScoreDisplay();
+                flashScore('gain');
+                showEventText('💰 50,000,000 💰');
+                
+                jackpotSquare.classList.remove('wild-pulse');
+                clearTimeout(specialJackpotTimeout);
+                jackpotSquare.removeEventListener('click', specialJackpotHandler);
+            };
+            jackpotSquare.addEventListener('click', specialJackpotHandler);
+
+            // Event expires after 15 seconds
+            specialJackpotTimeout = setTimeout(() => {
+                jackpotSquare.classList.remove('wild-pulse');
+                jackpotSquare.removeEventListener('click', specialJackpotHandler);
+            }, 15000);
+        }
+
+        /**
+         * Creates a flying coin animation from a start to an end element.
+         * @param {HTMLElement} startElement - The element to start from.
+         * @param {HTMLElement} endElement - The element to fly to.
+         */
+        function triggerCoinAnimation(startElement, endElement) {
+            const startRect = startElement.getBoundingClientRect();
+            const endRect = endElement.getBoundingClientRect();
+            const startX = startRect.left + startRect.width / 2;
+            const startY = startRect.top + startRect.height / 2;
+            const endX = endRect.left + endRect.width / 2;
+            const endY = endRect.top + endRect.height / 2;
+            const controlX = startX + (endX - startX) / 2;
+            const controlY = startY - 100; // Arc upwards
+            const curve = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
+
+            for (let i = 0; i < 15; i++) {
+                const coin = document.createElement('div');
+                coin.classList.add('coin');
+                coin.style.animation = `fly-along-path 0.8s cubic-bezier(0.4, 0, 0.9, 0.5) forwards`;
+                coin.style.offsetPath = `path('${curve}')`;
+                coin.style.animationDelay = `${Math.random() * 0.3}s`;
+                document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 1100);
+            }
+        }
+
+        function triggerBigCoinAnimation(startElement, endElement) {
+            const startRect = startElement.getBoundingClientRect();
+            const endRect = endElement.getBoundingClientRect();
+            const startX = startRect.left + startRect.width / 2;
+            const startY = startRect.top + startRect.height / 2;
+            const endX = endRect.left + endRect.width / 2;
+            const endY = endRect.top + endRect.height / 2;
+            const controlX = startX + (endX - startX) / 2;
+            const controlY = startY - 100;
+            const curve = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
+            
+            const coin = document.createElement('div');
+            coin.classList.add('coin');
+            coin.style.animation = `big-coin-tumble 0.8s ease-out forwards, fly-along-path 0.8s ease-out forwards`;
+            coin.style.offsetPath = `path('${curve}')`;
+            document.body.appendChild(coin);
+            setTimeout(() => coin.remove(), 800);
+        }
+
+        /**
+         * Creates a coin implosion effect at a specific element.
+         * @param {HTMLElement} originElement - The element where the implosion occurs.
+         */
+        function triggerCoinImplosion(originElement) {
+            const originRect = originElement.getBoundingClientRect();
+            const endRect = document.getElementById('coins-display').getBoundingClientRect();
+            const centerX = originRect.left + originRect.width / 2;
+            const centerY = originRect.top + originRect.height / 2;
+            const endX = endRect.left + endRect.width / 2;
+            const endY = endRect.top + endRect.height / 2;
+            const startRadius = 100;
+
+            for (let i = 0; i < 20; i++) {
+                const coin = document.createElement('div');
+                coin.classList.add('coin');
+                const angle = (i / 20) * (2 * Math.PI);
+                const startX = centerX + Math.cos(angle) * startRadius;
+                const startY = centerY + Math.sin(angle) * startRadius;
+                const controlX = startX + (endX - startX) / 2 + (Math.random() - 0.5) * 200;
+                const controlY = startY + (endY - startY) / 2 + (Math.random() - 0.5) * 200;
+                const curve = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
+
+                coin.style.offsetPath = `path('${curve}')`;
+                coin.style.animation = `coin-swirl-in 1s cubic-bezier(0.5, 0, 0.9, 0.5) forwards`;
+                coin.style.animationDelay = `${Math.random() * 0.3}s`;
+                document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 1300);
+            }
+        }
+
+        /**
+         * Handles the click of the "Solve Word" button.
+         */
+        function onSolveButtonClick() {
+            if (timeRemaining <= 0 || solveButtonCooldown > 0) return;
+            const unsolvedPuzzles = puzzles.filter(p => !p.solved);
+            if (unsolvedPuzzles.length === 0) return;
+
+            solveButtonClicks++;
+            triggerCoinImplosion(document.getElementById('solve-button'));
+            coins -= 200000;
+            updateScoreDisplay();
+            flashScore('deduct');
+
+            // Solve a random unsolved puzzle
+            const puzzleToSolve = unsolvedPuzzles[Math.floor(Math.random() * unsolvedPuzzles.length)];
+            puzzleToSolve.indices.forEach((tileIndex, letterIndex) => {
+                document.getElementById(`tile-${tileIndex}`).textContent = puzzleToSolve.word[letterIndex];
+            });
+            checkAllPuzzles();
+
+            if (solveButtonClicks >= 4) {
+                startSolveButtonCooldown();
+            }
+        }
+
+        /**
+         * Starts the 60-second cooldown for the solve button.
+         */
+        function startSolveButtonCooldown() {
+            solveButtonCooldown = 60;
+            const solveButton = document.getElementById('solve-button');
+            solveButton.disabled = true;
+            solveButton.classList.remove('text-3xl');
+            solveButton.classList.add('cooldown-timer');
+            
+            solveButtonTimerInterval = setInterval(() => {
+                if (solveButtonCooldown > 0) {
+                    solveButtonCooldown--;
+                    solveButton.textContent = `0:${solveButtonCooldown.toString().padStart(2, '0')}`;
+                } else {
+                    clearInterval(solveButtonTimerInterval);
+                    solveButton.textContent = '✅';
+                    solveButton.classList.remove('cooldown-timer');
+                    solveButton.classList.add('text-3xl');
+                    solveButton.disabled = false;
+                    solveButtonClicks = 0;
+                }
+            }, 1000);
+        }
+
+        let GJACKVARNUM = 0;
+        /**
+         * Handles clicks on the central jackpot square.
+         * @param {Event} event - The click event.
+         */
+        function onJackpotClick(event) {
+            timeSinceLastSolve = 0; 
+            
+            const jackpotSquare = event.currentTarget;
+            if (jackpotSquare.classList.contains('cooldown')) return;
+
+            GJACKVARNUM++; 
+            // document.getElementById('gjackvarnum-display').textContent = `GJACKVARNUM: ${GJACKVARNUM}`; 
+
+            coins += 50000; 
+            updateScoreDisplay();
+            flashScore('gain');
+            triggerCoinAnimation(jackpotSquare, document.getElementById('coins-display'));
+
+            if (GJACKVARNUM >= 4) {
+                showEventText("Yep! You're Greedy!");
+                GJACKVARNUM = 0; 
+                // document.getElementById('gjackvarnum-display').textContent = `GJACKVARNUM: ${GJACKVARNUM}`; 
+                
+                jackpotSquare.classList.add('cooldown');
+                setTimeout(() => {
+                    jackpotSquare.classList.remove('cooldown');
+                }, 2000);
+            }
+        }
+
+        function reinitializeJackpotSquare(square) {
+            square.textContent = '💰';
+            square.style.backgroundColor = '';
+            square.classList.remove('cooldown');
+        }
+
+        /**
+         * Schedules the next prize to spawn on the grid with a dynamic delay.
+         */
+        function scheduleNextPrizeSpawn() {
+            if (timeRemaining <= 0 || isGamePaused || isFrozen || isSpecialAnimationActive) return;
+            const timeElapsed = totalGameTime - timeRemaining;
+            const progress = timeElapsed / totalGameTime;
+            const maxDelay = 2500;
+            const minDelay = 100;
+            // Spawning speeds up as the game progresses
+            const currentDelay = minDelay + (maxDelay - minDelay) * Math.pow(1 - progress, 3);
+
+            prizeSpawnerTimeout = setTimeout(() => {
+                spawnPrizeEmoji();
+                scheduleNextPrizeSpawn();
+            }, currentDelay);
+        }
+
+        /**
+         * Spawns a random prize emoji on an empty tile.
+         */
+        function spawnPrizeEmoji() {
+            if (timeRemaining <= 0 || isGamePaused || isFrozen) return;
+
+            const allPuzzleIndices = puzzles.flatMap(p => p.indices);
+            const emptyTiles = [];
+            for(let i=0; i<81; i++) {
+                if (!allPuzzleIndices.includes(i) && i !== 40) {
+                    const tile = document.getElementById(`tile-${i}`);
+                    if (!tile.textContent) {
+                        emptyTiles.push(tile);
+                    }
+                }
+            }
+
+            if (emptyTiles.length === 0) return;
+
+            const tile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
+            
+            // Modify prize pool for the first 20 seconds to be safer
+            let prizePool = prizeEmojis.filter(p => p.type !== 'cash_money'); // Exclude special emoji from random pool
+            if (timeRemaining > 580) {
+                prizePool = prizePool.filter(p => p.type !== 'freeze' && p.type !== 'game_over' && p.type !== 'green_bomb');
+            }
+
+            const prize = prizePool[Math.floor(Math.random() * prizePool.length)];
+            tile.textContent = prize.emoji;
+            tile.dataset.prizeValue = prize.value;
+            tile.dataset.prizeType = prize.type;
+            tile.classList.add('prize-tile');
+
+            if (prize.type === 'game_over') tile.classList.add('red-bomb');
+            else if (prize.type === 'green_bomb') {
+                tile.classList.add('green-bomb');
+                tile.draggable = true;
+                addDragListeners(tile);
+            }
+            else if (prize.type === 'fire_column') tile.classList.add('fire-bomb');
+            
+            const clickHandler = () => {
+                if (tile.dataset.prizeType === 'game_over') { endGame(true); } 
+                else if (tile.dataset.prizeType === 'diamond') { startDiamondSequence(tile); } 
+                else if (tile.dataset.prizeType === 'green_bomb') { startGreenBombSequence(tile); }
+                else if (tile.dataset.prizeType === 'fire_column') { startFireColumnSequence(tile); }
+                else if (tile.dataset.prizeType === 'freeze') { startFreezeSequence(); }
+                else if (tile.dataset.prizeType === 'lightning') {
+                    bagsOfMoney = 0;
+                    coins += parseInt(tile.dataset.prizeValue);
+                    updateScoreDisplay();
+                    flashBagsPanel();
+                    triggerCoinAnimation(tile, document.getElementById('coins-display'));
+                }
+                else {
+                    coins += parseInt(tile.dataset.prizeValue);
+                    updateScoreDisplay();
+                    flashScore('gain');
+                    triggerCoinAnimation(tile, document.getElementById('coins-display'));
+                    if (tile.dataset.prizeType === 'trophy' && !trophyCollectedThisLevel) {
+                        trophyCollectedThisLevel = true;
+                        updateGreedPanelWithTrophy();
+                        showEventText("Oh Yeah!");
+                    }
+                }
+                tile.textContent = '';
+                tile.classList.remove('prize-tile', 'red-bomb', 'green-bomb', 'fire-bomb', 'cash-money-prize');
+            };
+
+            const despawnTimer = setTimeout(() => {
+                tile.textContent = '';
+                tile.classList.remove('prize-tile', 'red-bomb', 'green-bomb', 'fire-bomb', 'cash-money-prize');
+                tile.removeEventListener('click', clickHandler, { once: true });
+            }, 5000);
+
+            tile.addEventListener('click', () => {
+                clearTimeout(despawnTimer);
+                clickHandler();
+            }, { once: true });
+        }
+
+        /**
+         * Spawns the special cash money emoji.
+         */
+        function spawnSpecialCashEmoji() {
+             if (isGamePaused || isGameOver || isFrozen) return;
+            const allPuzzleIndices = puzzles.flatMap(p => p.indices);
+            const emptyTiles = [];
+            for(let i=0; i<81; i++) {
+                if (!allPuzzleIndices.includes(i) && i !== 40) {
+                    const tile = document.getElementById(`tile-${i}`);
+                    if (!tile.textContent) emptyTiles.push(tile);
+                }
+            }
+            if (emptyTiles.length === 0) return;
+
+            const tile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
+            const prize = prizeEmojis.find(p => p.type === 'cash_money');
+            tile.textContent = prize.emoji;
+            tile.dataset.prizeValue = prize.value;
+            tile.dataset.prizeType = prize.type;
+            tile.classList.add('prize-tile', 'cash-money-prize');
+            
+            const clickHandler = () => {
+                coins += parseInt(tile.dataset.prizeValue);
+                updateScoreDisplay();
+                flashScore('gain');
+                showEventText('💰 1,000,000 💰', true);
+                tile.textContent = '';
+                tile.classList.remove('prize-tile', 'cash-money-prize');
+            };
+            tile.addEventListener('click', clickHandler, { once: true });
+        }
+
+        // Sound effect for the imp
+        const evilLaugh = new Tone.Synth({
+            oscillator: { type: 'sawtooth' },
+            envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.5 },
+            volume: -10
+        }).toDestination();
+
+        /**
+         * Spawns an Imp that resets the player's coins if clicked.
+         */
+        function spawnImp() {
+            if (isGamePaused || isGameOver || isFrozen) return;
+            const allPuzzleIndices = puzzles.flatMap(p => p.indices);
+            const emptyTiles = [];
+            for(let i=0; i<81; i++) {
+                if (!allPuzzleIndices.includes(i) && i !== 40) {
+                    const tile = document.getElementById(`tile-${i}`);
+                    if (!tile.textContent) emptyTiles.push(tile);
+                }
+            }
+            if (emptyTiles.length === 0) return;
+
+            const tile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
+            tile.innerHTML = `<div class="w-full h-full flex items-center justify-center prize-tile red-bomb">😈</div>`;
+            const impElement = tile.firstChild;
+
+            const clickHandler = () => {
+                Tone.start(); // Required for audio context
+                evilLaugh.triggerAttackRelease("C2", "8n");
+                setTimeout(() => evilLaugh.triggerAttackRelease("G2", "8n"), 150);
+                
+                coins = 0;
+                updateScoreDisplay();
+                showEventText("Ha ha!");
+                tile.innerHTML = '';
+                tile.classList.remove('prize-tile', 'red-bomb');
+                clearTimeout(despawnTimer);
+            };
+
+            const despawnTimer = setTimeout(() => {
+                tile.innerHTML = '';
+                tile.classList.remove('prize-tile', 'red-bomb');
+                impElement.removeEventListener('click', clickHandler, { once: true });
+            }, 10000); // Imp stays for 10 seconds
+
+            impElement.addEventListener('click', clickHandler, { once: true });
+        }
+
+        function updateGreedPanelWithTrophy() {
+            const iconsContainer = document.getElementById('greed-icons-container');
+            const trophyElement = document.createElement('div');
+            trophyElement.classList.add('greed-icon');
+            trophyElement.textContent = '🏆';
+            trophyElement.addEventListener('click', () => {
+                showEventText("You're so greedy!");
+            });
+            iconsContainer.appendChild(trophyElement);
+        }
+        
+        function updateGreedPanelWithDiamond() {
+            if (diamondCollectedThisLevel) return;
+            diamondCollectedThisLevel = true;
+            const iconsContainer = document.getElementById('greed-icons-container');
+            const diamondElement = document.createElement('div');
+            diamondElement.classList.add('greed-icon');
+            diamondElement.textContent = '💎';
+            diamondElement.addEventListener('click', () => {
+                showEventText("You're so greedy!");
+            });
+            iconsContainer.appendChild(diamondElement);
+        }
+
+        /**
+         * Shows a large text event in the center of the screen.
+         * @param {string} text - The text to display.
+         */
+        function showEventText(text, greenGlow = false) {
+            const eventTextContainer = document.getElementById('event-text-container');
+            const eventText = document.getElementById('event-text');
+            eventText.textContent = text;
+            eventText.classList.toggle('green-glow', greenGlow);
+            
+            eventTextContainer.classList.remove('hidden');
+            setTimeout(() => {
+                eventTextContainer.classList.add('hidden');
+                eventText.classList.remove('green-glow');
+            }, 2000);
+        }
+
+        /**
+         * Initiates the diamond collection sequence: clears the board and triggers a vortex animation.
+         * @param {HTMLElement} clickedTile - The diamond tile that was clicked.
+         */
+        function startDiamondSequence(clickedTile) {
+            isSpecialAnimationActive = true; // Pause prize spawning
+            coins += currentDiamondValue;
+            updateScoreDisplay();
+            flashScore('gain');
+            showEventText("You're Greedy!");
+            currentDiamondValue = Math.floor(currentDiamondValue / 2);
+            updateGreedPanelWithDiamond();
+
+            // Clear other prizes
+            document.querySelectorAll('.prize-tile').forEach(t => {
+                if (t !== clickedTile) { 
+                    t.textContent = ''; 
+                    t.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
+                }
+            });
+
+            // Fill empty tiles with temporary diamonds for the animation
+            const allPuzzleIndices = puzzles.flatMap(p => p.indices);
+            const diamondTiles = [];
+            for(let i=0; i<81; i++) {
+                if (!allPuzzleIndices.includes(i) && i !== 40) {
+                    const tile = document.getElementById(`tile-${i}`);
+                    if(tile) {
+                        tile.textContent = '💎';
+                        tile.classList.add('temp-diamond');
+                        diamondTiles.push(tile);
+                    }
+                }
+            }
+
+            diamondSequenceTimeout = setTimeout(() => {
+                triggerVortexAnimation(diamondTiles);
+            }, 2000);
+        }
+
+        /**
+         * Creates a vortex animation, pulling all diamonds to the center.
+         * @param {HTMLElement[]} diamondTiles - An array of the temporary diamond tiles.
+         */
+        function triggerVortexAnimation(diamondTiles) {
+            const vortexCenterEl = document.getElementById('jackpot-square');
+            if (!vortexCenterEl) return;
+            const vortexCenter = vortexCenterEl.getBoundingClientRect();
+            const endX = vortexCenter.left + vortexCenter.width / 2;
+            const endY = vortexCenter.top + vortexCenter.height / 2;
+
+            diamondTiles.forEach(tile => {
+                if (!tile || !document.body.contains(tile)) return;
+                const startRect = tile.getBoundingClientRect();
+                const startX = startRect.left;
+                const startY = startRect.top;
+
+                const flyingDiamond = document.createElement('div');
+                flyingDiamond.textContent = '💎';
+                flyingDiamond.classList.add('temp-diamond');
+                flyingDiamond.style.position = 'absolute';
+                flyingDiamond.style.left = `${startX}px`;
+                flyingDiamond.style.top = `${startY}px`;
+                flyingDiamond.style.zIndex = '200';
+                flyingDiamond.style.setProperty('--start-x', `0px`);
+                flyingDiamond.style.setProperty('--start-y', `0px`);
+                flyingDiamond.style.setProperty('--end-x', `${endX - startX}px`);
+                flyingDiamond.style.setProperty('--end-y', `${endY - startY}px`);
+                flyingDiamond.style.animation = `diamond-vortex 1s ease-in forwards`;
+                document.body.appendChild(flyingDiamond);
+
+                // Reset the grid tile underneath
+                tile.textContent = '';
+                tile.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
+                setTimeout(() => { flyingDiamond.remove(); }, 1000);
+            });
+
+            // Resume game logic after the animation
+            setTimeout(() => {
+                 isSpecialAnimationActive = false;
+                 scheduleNextPrizeSpawn();
+            }, 1500);
+        }
+        
+        /**
+         * Gets the indices of all tiles adjacent to a given index.
+         * @param {number} index - The center tile index (0-80).
+         * @returns {number[]} An array of adjacent indices.
+         */
+        function getAdjacentIndices(index) {
+            const indices = [];
+            const row = Math.floor(index / 9);
+            const col = index % 9;
+            for (let r = -1; r <= 1; r++) {
+                for (let c = -1; c <= 1; c++) {
+                    const newRow = row + r;
+                    const newCol = col + c;
+                    if (newRow >= 0 && newRow < 9 && newCol >= 0 && newCol < 9) {
+                        indices.push(newRow * 9 + newCol);
+                    }
+                }
+            }
+            return indices;
+        }
+
+        /**
+         * Handles the green bomb effect: solves adjacent letters and collects adjacent prizes.
+         * @param {HTMLElement} bombTile - The green bomb tile that was clicked.
+         */
+        function startGreenBombSequence(bombTile) {
+            const bombIndex = parseInt(bombTile.id.split('-')[1]);
+            const adjacentIndices = getAdjacentIndices(bombIndex);
+            
+            adjacentIndices.forEach(index => {
+                const adjTile = document.getElementById(`tile-${index}`);
+                if (adjTile && adjTile.classList.contains('prize-tile')) {
+                    // Collect prize
+                    const prizeValue = parseInt(adjTile.dataset.prizeValue) || 0;
+                    coins += prizeValue;
+                    triggerCoinAnimation(adjTile, document.getElementById('coins-display'));
+                    adjTile.textContent = '';
+                    adjTile.classList.remove('prize-tile', 'red-bomb', 'green-bomb');
+                } else if (adjTile && adjTile.classList.contains('word-puzzle-tile') && !adjTile.classList.contains('solved')) {
+                    // Solve letter
+                    const puzzleIndex = parseInt(adjTile.dataset.puzzleIndex);
+                    const puzzle = puzzles[puzzleIndex];
+                    const letterIndex = puzzle.indices.indexOf(index);
+                    const correctLetter = puzzle.word[letterIndex];
+                    
+                    // Find where the correct letter currently is and swap with it
+                    for (const i of puzzle.indices) {
+                        const sourceTile = document.getElementById(`tile-${i}`);
+                        if (sourceTile && sourceTile.textContent === correctLetter) {
+                            const tempText = adjTile.textContent;
+                            adjTile.textContent = sourceTile.textContent;
+                            sourceTile.textContent = tempText;
+                            break;
+                        }
+                    }
+                    coins += 1; // Small bonus for the help
+                    triggerBigCoinAnimation(adjTile, document.getElementById('coins-display'));
+                }
+            });
+
+            setTimeout(() => {
+                updateScoreDisplay();
+                checkAllPuzzles();
+            }, 100);
+        }
+
+        /**
+         * Handles the fire column effect: solves all letters in the column.
+         * @param {HTMLElement} fireTile - The fire tile that was clicked.
+         */
+        function startFireColumnSequence(fireTile) {
+            const fireIndex = parseInt(fireTile.id.split('-')[1]);
+            const column = fireIndex % 9;
+
+            for (let i = column; i < 81; i += 9) {
+                const tileInColumn = document.getElementById(`tile-${i}`);
+                if (tileInColumn) {
+                    if (tileInColumn.classList.contains('prize-tile')) {
+                        // Clear prize
+                        tileInColumn.textContent = '';
+                        tileInColumn.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
+                    } else if (tileInColumn.classList.contains('word-puzzle-tile') && !tileInColumn.classList.contains('solved')) {
+                        // Solve letter
+                        const puzzleIndex = parseInt(tileInColumn.dataset.puzzleIndex);
+                        const puzzle = puzzles[puzzleIndex];
+                        const letterIndex = puzzle.indices.indexOf(i);
+                        const correctLetter = puzzle.word[letterIndex];
+                        if (tileInColumn.textContent !== correctLetter) {
+                            for (const sourceIndex of puzzle.indices) {
+                                const sourceTile = document.getElementById(`tile-${sourceIndex}`);
+                                if (sourceTile && sourceTile.textContent === correctLetter) {
+                                    const tempText = tileInColumn.textContent;
+                                    tileInColumn.textContent = sourceTile.textContent;
+                                    sourceTile.textContent = tempText;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            coins += 400;
+            updateScoreDisplay();
+            flashScore('gain');
+            checkAllPuzzles();
+        }
+
+        /**
+         * Ends the game, stops all timers and spawners, and shows the game over modal.
+         * @param {boolean} [isBomb=false] - Whether the game ended due to a bomb.
+         */
+        function endGame(isBomb = false) {
+            isGameOver = true;
+            clearInterval(mainTimerInterval);
+            clearTimeout(prizeSpawnerTimeout);
+            clearTimeout(diamondSequenceTimeout);
+            clearInterval(scoreDecayInterval);
+            clearTimeout(impTimeout);
+            clearTimeout(thawTimeout);
+            timeRemaining = 0;
+            document.getElementById('timer-display').textContent = "00:00";
+            triggerSwirlAnimation();
+            setTimeout(showGameOverModal, 1500);
+        }
+
+        /**
+         * Creates a swirl animation that pulls all grid elements to the center on game over.
+         */
+        function triggerSwirlAnimation() {
+            const elementsToSwirl = document.querySelectorAll('#game-grid > div');
+            const vortexCenterEl = document.getElementById('jackpot-square');
+            if (!vortexCenterEl) return;
+            const vortexCenter = vortexCenterEl.getBoundingClientRect();
+            const endX = vortexCenter.left + vortexCenter.width / 2;
+            const endY = vortexCenter.top + vortexCenter.height / 2;
+
+            elementsToSwirl.forEach(el => {
+                if (el.textContent) {
+                    const startRect = el.getBoundingClientRect();
+                    const startX = startRect.left;
+                    const startY = startRect.top;
+                    const flyingEl = el.cloneNode(true);
+                    flyingEl.style.position = 'absolute';
+                    flyingEl.style.left = `${startX}px`;
+                    flyingEl.style.top = `${startY}px`;
+                    flyingEl.style.zIndex = '200';
+                    flyingEl.style.margin = '0';
+                    flyingEl.style.setProperty('--start-x', `0px`);
+                    flyingEl.style.setProperty('--start-y', `0px`);
+                    flyingEl.style.setProperty('--end-x', `${endX - startX}px`);
+                    flyingEl.style.setProperty('--end-y', `${endY - startY}px`);
+                    flyingEl.style.animation = `game-over-swirl 1.5s ease-in forwards`;
+                    document.body.appendChild(flyingEl);
+                    el.textContent = '';
+                    el.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
+                }
+            });
+        }
+
+        function showGameOverModal() {
+            displayLeaderboard();
+            document.getElementById('game-over-modal').classList.remove('hidden');
+        }
+        
+        /**
+         * Displays the final leaderboard with the player's score.
+         */
+        function displayLeaderboard() {
+            const fakeScores = [
+                { name: 'Olivia', score: 234000000 },
+                { name: 'James', score: 42000000 },
+                { name: 'Sophia', score: 35000000 },
+                { name: 'Liam', score: 28000000 },
+            ];
+            
+            const allScores = [...fakeScores, { name: 'You', score: coins }];
+            allScores.sort((a, b) => b.score - a.score);
+            const top5 = allScores.slice(0, 5);
+            const container = document.getElementById('leaderboard-container');
+            container.innerHTML = `
+                <h3 class="text-2xl font-bold text-amber-300 mb-4">Top 5 Players</h3>
+                <ol class="text-left w-full space-y-2">
+                    ${top5.map((entry, index) => `
+                        <li class="flex justify-between p-2 rounded-lg ${entry.name === 'You' ? 'bg-purple-600' : 'bg-black/20'}">
+                            <span class="font-bold">${index + 1}. ${entry.name} (Lvl ${entry.name === 'You' ? currentLevel : Math.floor(Math.random() * 15) + 5})</span>
+                            <span class="font-semibold">${entry.score.toLocaleString()}</span>
+                        </li>
+                    `).join('')}
+                </ol>
+            `;
+        }
+
+        function pauseGame() {
+            isGamePaused = true;
+            clearInterval(mainTimerInterval);
+            clearTimeout(prizeSpawnerTimeout);
+            clearInterval(scoreDecayInterval);
+            clearTimeout(impTimeout);
+        }
+
+        function resumeGame() {
+            if (isGameOver) return;
+            isGamePaused = false;
+            mainTimerInterval = setInterval(updateTimer, 1000);
+            if (!isFrozen) {
+                scheduleNextPrizeSpawn();
+            }
+            scoreDecayInterval = setInterval(handleScoreDecay, 1000);
+        }
+
+        /**
+         * Handles score decay when the player is inactive.
+         */
+        function handleScoreDecay() {
+            if (isGamePaused || isGameOver) return;
+            // Start decaying score after 20 seconds of no solves
+            if (timeSinceLastSolve > 20) {
+                const decayAmount = Math.floor(Math.pow(timeSinceLastSolve - 19, 1.5) * 10);
+                coins -= decayAmount;
+                if (coins < 0) coins = 0;
+                updateScoreDisplay();
+                document.getElementById('coins-display').classList.add('score-decay');
+            } else {
+                document.getElementById('coins-display').classList.remove('score-decay');
+            }
+        }
+
+        /**
+         * Initiates the freeze sequence, stopping prize spawns and thawing tiles over time.
+         */
+        function startFreezeSequence() {
+            isFrozen = true;
+            clearTimeout(prizeSpawnerTimeout);
+            clearTimeout(impTimeout);
+            const frozenTiles = [];
+            document.querySelectorAll('#game-grid > div:not(.word-puzzle-tile)').forEach(tile => {
+                const rect = tile.getBoundingClientRect();
+                const iceBlock = document.createElement('div');
+                iceBlock.className = 'ice-block';
+                iceBlock.style.width = `${rect.width}px`;
+                iceBlock.style.height = `${rect.height}px`;
+                iceBlock.style.left = `${rect.left}px`;
+                iceBlock.style.top = `${rect.top}px`;
+                document.body.appendChild(iceBlock);
+                frozenTiles.push(iceBlock);
+            });
+
+            thawTimeout = setTimeout(() => {
+                const thawDuration = 30000; // 30 seconds to thaw
+                if (frozenTiles.length === 0) {
+                    endFreeze();
+                    return;
+                }
+                const thawIntervalTime = thawDuration / frozenTiles.length;
+                
+                function thawNext() {
+                    if (frozenTiles.length > 0) {
+                        const tileToThaw = frozenTiles.shift();
+                        if (tileToThaw) {
+                            tileToThaw.remove();
+                        }
+                        setTimeout(thawNext, thawIntervalTime);
+                    } else {
+                        endFreeze();
+                    }
+                }
+                thawNext();
+            }, 30000); // Freeze lasts for 30 seconds
+        }
+
+        function endFreeze() {
+            clearTimeout(thawTimeout);
+            isFrozen = false;
+            document.querySelectorAll('.ice-block').forEach(block => block.remove());
+            if (!isGamePaused && !isGameOver) {
+                // Add a small delay to prevent emoji burst
+                setTimeout(() => scheduleNextPrizeSpawn(), 500);
+            }
+        }
+        
+        /**
+         * Hides the start modal and begins the main game loop.
+         */
+        function startGame() {
+            document.getElementById('start-modal').classList.add('hidden');
+            document.getElementById('game-container').classList.remove('hidden');
+            document.getElementById('game-container').classList.add('flex');
+            clearInterval(startModalAnimationInterval);
+            isGamePaused = false;
+            mainTimerInterval = setInterval(updateTimer, 1000);
+            scoreDecayInterval = setInterval(handleScoreDecay, 1000);
+            scheduleNextPrizeSpawn();
+        }
+
+        /**
+         * Initializes the game on window load. Sets up event listeners.
+         */
+        function initGame() {
+            startLevel();
+            updateScoreDisplay();
+            
+            // Fun animation for the start modal
+            const startModal = document.getElementById('start-modal');
+            startModalAnimationInterval = setInterval(() => {
+                const coin = document.createElement('div');
+                coin.classList.add('falling-coin');
+                coin.textContent = '🪙';
+                coin.style.left = `${Math.random() * 100}%`;
+                coin.style.animationDuration = `${Math.random() * 2 + 3}s`;
+                coin.style.fontSize = `${Math.random() * 1 + 0.5}rem`;
+                startModal.appendChild(coin);
+                setTimeout(() => coin.remove(), 5000);
+
+                if (Math.random() < 0.3) {
+                    const sparkle = document.createElement('div');
+                    sparkle.classList.add('sparkle');
+                    sparkle.style.left = `${Math.random() * 100}%`;
+                    sparkle.style.top = `${Math.random() * 100}%`;
+                    sparkle.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
+                    startModal.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 1500);
+                }
+            }, 300);
+
+            // --- Event Listeners ---
+            document.getElementById('start-game-button').addEventListener('click', startGame);
+            document.getElementById('play-again-button').addEventListener('click', () => { location.reload(); });
+            document.getElementById('help-button').addEventListener('click', () => {
+                pauseGame();
+                document.getElementById('help-modal').classList.remove('hidden');
+            });
+            document.getElementById('close-help-button').addEventListener('click', () => {
+                document.getElementById('help-modal').classList.add('hidden');
+                resumeGame();
+            });
+            document.getElementById('solve-button').addEventListener('click', onSolveButtonClick);
+
+            document.querySelectorAll('.difficulty-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    document.querySelectorAll('.difficulty-button').forEach(btn => btn.classList.remove('difficulty-active'));
+                    const clickedButton = e.currentTarget;
+                    clickedButton.classList.add('difficulty-active');
+
+                    if (clickedButton.id === 'difficulty-easy') maxSameEmoji = 8;
+                    else if (clickedButton.id === 'difficulty-medium') maxSameEmoji = 4;
+                    else if (clickedButton.id === 'difficulty-hard') maxSameEmoji = 2;
+                    else maxSameEmoji = 4; // Default
+                });
+            });
+        }
+
+        // --- Start Game ---
+        window.onload = () => {
+            initGame();
+        };
+    </script>
+</body>
+</html>
