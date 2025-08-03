@@ -21,29 +21,17 @@
         
         .game-title-style { 
             font-family: 'Lobster Two', cursive; 
-            color: #FDD835; /* Brighter, richer gold */
+            color: #FDD835;
             font-weight: 700; 
             font-style: italic; 
-            text-shadow: 
-                -3px -3px 0 #4a2c0f, 3px -3px 0 #4a2c0f, -3px 3px 0 #4a2c0f, 3px 3px 0 #4a2c0f,
-                4px 4px 2px rgba(0,0,0,0.6);
+            text-shadow: -3px -3px 0 #4a2c0f, 3px -3px 0 #4a2c0f, -3px 3px 0 #4a2c0f, 3px 3px 0 #4a2c0f, 4px 4px 2px rgba(0,0,0,0.6);
         }
 
-        /* --- Coin Rotation Animation (Sped Up) --- */
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        .coin-rotate {
-            display: inline-block;
-            animation: spin 5s linear infinite;
-        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .coin-rotate { display: inline-block; animation: spin 5s linear infinite; }
 
         @keyframes fly-along-path { 0% { offset-distance: 0%; opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
-        @keyframes coin-swirl-in {
-            0% { transform: scale(1) rotate(0deg); opacity: 1; }
-            100% { transform: scale(0) rotate(360deg); opacity: 0; }
-        }
+        @keyframes coin-swirl-in { 0% { transform: scale(1) rotate(0deg); opacity: 1; } 100% { transform: scale(0) rotate(360deg); opacity: 0; } }
         @keyframes diamond-vortex { 0% { transform: translate(var(--start-x), var(--start-y)) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--end-x), var(--end-y)) scale(0) rotate(720deg); opacity: 0; } }
         @keyframes game-over-swirl { 0% { transform: translate(var(--start-x), var(--start-y)) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--end-x), var(--end-y)) scale(0) rotate(-360deg); opacity: 0; } }
         @keyframes big-coin-tumble { 0% { transform: scale(8) rotate(0deg); opacity: 1; } 50% { transform: scale(5) rotate(360deg); } 100% { transform: scale(1) rotate(720deg); opacity: 1; } }
@@ -59,7 +47,7 @@
         .prize-tile.green-bomb { background-color: #22c55e !important; animation-name: pulse-glow-green; cursor: grab; }
         .prize-tile.fire-bomb { background-color: #f97316 !important; animation-name: pulse-glow-fire; }
         .glass-panel { background-color: rgba(20, 20, 40, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
-        #start-modal .glass-panel { box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 0 2px #f59e0b; } /* Gold outline for start modal */
+        #start-modal .glass-panel { box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 0 2px #f59e0b; }
         .word-puzzle-tile { background-color: #FFFFFF !important; color: #111827 !important; border: 2px solid #d1d5db; cursor: grab; }
         .word-puzzle-tile.dragging { opacity: 0.5; cursor: grabbing; }
         .word-puzzle-tile.solved { background-color: #15803d !important; color: #FFFFFF !important; border-color: #14532d; box-shadow: inset 3px 3px 4px rgba(0, 0, 0, 0.5); cursor: default; }
@@ -71,9 +59,7 @@
         #solve-button.cooldown-timer { font-size: 1.25rem; font-family: 'Inter', sans-serif; }
         
         .event-text {
-            font-family: 'Lobster Two', cursive;
-            font-size: 5rem;
-            color: #FDD835; /* Unified Gold Color */
+            font-family: 'Lobster Two', cursive; font-size: 5rem; color: #FDD835;
             text-shadow: -3px -3px 0 #4a2c0f, 3px -3px 0 #4a2c0f, -3px 3px 0 #4a2c0f, 3px 3px 0 #4a2c0f, 4px 4px 2px rgba(0,0,0,0.6);
             animation: event-flash 2s ease-out forwards;
         }
@@ -84,50 +70,23 @@
 
         @keyframes event-flash { 0%, 100% { opacity: 0; transform: scale(0.8); } 20%, 80% { opacity: 1; transform: scale(1.1); } }
         
-        /* --- Glassy Button Styles --- */
         @keyframes button-shimmer { 0% { transform: translateX(-100%) skewX(-15deg); } 100% { transform: translateX(200%) skewX(-15deg); } }
         .glassy-button {
-            border: 1px solid;
-            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2);
-            transition: all 0.1s ease-out;
-            position: relative;
-            overflow: hidden;
+            border: 1px solid; box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.1s ease-out; position: relative; overflow: hidden;
         }
         .glassy-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 50%;
-            height: 100%;
+            content: ''; position: absolute; top: 0; left: 0; width: 50%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             animation: button-shimmer 4s infinite linear;
         }
-        .glassy-button:active {
-            transform: translateY(2px);
-            border-bottom-width: 2px;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
+        .glassy-button:active { transform: translateY(2px); border-bottom-width: 2px; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2); }
 
-        /* Start Game Button Specifics */
         @keyframes start-button-pulse { 0%, 100% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 10px #60a5fa, 0 0 20px #60a5fa; } 5% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 20px #3b82f6, 0 0 40px #3b82f6; } 15% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 10px #60a5fa, 0 0 20px #60a5fa; } }
-        #start-game-button {
-            background: linear-gradient(145deg, #5c97f5, #3b82f6);
-            border-color: #93c5fd;
-            border-bottom: 4px solid #1e3a8a;
-            animation: start-button-pulse 15s infinite;
-        }
+        #start-game-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; animation: start-button-pulse 15s infinite; }
 
-        #play-again-button {
-             background: linear-gradient(145deg, #6b7280, #4b5563);
-             border-color: #9ca3af;
-             border-bottom: 4px solid #1f2937;
-        }
-        #close-help-button {
-             background: linear-gradient(145deg, #5c97f5, #3b82f6);
-             border-color: #93c5fd;
-             border-bottom: 4px solid #1e3a8a;
-        }
+        #play-again-button, #about-button, #playlist-button { background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af; border-bottom: 4px solid #1f2937; }
+        #close-help-button, #close-about-button, #close-playlist-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
 
         .theme-button { width: 2.5rem; height: 2.5rem; border-radius: 50%; background-color: var(--panel-bg); border: 1px solid var(--panel-border); color: white; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; padding: 0; position: relative; }
         .theme-button:hover .tooltip { opacity: 1; visibility: visible; }
@@ -136,31 +95,22 @@
         .tooltip { visibility: hidden; opacity: 0; width: 120px; background-color: black; color: #fff; text-align: center; border-radius: 6px; padding: 5px 0; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -60px; transition: opacity 0.3s; font-size: 0.75rem; }
         .tooltip::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: black transparent transparent transparent; }
         #help-button { font-size: 1.25rem; font-weight: bold; }
-        #difficulty-default .orb { fill: #8B5CF6; }
-        #difficulty-easy .orb { fill: #3B82F6; }
-        #difficulty-medium .orb { fill: #F59E0B; }
-        #difficulty-hard .orb { fill: #EF4444; }
+        #difficulty-default .orb { fill: #8B5CF6; } #difficulty-easy .orb { fill: #3B82F6; } #difficulty-medium .orb { fill: #F59E0B; } #difficulty-hard .orb { fill: #EF4444; }
 
-        /* --- New Feature Styles --- */
         .score-decay { color: #ef4444 !important; }
         .greed-icon {
             width: 3rem; height: 3rem; background-color: var(--primary-color); border-radius: 50%; display: flex;
             align-items: center; justify-content: center; font-size: 1.75rem; border: 1px solid var(--primary-color-light);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.4); cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4); cursor: pointer; color: white;
         }
         @keyframes ice-shimmer { 0% { background-position: -100% 0; } 100% { background-position: 100% 0; } }
         @keyframes crack-fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
         @keyframes ice-fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(90deg); opacity: 0; } }
         .ice-block {
-            position: absolute;
-            background: linear-gradient(145deg, rgba(173, 216, 230, 0.5), rgba(135, 206, 250, 0.6));
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 0.5rem;
+            position: absolute; background: linear-gradient(145deg, rgba(173, 216, 230, 0.5), rgba(135, 206, 250, 0.6));
+            border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 0.5rem;
             box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.5), 0 4px 6px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            z-index: 50;
-            overflow: hidden;
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 50; overflow: hidden;
         }
         .ice-block::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -169,103 +119,42 @@
         }
         .ice-block.cracked {
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44"><path d="M 10 0 L 10 15 L 0 20 L 10 25 L 10 44 M 20 0 L 25 10 L 15 15 L 25 20 L 20 44 M 35 0 L 30 22 L 44 28" stroke="rgba(255,255,255,0.7)" stroke-width="1" fill="none"/></svg>'), linear-gradient(145deg, rgba(173, 216, 230, 0.6), rgba(135, 206, 250, 0.7));
-            background-size: cover;
-            animation: crack-fade-in 0.2s forwards;
+            background-size: cover; animation: crack-fade-in 0.2s forwards;
         }
-        #bomb-drag-preview {
-            position: absolute;
-            border: 3px dashed #22c55e;
-            background-color: rgba(34, 197, 94, 0.3);
-            pointer-events: none;
-            z-index: 200;
-            display: none; /* Hidden by default */
-        }
+        #bomb-drag-preview { position: absolute; border: 3px dashed #22c55e; background-color: rgba(34, 197, 94, 0.3); pointer-events: none; z-index: 200; display: none; }
         @keyframes cash-money-pulse { 0%, 100% { box-shadow: 0 0 15px #4ade80, 0 0 30px #4ade80; } 50% { box-shadow: 0 0 25px #22c55e, 0 0 50px #22c55e; } }
-        .cash-money-prize {
-            background-color: #16a34a !important;
-            animation: cash-money-pulse 0.7s infinite ease-in-out;
-        }
+        .cash-money-prize { background-color: #16a34a !important; animation: cash-money-pulse 0.7s infinite ease-in-out; }
 
-        /* Start Screen Animations */
-        @keyframes fall {
-            0% { transform: translateY(-100%) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-        }
-        @keyframes twinkle {
-            0%, 100% { transform: scale(0); opacity: 0; }
-            50% { transform: scale(1); opacity: 1; }
-        }
-        .falling-coin {
-            position: absolute;
-            font-size: 1.5rem;
-            animation: fall linear forwards;
-            pointer-events: none;
-        }
-        .sparkle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background-color: #fde047;
-            border-radius: 50%;
-            box-shadow: 0 0 5px #fde047, 0 0 10px #facc15;
-            animation: twinkle ease-in-out infinite;
-            pointer-events: none;
-        }
+        @keyframes fall { 0% { transform: translateY(-100%) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
+        @keyframes twinkle { 0%, 100% { transform: scale(0); opacity: 0; } 50% { transform: scale(1); opacity: 1; } }
+        .falling-coin { position: absolute; font-size: 1.5rem; animation: fall linear forwards; pointer-events: none; }
+        .sparkle { position: absolute; width: 8px; height: 8px; background-color: #fde047; border-radius: 50%; box-shadow: 0 0 5px #fde047, 0 0 10px #facc15; animation: twinkle ease-in-out infinite; pointer-events: none; }
         
-        /* --- Volume Slider Styles --- */
-        input[type=range].volume-slider {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
+        input[type=range].volume-slider { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range].volume-slider:focus { outline: none; }
+        input[type=range].volume-slider::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: rgba(0, 0, 0, 0.5); border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); }
+        input[type=range].volume-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #a78bfa; cursor: pointer; margin-top: -7px; border: 2px solid #c4b5fd; box-shadow: 0 0 5px #8b5cf6; }
+        input[type=range].volume-slider::-moz-range-track { width: 100%; height: 8px; cursor: pointer; background: rgba(0, 0, 0, 0.5); border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); }
+        input[type=range].volume-slider::-moz-range-thumb { height: 20px; width: 20px; border-radius: 50%; background: #a78bfa; cursor: pointer; border: 2px solid #c4b5fd; box-shadow: 0 0 5px #8b5cf6; }
+
+        /* Playlist Styles */
+        .playlist-item { display: flex; align-items: center; padding: 0.5rem 0.75rem; background-color: rgba(0,0,0,0.2); border-radius: 0.5rem; transition: background-color 0.2s; }
+        .playlist-item:hover { background-color: rgba(0,0,0,0.4); }
+        .playlist-item input[type="checkbox"] { display: none; }
+        .playlist-item .custom-checkbox {
+            width: 20px; height: 20px; border: 2px solid var(--primary-color-light); border-radius: 4px;
+            display: flex; align-items: center; justify-content: center; margin-right: 0.75rem;
+            cursor: pointer; background-color: rgba(0,0,0,0.3);
         }
-        input[type=range].volume-slider:focus {
-            outline: none;
-        }
-        input[type=range].volume-slider::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 8px;
-            cursor: pointer;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        input[type=range].volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: #a78bfa;
-            cursor: pointer;
-            margin-top: -7px; /* You need to specify a margin in Chrome, but not in Firefox */
-            border: 2px solid #c4b5fd;
-            box-shadow: 0 0 5px #8b5cf6;
-        }
-        input[type=range].volume-slider::-moz-range-track {
-            width: 100%;
-            height: 8px;
-            cursor: pointer;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        input[type=range].volume-slider::-moz-range-thumb {
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: #a78bfa;
-            cursor: pointer;
-            border: 2px solid #c4b5fd;
-            box-shadow: 0 0 5px #8b5cf6;
-        }
+        .playlist-item .custom-checkbox svg { display: none; }
+        .playlist-item input[type="checkbox"]:checked + .custom-checkbox { background-color: var(--primary-color); }
+        .playlist-item input[type="checkbox"]:checked + .custom-checkbox svg { display: block; }
     </style>
 </head>
 <body class="text-white flex items-center justify-center min-h-screen p-4">
 
-    <!-- Background Music -->
-    <audio id="background-music" loop>
-        <source src="https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/wordgreed001.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
+    <audio id="background-music">
+        <!-- Source will be set dynamically by JavaScript -->
     </audio>
 
     <div id="game-container" class="hidden flex-col md:flex-row gap-4 items-start justify-center">
@@ -280,23 +169,17 @@
         <!-- Score & Control Panel -->
         <div id="score-panel" class="glass-panel p-4 rounded-xl w-full max-w-xs md:w-[17rem] flex flex-col justify-between gap-3 relative">
             <div class="flex flex-col gap-2"> 
-                <!-- Title -->
                 <div class="relative w-full h-24 flex justify-center items-center">
                     <h1 class="game-title-style text-6xl relative" style="width: 15rem; height: 7rem; left: 1rem;">
                         <span class="absolute" style="top: 0; left: 0;">Word</span>
                         <span class="absolute" style="top: 2.7rem; left: 2.5rem;">Greed</span>
                     </h1>
                 </div>
-
-                <!-- Level & Timer -->
                 <div class="p-2 flex justify-around text-center">
                     <div><span class="text-sm font-bold text-slate-300">LEVEL</span><div id="level-display" class="text-2xl font-bold text-white">1</div></div>
                     <div><span class="text-sm font-bold text-slate-300">TIME</span><div id="timer-display" class="text-2xl font-bold text-white">10:00</div></div>
                 </div>
-
-                <!-- Main Score & Greed Section -->
                 <div id="score-container" class="greed-panel p-3 rounded-lg text-center flex flex-col gap-2">
-                    <!-- Coins and Bags -->
                     <div class="grid grid-cols-2 gap-2 text-center">
                         <div class="text-4xl coin-rotate" style="filter: drop-shadow(0 0 5px #fde047);">🪙</div>
                         <div class="text-4xl" style="filter: drop-shadow(0 0 5px #fde047);">💰</div>
@@ -304,11 +187,8 @@
                         <div id="bags-of-money-display" class="text-lg font-bold text-green-400">0</div>
                     </div>
                     <hr class="border-violet-300/20">
-                    <!-- Greed Score & Solve Button -->
                     <div id="greed-content" class="mx-auto flex flex-col items-center justify-center gap-1">
-                         <div class="flex items-center justify-center gap-2">
-                            <span class="text-sm font-bold text-violet-200">GREED SCORE</span>
-                         </div>
+                         <div class="flex items-center justify-center gap-2"><span class="text-sm font-bold text-violet-200">GREED SCORE</span></div>
                         <div class="flex items-center justify-center gap-2 mt-1">
                             <button id="solve-button" class="w-12 h-12 rounded-full text-3xl font-black flex items-center justify-center">✅</button>
                             <div id="greed-icons-container" class="flex items-center justify-center gap-2"></div>
@@ -316,57 +196,28 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Theme/Control Buttons -->
             <div id="theme-buttons-container" class="flex justify-around items-center">
                 <button id="help-button" class="theme-button">?</button>
                 <button id="difficulty-default" class="theme-button difficulty-button difficulty-active">
                     <span class="tooltip">Default: Max 4</span>
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                        <defs>
-                            <radialGradient id="highlight1" cx="0.3" cy="0.3" r="0.4">
-                                <stop offset="0%" stop-color="white" stop-opacity="0.8"/>
-                                <stop offset="100%" stop-color="white" stop-opacity="0"/>
-                            </radialGradient>
-                             <radialGradient id="highlight2" cx="0.7" cy="0.7" r="0.3">
-                                <stop offset="0%" stop-color="white" stop-opacity="0.6"/>
-                                <stop offset="100%" stop-color="white" stop-opacity="0"/>
-                            </radialGradient>
-                        </defs>
-                        <circle class="orb" cx="50" cy="50" r="45"/>
-                        <circle cx="50" cy="50" r="45" fill="url(#highlight1)"/>
-                        <circle cx="50" cy="50" r="45" fill="url(#highlight2)"/>
-                    </svg>
+                    <svg viewBox="0 0 100 100" class="w-full h-full"><defs><radialGradient id="highlight1" cx="0.3" cy="0.3" r="0.4"><stop offset="0%" stop-color="white" stop-opacity="0.8"/><stop offset="100%" stop-color="white" stop-opacity="0"/></radialGradient><radialGradient id="highlight2" cx="0.7" cy="0.7" r="0.3"><stop offset="0%" stop-color="white" stop-opacity="0.6"/><stop offset="100%" stop-color="white" stop-opacity="0"/></radialGradient></defs><circle class="orb" cx="50" cy="50" r="45"/><circle cx="50" cy="50" r="45" fill="url(#highlight1)"/><circle cx="50" cy="50" r="45" fill="url(#highlight2)"/></svg>
                 </button>
                 <button id="difficulty-easy" class="theme-button difficulty-button">
                      <span class="tooltip">Easy: Max 8</span>
-                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                        <circle class="orb" cx="50" cy="50" r="45"/>
-                        <circle cx="50" cy="50" r="45" fill="url(#highlight1)"/>
-                        <circle cx="50" cy="50" r="45" fill="url(#highlight2)"/>
-                    </svg>
+                     <svg viewBox="0 0 100 100" class="w-full h-full"><circle class="orb" cx="50" cy="50" r="45"/><circle cx="50" cy="50" r="45" fill="url(#highlight1)"/><circle cx="50" cy="50" r="45" fill="url(#highlight2)"/></svg>
                 </button>
                 <button id="difficulty-medium" class="theme-button difficulty-button">
                      <span class="tooltip">Medium: Max 4</span>
-                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                        <circle class="orb" cx="50" cy="50" r="45"/>
-                        <circle cx="50" cy="50" r="45" fill="url(#highlight1)"/>
-                        <circle cx="50" cy="50" r="45" fill="url(#highlight2)"/>
-                    </svg>
+                     <svg viewBox="0 0 100 100" class="w-full h-full"><circle class="orb" cx="50" cy="50" r="45"/><circle cx="50" cy="50" r="45" fill="url(#highlight1)"/><circle cx="50" cy="50" r="45" fill="url(#highlight2)"/></svg>
                 </button>
                 <button id="difficulty-hard" class="theme-button difficulty-button">
                      <span class="tooltip">Hard: Max 2</span>
-                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                        <circle class="orb" cx="50" cy="50" r="45"/>
-                        <circle cx="50" cy="50" r="45" fill="url(#highlight1)"/>
-                        <circle cx="50" cy="50" r="45" fill="url(#highlight2)"/>
-                    </svg>
+                     <svg viewBox="0 0 100 100" class="w-full h-full"><circle class="orb" cx="50" cy="50" r="45"/><circle cx="50" cy="50" r="45" fill="url(#highlight1)"/><circle cx="50" cy="50" r="45" fill="url(#highlight2)"/></svg>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Start Game Modal -->
     <div id="start-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
         <div class="glass-panel p-8 rounded-2xl text-center flex flex-col items-center gap-6 w-full max-w-md relative overflow-hidden">
             <h1 class="game-title-style text-8xl relative" style="width: 22rem; height: 10rem;">
@@ -378,7 +229,6 @@
         </div>
     </div>
 
-    <!-- Game Over Modal -->
     <div id="game-over-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div class="glass-panel p-8 rounded-2xl text-center flex flex-col items-center gap-6 w-full max-w-md relative overflow-hidden">
              <h1 class="game-title-style text-6xl relative" style="width: 15rem; height: 7rem;">
@@ -390,12 +240,10 @@
         </div>
     </div>
     
-    <!-- Event Text Overlay -->
     <div id="event-text-container" class="hidden fixed inset-0 flex items-center justify-center pointer-events-none z-50">
         <div id="event-text" class="event-text"></div>
     </div>
 
-    <!-- Help Modal -->
     <div id="help-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-3 w-full max-w-lg relative">
             <h2 class="text-2xl font-bold text-amber-300">How to Play</h2>
@@ -407,34 +255,66 @@
                     <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">🏆</td><td class="py-0.5 pr-2 font-bold text-white">Trophy</td><td class="py-0.5 text-slate-300">+<span class="font-bold text-white">3,500,000</span> coins.</td></tr>
                     <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">💎</td><td class="py-0.5 pr-2 font-bold text-white">Diamond</td><td class="py-0.5 text-slate-300">+<span class="font-bold text-white">20,000,000</span> coins & board clear.</td></tr>
                     <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">⚡</td><td class="py-0.5 pr-2 font-bold text-white">Lightning</td><td class="py-0.5 text-slate-300">+<span class="font-bold text-white">20,000</span> coins, but <strong class="text-red-400">resets Bags of Money!</strong></td></tr>
-                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">💣</td><td class="py-0.5 pr-2 font-bold text-green-400">Green Bomb</td><td class="py-0.5 text-slate-300">Drag to a puzzle to solve key letters & collect prizes.</td></tr> <!-- MODIFIED: Text -->
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">💣</td><td class="py-0.5 pr-2 font-bold text-green-400">Green Bomb</td><td class="py-0.5 text-slate-300">Drag to a puzzle to solve key letters & collect prizes.</td></tr>
                     <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">💣</td><td class="py-0.5 pr-2 font-bold text-red-400">Red Bomb</td><td class="py-0.5 text-slate-300">GAME OVER!</td></tr>
-                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">❄️</td><td class="py-0.5 pr-2 font-bold text-blue-300">Snowflake</td><td class="py-0.5 text-slate-300">Freezes all prizes for 15 seconds.</td></tr> <!-- MODIFIED: Text -->
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">❄️</td><td class="py-0.5 pr-2 font-bold text-blue-300">Snowflake</td><td class="py-0.5 text-slate-300">Freezes all prizes for 15 seconds.</td></tr>
                 </tbody>
             </table>
-            <div class="w-full flex justify-between items-center mt-2">
+            <div class="w-full flex justify-between items-center mt-2 gap-2">
                 <div class="flex items-center gap-3">
-                    <button id="volume-toggle-button" class="text-2xl hover:text-white text-slate-300 transition-colors">
-                        <!-- Speaker icons will be injected here by JS -->
-                    </button>
+                    <button id="volume-toggle-button" class="text-2xl hover:text-white text-slate-300 transition-colors"></button>
                     <input type="range" id="volume-slider" min="0" max="1" step="0.01" class="volume-slider w-32">
                 </div>
-                <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
+                <div class="flex items-center gap-2">
+                    <button id="playlist-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Playlist</button>
+                    <button id="about-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">About</button>
+                    <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
+                </div>
             </div>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.1</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.2</div>
+        </div>
+    </div>
+
+    <div id="about-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+        <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-md relative text-center">
+            <h2 class="text-2xl font-bold text-amber-300">About Word Greed</h2>
+            <div class="text-slate-300 space-y-2">
+                <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
+                <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
+                <p>Version: <span class="font-bold text-white">1.2</span></p>
+                <p>Build Date: <span class="font-bold text-white">August 3, 2025</span></p>
+            </div>
+            <p class="text-xs text-slate-500 mt-4">Copyright © 2025</p>
+            <button id="close-about-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
+        </div>
+    </div>
+
+    <!-- NEW: Playlist Modal -->
+    <div id="playlist-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+        <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-md relative text-center">
+            <h2 class="text-2xl font-bold text-amber-300">Soundtrack Playlist</h2>
+            <div id="playlist-container" class="w-full space-y-2 my-2 text-left">
+                <!-- Playlist items will be injected here by JS -->
+            </div>
+            <button id="close-playlist-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
         </div>
     </div>
 
     <script>
         // --- DOM Elements ---
         const gridContainer = document.getElementById('game-grid');
+        const musicPlayer = document.getElementById('background-music');
 
         // --- Game Data ---
         let coins = 0;
         let bagsOfMoney = 0;
-        const jackpotColors = ['#8B5CF6', '#EC4899', '#10B981', '#EF4444', '#3B82F6'];
-        let currentColorIndex = 0;
         let draggedTile = null;
+
+        // --- Playlist Data ---
+        const playlist = [ 'wordgreed001.mp3', 'wordgreed002.mp3', 'wordgreed003.mp3', 'wordgreed004.mp3', 'wordgreed005.mp3' ];
+        let userPlaylist = [...playlist];
+        let currentTrackIndex = 0;
+        const musicBaseURL = 'https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/';
 
         // --- Game State ---
         let currentLevel = 1;
@@ -446,11 +326,11 @@
         let puzzles = [];
         let trophyCollectedThisLevel = false;
         let diamondCollectedThisLevel = false;
-        let currentDiamondValue = 20000000; // Value persists across levels
+        let currentDiamondValue = 20000000;
         let solveButtonClicks = 0;
         let solveButtonCooldown = 0;
         let solveButtonTimerInterval = null;
-        let isGamePaused = true; // Start game paused
+        let isGamePaused = true;
         let isGameOver = false;
         let timeSinceLastSolve = 0;
         let scoreDecayInterval = null;
@@ -461,13 +341,12 @@
         let specialJackpotTimeout = null;
         let specialCashEmojiSpawned = false;
         let impEvents = { sixMin: true, threeMin: true };
-        let isSpecialAnimationActive = false; // Prevents prize spawns during diamond vortex
+        let isSpecialAnimationActive = false;
         let startModalAnimationInterval = null;
-        let maxSameEmoji = 4; // Default difficulty
+        let maxSameEmoji = 4;
         let isDraggingBomb = false;
         let lastVolume = 0.5;
 
-        // --- Word Bank & Prize Data ---
         const wordBank = ["ABROAD","ACCEPT","ACCESS","ACROSS","ACTION","ACTIVE","ADMIRE","ADVICE","AFFAIR","AFFECT","AFFORD","AGENCY","AGENDA","ALMOST","ALWAYS","AMOUNT","ANIMAL","ANNUAL","ANSWER","ANYONE","ANYWAY","APART","APPEAL","APPEAR","APPLY","APPROVE","AROUND","ARRIVE","ARTIST","ASLEEP","ASPECT","ASSESS","ASSIST","ASSUME","ATTACK","ATTEND","ATTRACT","AUTHOR","AWARD","BALANCE","BECOME","BEHAVE","BELIEF","BELONG","BENEATH","BENEFIT","BESIDE","BEYOND","BISHOP","BORDER","BOTTLE","BOTTOM","BRANCH","BREATH","BRIDGE","BRIEFLY","BRIGHT","BROKEN","BUDGET","BURDEN","CAMERA","CANCEL","CANCER","CANDLE","CAPITAL","CAREER","CAREFUL","CENTRAL","CENTURY","CERTAIN","CHAIR","CHALLENGE","CHANCE","CHANGE","CHARGE","CHOICE","CHOOSE","CHURCH","CIRCLE","CLIENT","CLIMB","CLOSELY","CLOSER","COFFEE","COLLECT","COLLEGE","COLUMN","COMBINE","COMFORT","COMMAND","COMMENT","COMMIT","COMMON","COMPARE","COMPETE","COMPLEX","CONCEPT","CONCERN","CONFIRM","CONFLICT","CONNECT","CONSENT","CONSIST","CONTACT","CONTAIN","CONTENT","CONTEST","CONTEXT","CONTROL","CONVERT","CORNER","COUNCIL","COUNTY","COUPLE","COVER","CREATE","CREDIT","CRISIS","CRITERION","CRITIC","CROWD","CULTURE","CURRENT","CUSTOM","DAMAGE","DANGER","DEALER","DEBATE","DECADE","DECIDE","DECLARE","DECREASE","DEEPLY","DEFAULT","DEFENCE","DEFEND","DEFINE","DEGREE","DELAY","DELIVER","DEMAND","DEPEND","DEPICT","DEPOSIT","DEPUTY","DERIVE","DESIGN","DESIRE","DESPITE","DESTROY","DETAIL","DETECT","DEVELOP","DEVICE","DEVOTE","DIFFER","DIFFICULT","DINNER","DIRECT","DISCUSS","DISEASE","DISMISS","DISPLAY","DISTANT","DIVIDE","DIVISION","DOCTOR","DOCUMENT","DOUBLE","DOUBT","DOZEN","DREAM","DRINK","DRIVE","EAGER","EARLY","EARTH","EASTERN","ECONOMIC","ECONOMY","EDITOR","EDUCATE","EFFECT","EFFORT","EIGHT","EITHER","ELDERLY","ELECT","ELEMENT","ELSE","EMERGE","EMPHASIS","EMPLOY","ENABLE","ENCOURAGE","ENGINE","ENJOY","ENOUGH","ENSURE","ENTER","ENTIRE","ENTITLE","EQUALLY","EQUIP","ESCAPE","ESSAY","ESSENTIAL","ESTATE","ETHNIC","EVENT","EVERY","EXACTLY","EXAMINE","EXAMPLE","EXCEED","EXCEPT","EXCHANGE","EXCITE","EXCLUDE","EXCUSE","EXERCISE","EXIST","EXPECT","EXPENSE","EXPERIENCE","EXPERT","EXPLAIN","EXPLORE","EXPOSE","EXPRESS","EXTEND","EXTENT","EXTERNAL","EXTRA","EXTREME","FACTOR","FACULTY","FAILED","FAILURE","FAIRLY","FAITH","FAMLIAR","FAMOUS","FARMER","FASHION","FATHER","FAVOUR","FEELING","FEMALE","FIFTEEN","FIGHT","FIGURE","FINANCE","FINALLY","FINGER","FINISH","FLIGHT","FLOWER","FOLLOW","FOOTBALL","FORCE","FOREIGN","FOREST","FORGET","FORMAL","FORMER","FORWARD","FOUND","FOURTH","FRAME","FREEDOM","FRIEND","FUNCTION","FUTURE","GARDEN","GATHER","GENERAL","GENERATION","GENTLE","GLOBAL","GOLDEN","GROUND","GROWTH","GUARD","GUILTY","HANDLE","HAPPEN","HARDLY","HEALTH","HEAVILY","HEIGHT","HENCE","HOLIDAY","HORSE","HOSPITAL","HOUSE","HOWEVER","HUMAN","HUSBAND","IMPACT","IMPLY","IMPORT","IMPOSE","IMPROVE","INCLUDE","INCREASE","INDEED","INDICATE","INDIVIDUAL","INDUSTRY","INFORM","INITIAL","INJURY","INSIDE","INSIST","INSTANCE","INSTEAD","INSTITUTE","INTEND","INTEREST","INTERNAL","INVOLVE","ISLAND","ISSUE","ITSELF","JOINT","JUDGE","JUDGMENT","JUNIOR","JUSTICE","LABOUR","LANGUAGE","LARGELY","LATTER","LAUGH","LAWYER","LEADER","LEAGUE","LEARN","LEAVE","LEGAL","LENGTH","LESSON","LETTER","LEVEL","LIBERAL","LIBRARY","LICENCE","LIMIT","LIMITED","LITTLE","LOCAL","LONDON","LONGER","MACHINE","MAJOR","MANAGE","MANAGER","MANNER","MANY","MARKET","MARRIAGE","MATCH","MATERIAL","MATTER","MEASURE","MEDIA","MEDICAL","MEETING","MEMBER","MEMORY","MENTAL","MENTION","MERELY","METHOD","MIDDLE","MIGHT","MILE","MILITARY","MINISTER","MINOR","MINORITY","MINUTE","MISSION","MISTAKE","MODEL","MODERN","MODULE","MOMENT","MONEY","MONTH","MORAL","MORNING","MOTHER","MOTION","MOTOR","MOUNTAIN","MOUTH","MOVEMENT","MOVIE","MUCH","MUSIC","MYSELF","NARROW","NATION","NATIONAL","NATIVE","NATURAL","NATURE","NEARLY","NECESSary","NEEDLE","NEITHER","NERVE","NETWORK","NEVER","NEWLY","NIGHT","NOBODY","NORMAL","NORTHERN","NOTICE","NOTION","NOWHERE","NUMBER","OBJECT","OBSERVE","OBTAIN","OBVIOUS","OCCASION","OCCUR","OFFENCE","OFFER","OFFICE","OFFICER","OFFICIAL","OFTEN","ONCE","ONLINE","ONLY","ONTO","OPENING","OPERATE","OPPORTUNITY","OPPOSE","OPPOSITE","ORDER","ORDINARY","ORGANISE","ORIGIN","ORIGINAL","OTHER","OUGHT","OUTCOME","OUTSIDE","OVERALL","OWNER","PACKAGE","PAINT","PANEL","PARENT","PARISH","PARLIAMENT","PARTLY","PARTNER","PARTY","PASSAGE","PATIENT","PATTERN","PEACE","PEOPLE","PERFORM","PERHAPS","PERIOD","PERMIT","PERSON","PERSONAL","PHONE","PHOTO","PHYSICAL","PICTURE","PIECE","PLACE","PLANNING","PLANT","PLASTIC","PLAYER","POCKET","POINT","POLICE","POLICY","POLITICAL","POLLUTION","POPULAR","POSITION","POSITIVE","POSSIBLE","POSTER","POWER","PRACTICE","PREFER","PREPARE","PRESENCE","PRESENT","PRESIDENT","PRESS","PRESSURE","PRETTY","PREVIOUS","PRICE","PRIMARY","PRINCIPLE","PRINT","PRIOR","PRIORITY","PRISON","PRIVATE","PROBABLY","PROBLEM","PROCEDURE","PROCESS","PRODUCE","PRODUCT","PROFESSION","PROFILE","PROFIT","PROGRAM","PROGRESS","PROJECT","PROMISE","PROMOTE","PROPER","PROPERTY","PROPOSE","PROTECT","PROVIDE","PUBLIC","PUBLISH","PURPOSE","PUSH","QUALITY","QUARTER","QUESTION","QUICKLY","QUITE","RAISE","RANGE","RAPIDLY","RATELY","RATHER","REACH","REACTION","READER","READING","READY","REALISE","REALLY","REASON","RECALL","RECEIVE","RECENT","RECENTLY","RECOGNISE","RECORD","RECOVER","REDUCE","REFER","REFLECT","REFORM","REFUSE","REGARD","REGION","REGIONAL","REGULAR","RELATE","RELATION","RELATIVE","RELEASE","RELEVANT","RELIEF","RELIGION","REMAIN","REMEMBER","REMOVE","REPEAT","REPLACE","REPLY","REPORT","REPRESENT","REQUEST","REQUIRE","RESEARCH","RESOURCE","RESPECT","RESPOND","RESPONSE","RESULT","RETAIN","RETURN","REVEAL","REVENUE","REVIEW","REVOLUTION","RIGHT","RING","RISE","ROAD","ROLE","ROOM","ROUND","ROUTE","ROYAL","RULE","SAFETY","SALE","SAME","SAMPLE","SAVE","SCALE","SCENE","SCHEME","SCHOOL","SCIENCE","SCORE","SCREEN","SEARCH","SEASON","SECOND","SECRETARY","SECTION","SECTOR","SECURE","SEEM","SELECT","SENIOR","SENSE","SENSITIVE","SENTENCE","SEPARATE","SEQUENCE","SERIES","SERIOUS","SERVANT","SERVICE","SESSION","SETTLE","SEVEN","SEVERAL","SEVERE","SHARE","SHEET","SHOOT","SHORT","SHOT","SHOULD","SHOULDER","SHOUT","SHOW","SIDE","SIGHT","SIGN","SIGNAL","SILENCE","SIMPLE","SIMPLY","SINCE","SINGLE","SISTER","SITE","SITUATION","SIZE","SKILL","SKIN","SLEEP","SLIGHTLY","SLOWLY","SOCIAL","SOCIETY","SOLDIER","SOLUTION","SOME","SOMEHOW","SOMEONE","SOMETHING","SOMETIMES","SOMEWHAT","SOON","SORRY","SORT","SOUND","SOURCE","SOUTHERN","SPACE","SPEAK","SPECIAL","SPECIFIC","SPEECH","SPEED","SPEND","SPIRIT","SPORT","SPOT","SPREAD","SPRING","SQUARE","STAFF","STAGE","STAND","STANDARD","START","STATE","STATEMENT","STATION","STATUS","STAY","STEP","STILL","STOCK","STONE","STOP","STORE","STORY","STRAIGHT","STRANGE","STRATEGY","STREET","STRENGTH","STRESS","STRIKE","STRONG","STRUCTURE","STUDENT","STUDIO","STUDY","STYLE","SUBJECT","SUBMIT","SUCCEED","SUCCESS","SUCH","SUDDENLY","SUFFER","SUGGEST","SUMMER","SUPPORT","SUPPOSE","SURELY","SURFACE","SURVEY","SURVIVE","SWITCH","SYSTEM","TABLE","TAKE","TALK","TARGET","TASK","TEACH","TEACHER","TEAM","TECHNOLOGY","TELEPHONE","TELEVISION","TEMPERATURE","TERM","TERRIBLE","TEST","THANKS","THEATRE","THEIR","THEME","THEMSELVES","THEN","THEORY","THERE","THESE","THEY","THING","THINK","THIRD","THIRTY","THIS","THOSE","THOUGH","THOUSAND","THREAT","THREATEN","THREE","THROUGH","THROW","TICKET","TIME","TITLE","TODAY","TOGETHER","TOMORROW","TONE","TONIGHT","TOTAL","TOTALLY","TOUCH","TOUR","TOWARDS","TOWN","TRADE","TRADITION","TRAFFIC","TRAIN","TRAINING","TRANSFER","TRANSPORT","TRAVEL","TREAT","TREATMENT","TREATY","TREE","TREND","TRIAL","TRIP","TROOP","TROUBLE","TRUE","TRUST","TRUTH","TWENTY","TWICE","TYPE","UNDER","UNDERSTAND","UNION","UNIQUE","UNIT","UNITED","UNIVERSITY","UNLESS","UNLIKE","UNTIL","UPON","UPPER","URBAN","USER","USUAL","USUALLY","VALLEY","VALUE","VARIETY","VARIOUS","VEHICLE","VERSION","VERY","VIDEO","VIEW","VILLAGE","VIOLENCE","VISION","VISIT","VISITOR","VOICE","VOLUME","VOTE","WAIT","WALK","WALL","WANT","WAR","WATCH","WATER","WAY","WEALTH","WEAPON","WEAR","WEATHER","WEEK","WEEKEND","WEIGHT","WELCOME","WELL","WESTERN","WHAT","WHATEVER","WHEN","WHERE","WHETHER","WHICH","WHILE","WHITE","WHOLE","WHOM","WHOSE","WIDE","WIDELY","WIFE","WILD","WILL","WINDOW","WINE","WINTER","WISH","WITHIN","WITHOUT","WOMAN","WONDER","WOOD","WORD","WORK","WORKER","WORLD","WORRY","WORTH","WOULD","WRITE","WRITER","WRONG","YARD","YEAR","YOUNG","YOURSELF","YOUTH"];
         const prizeEmojis = [
             { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: '💣', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: '💰', value: 1000000, type: 'cash_money' }
@@ -1036,7 +915,7 @@
             const iconsContainer = document.getElementById('greed-icons-container');
             const trophyElement = document.createElement('div');
             trophyElement.classList.add('greed-icon');
-            trophyElement.textContent = ' ';
+            trophyElement.textContent = '🏆';
             trophyElement.addEventListener('click', () => {
                 showEventText("You're so greedy!");
             });
@@ -1282,10 +1161,8 @@
         
         function displayLeaderboard() {
             const fakeScores = [
-                { name: 'Olivia', score: 234000000 },
-                { name: 'James', score: 42000000 },
-                { name: 'Sophia', score: 35000000 },
-                { name: 'Liam', score: 28000000 },
+                { name: 'Olivia', score: 234000000 }, { name: 'James', score: 42000000 },
+                { name: 'Sophia', score: 35000000 }, { name: 'Liam', score: 28000000 },
             ];
             
             const allScores = [...fakeScores, { name: 'You', score: coins }];
@@ -1336,9 +1213,6 @@
             }
         }
 
-        /**
-         * MODIFIED: Initiates the freeze sequence with shorter duration.
-         */
         function startFreezeSequence() {
             isFrozen = true;
             clearTimeout(prizeSpawnerTimeout);
@@ -1357,7 +1231,7 @@
             });
 
             thawTimeout = setTimeout(() => {
-                const thawDuration = 15000; // MODIFIED: 15 seconds to thaw
+                const thawDuration = 15000;
                 if (frozenTiles.length === 0) {
                     endFreeze();
                     return;
@@ -1376,7 +1250,7 @@
                     }
                 }
                 thawNext();
-            }, 15000); // MODIFIED: Freeze lasts for 15 seconds
+            }, 15000);
         }
 
         function endFreeze() {
@@ -1389,13 +1263,12 @@
         }
         
         function startGame() {
-            const music = document.getElementById('background-music');
-            music.volume = 0.5;
+            musicPlayer.volume = 0.5;
             lastVolume = 0.5;
             document.getElementById('volume-slider').value = 0.5;
             updateVolumeIcon(0.5);
 
-            music.play().catch(error => console.error("Audio play failed:", error));
+            playNextTrack();
 
             document.getElementById('start-modal').classList.add('hidden');
             document.getElementById('game-container').classList.remove('hidden');
@@ -1406,18 +1279,30 @@
             scoreDecayInterval = setInterval(handleScoreDecay, 1000);
             scheduleNextPrizeSpawn();
         }
+
+        function playNextTrack() {
+            if (userPlaylist.length === 0) {
+                console.log("Playlist is empty. Music stopped.");
+                return;
+            }
+            // Ensure index is within bounds
+            currentTrackIndex = currentTrackIndex % userPlaylist.length;
+            const trackName = userPlaylist[currentTrackIndex];
+            musicPlayer.src = musicBaseURL + trackName;
+            musicPlayer.play().catch(error => console.error("Audio play failed:", error));
+            currentTrackIndex++;
+        }
         
         function setupAudioControls() {
-            const music = document.getElementById('background-music');
             const volumeSlider = document.getElementById('volume-slider');
             const volumeToggleButton = document.getElementById('volume-toggle-button');
 
             volumeSlider.value = lastVolume;
-            updateVolumeIcon(music.volume);
+            updateVolumeIcon(musicPlayer.volume);
 
             volumeSlider.addEventListener('input', (e) => {
                 const newVolume = parseFloat(e.target.value);
-                music.volume = newVolume;
+                musicPlayer.volume = newVolume;
                 updateVolumeIcon(newVolume);
                 if (newVolume > 0) {
                     lastVolume = newVolume;
@@ -1425,12 +1310,12 @@
             });
 
             volumeToggleButton.addEventListener('click', () => {
-                if (music.volume > 0) {
-                    music.volume = 0;
+                if (musicPlayer.volume > 0) {
+                    musicPlayer.volume = 0;
                     volumeSlider.value = 0;
                     updateVolumeIcon(0);
                 } else {
-                    music.volume = lastVolume;
+                    musicPlayer.volume = lastVolume;
                     volumeSlider.value = lastVolume;
                     updateVolumeIcon(lastVolume);
                 }
@@ -1440,20 +1325,45 @@
         function updateVolumeIcon(volume) {
             const volumeToggleButton = document.getElementById('volume-toggle-button');
             if (volume === 0) {
-                volumeToggleButton.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
-                `;
+                volumeToggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
             } else {
-                 volumeToggleButton.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-                `;
+                 volumeToggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
             }
+        }
+
+        function populatePlaylistModal() {
+            const container = document.getElementById('playlist-container');
+            container.innerHTML = '';
+            playlist.forEach(trackName => {
+                const isChecked = userPlaylist.includes(trackName);
+                const item = document.createElement('label');
+                item.className = 'playlist-item';
+                item.innerHTML = `
+                    <input type="checkbox" value="${trackName}" ${isChecked ? 'checked' : ''}>
+                    <span class="custom-checkbox">
+                        <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                    </span>
+                    <span>${trackName}</span>
+                `;
+                container.appendChild(item);
+
+                item.querySelector('input').addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        userPlaylist.push(e.target.value);
+                    } else {
+                        userPlaylist = userPlaylist.filter(t => t !== e.target.value);
+                    }
+                    // Sort to maintain original order
+                    userPlaylist.sort((a, b) => playlist.indexOf(a) - playlist.indexOf(b));
+                });
+            });
         }
 
         function initGame() {
             startLevel();
             updateScoreDisplay();
             setupAudioControls();
+            populatePlaylistModal();
             
             const startModal = document.getElementById('start-modal');
             startModalAnimationInterval = setInterval(() => {
@@ -1477,6 +1387,8 @@
                 }
             }, 300);
 
+            // --- Event Listeners ---
+            musicPlayer.addEventListener('ended', playNextTrack);
             document.getElementById('start-game-button').addEventListener('click', startGame);
             document.getElementById('play-again-button').addEventListener('click', () => { location.reload(); });
             document.getElementById('help-button').addEventListener('click', () => {
@@ -1488,6 +1400,25 @@
                 resumeGame();
             });
             document.getElementById('solve-button').addEventListener('click', onSolveButtonClick);
+
+            document.getElementById('about-button').addEventListener('click', () => {
+                document.getElementById('help-modal').classList.add('hidden');
+                document.getElementById('about-modal').classList.remove('hidden');
+            });
+            document.getElementById('close-about-button').addEventListener('click', () => {
+                document.getElementById('about-modal').classList.add('hidden');
+                document.getElementById('help-modal').classList.remove('hidden'); // Go back to help
+            });
+            
+            document.getElementById('playlist-button').addEventListener('click', () => {
+                document.getElementById('help-modal').classList.add('hidden');
+                document.getElementById('playlist-modal').classList.remove('hidden');
+            });
+            document.getElementById('close-playlist-button').addEventListener('click', () => {
+                document.getElementById('playlist-modal').classList.add('hidden');
+                document.getElementById('help-modal').classList.remove('hidden'); // Go back to help
+            });
+
 
             document.querySelectorAll('.difficulty-button').forEach(button => {
                 button.addEventListener('click', (e) => {
@@ -1509,4 +1440,3 @@
     </script>
 </body>
 </html>
- 
