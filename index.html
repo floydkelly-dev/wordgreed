@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Greed</title>
+    <link id="favicon" rel="icon" href="https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/WordGreedSiteIcon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
@@ -314,6 +315,10 @@
         let userPlaylist = [];
         let currentTrackIndex = 0;
         const musicBaseURL = 'https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/';
+        const mutedIconHref = 'https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/WordGreedSiteIcon.png';
+        const speakerSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M 20 40 L 40 40 L 60 20 L 60 80 L 40 60 L 20 60 Z" fill="white" stroke="black" stroke-width="2"/><path d="M 70 30 C 80 40, 80 60, 70 70" stroke="white" stroke-width="5" fill="none"/><path d="M 80 20 C 95 35, 95 65, 80 80" stroke="white" stroke-width="5" fill="none"/></svg>`;
+        const speakerIconHref = `data:image/svg+xml,${encodeURIComponent(speakerSVG)}`;
+
 
         // --- Game State ---
         let currentLevel = 1;
@@ -750,7 +755,7 @@
         }
 
         function reinitializeJackpotSquare(square) {
-            square.textContent = ' ';
+            square.textContent = '💰';
             square.style.backgroundColor = '';
             square.classList.remove('cooldown');
         }
@@ -1322,10 +1327,14 @@
 
         function updateVolumeIcon(volume) {
             const volumeToggleButton = document.getElementById('volume-toggle-button');
+            const favicon = document.getElementById('favicon');
+            
             if (volume === 0) {
                 volumeToggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
+                favicon.href = mutedIconHref;
             } else {
                  volumeToggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+                 favicon.href = speakerIconHref;
             }
         }
 
@@ -1452,4 +1461,3 @@
     </script>
 </body>
 </html>
- 
