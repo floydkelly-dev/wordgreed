@@ -4,6 +4,8 @@ Word Greed
 
 A fast-paced, high-stakes arcade puzzle game where your vocabulary is your greatest asset and your greed is your greatest enemy. Drag letters to solve words, grab massive prizes, and make split-second decisions to avoid game-ending bombs. How high can you score before your greed gets the best of you?
 
+A nice balance of relaxing sound makes this game enjoyable.
+
 Play it live on Netlify: https://wordgreed.netlify.app/
 
 Gameplay
