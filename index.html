@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Greed</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Lobster+Two:ital,wght@1,700&display=swap" rel="stylesheet">
@@ -27,6 +27,16 @@
             text-shadow: 
                 -3px -3px 0 #4a2c0f, 3px -3px 0 #4a2c0f, -3px 3px 0 #4a2c0f, 3px 3px 0 #4a2c0f,
                 4px 4px 2px rgba(0,0,0,0.6);
+        }
+
+        /* --- Coin Rotation Animation (Sped Up) --- */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .coin-rotate {
+            display: inline-block;
+            animation: spin 5s linear infinite;
         }
 
         @keyframes fly-along-path { 0% { offset-distance: 0%; opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
@@ -108,11 +118,15 @@
             animation: start-button-pulse 15s infinite;
         }
 
-        /* Close & Play Again Button Specifics */
-        #close-help-button, #play-again-button {
+        #play-again-button {
              background: linear-gradient(145deg, #6b7280, #4b5563);
              border-color: #9ca3af;
              border-bottom: 4px solid #1f2937;
+        }
+        #close-help-button {
+             background: linear-gradient(145deg, #5c97f5, #3b82f6);
+             border-color: #93c5fd;
+             border-bottom: 4px solid #1e3a8a;
         }
 
         .theme-button { width: 2.5rem; height: 2.5rem; border-radius: 50%; background-color: var(--panel-bg); border: 1px solid var(--panel-border); color: white; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; padding: 0; position: relative; }
@@ -198,9 +212,61 @@
             animation: twinkle ease-in-out infinite;
             pointer-events: none;
         }
+        
+        /* --- Volume Slider Styles --- */
+        input[type=range].volume-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range].volume-slider:focus {
+            outline: none;
+        }
+        input[type=range].volume-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        input[type=range].volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+            margin-top: -7px; /* You need to specify a margin in Chrome, but not in Firefox */
+            border: 2px solid #c4b5fd;
+            box-shadow: 0 0 5px #8b5cf6;
+        }
+        input[type=range].volume-slider::-moz-range-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        input[type=range].volume-slider::-moz-range-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #a78bfa;
+            cursor: pointer;
+            border: 2px solid #c4b5fd;
+            box-shadow: 0 0 5px #8b5cf6;
+        }
     </style>
 </head>
 <body class="text-white flex items-center justify-center min-h-screen p-4">
+
+    <!-- Background Music -->
+    <audio id="background-music" loop>
+        <source src="https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/wordgreed001.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 
     <div id="game-container" class="hidden flex-col md:flex-row gap-4 items-start justify-center">
         <!-- Game Grid Section -->
@@ -209,7 +275,6 @@
                 <div id="game-grid" class="grid grid-cols-9 gap-1 bg-slate-800/70 p-3 rounded-xl shadow-2xl border border-slate-700/50"></div>
                 <div id="bomb-drag-preview"></div>
             </div>
-            <!-- <div id="gjackvarnum-display" class="text-xs text-center text-slate-500">GJACKVARNUM: 0</div> -->
         </div>
 
         <!-- Score & Control Panel -->
@@ -233,7 +298,7 @@
                 <div id="score-container" class="greed-panel p-3 rounded-lg text-center flex flex-col gap-2">
                     <!-- Coins and Bags -->
                     <div class="grid grid-cols-2 gap-2 text-center">
-                        <div class="text-4xl" style="filter: drop-shadow(0 0 5px #fde047);">🪙</div>
+                        <div class="text-4xl coin-rotate" style="filter: drop-shadow(0 0 5px #fde047);">🪙</div>
                         <div class="text-4xl" style="filter: drop-shadow(0 0 5px #fde047);">💰</div>
                         <div id="coins-display" class="text-lg font-bold text-white">0</div>
                         <div id="bags-of-money-display" class="text-lg font-bold text-green-400">0</div>
@@ -332,23 +397,31 @@
 
     <!-- Help Modal -->
     <div id="help-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-        <div class="glass-panel p-6 rounded-2xl flex flex-col items-center gap-3 w-full max-w-lg relative">
+        <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-3 w-full max-w-lg relative">
             <h2 class="text-2xl font-bold text-amber-300">How to Play</h2>
             <table class="w-full text-sm my-2">
                 <tbody class="divide-y divide-slate-600">
                     <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">📝</td><td class="py-0.5 pr-2 font-bold text-green-400">Solve Words</td><td class="py-0.5 text-slate-300">Drag letters to solve words for <span class="font-bold text-white">10,000</span> coins.</td></tr>
-                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">📈</td><td class="py-0.5 pr-2 font-bold text-green-400">Complete Level</td><td class="py-0.5 text-slate-300">Solve all 4 words for a <span class="font-bold text-white">100,000</span> coin bonus.</td></tr>
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">🎉</td><td class="py-0.5 pr-2 font-bold text-green-400">Complete Level</td><td class="py-0.5 text-slate-300">Solve all 4 words for a <span class="font-bold text-white">100,000</span> coin bonus.</td></tr>
                     <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">🎁</td><td class="py-0.5 pr-2 font-bold text-white">Present</td><td class="py-0.5 text-slate-300">+<span class="font-bold text-white">1,500,000</span> coins.</td></tr>
                     <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">🏆</td><td class="py-0.5 pr-2 font-bold text-white">Trophy</td><td class="py-0.5 text-slate-300">+<span class="font-bold text-white">3,500,000</span> coins.</td></tr>
                     <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">💎</td><td class="py-0.5 pr-2 font-bold text-white">Diamond</td><td class="py-0.5 text-slate-300">+<span class="font-bold text-white">20,000,000</span> coins & board clear.</td></tr>
                     <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">⚡</td><td class="py-0.5 pr-2 font-bold text-white">Lightning</td><td class="py-0.5 text-slate-300">+<span class="font-bold text-white">20,000</span> coins, but <strong class="text-red-400">resets Bags of Money!</strong></td></tr>
-                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">💣</td><td class="py-0.5 pr-2 font-bold text-green-400">Green Bomb</td><td class="py-0.5 text-slate-300">Solves adjacent letters & collects prizes.</td></tr>
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">💣</td><td class="py-0.5 pr-2 font-bold text-green-400">Green Bomb</td><td class="py-0.5 text-slate-300">Drag to a puzzle to solve key letters & collect prizes.</td></tr> <!-- MODIFIED: Text -->
                     <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">💣</td><td class="py-0.5 pr-2 font-bold text-red-400">Red Bomb</td><td class="py-0.5 text-slate-300">GAME OVER!</td></tr>
-                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">❄️</td><td class="py-0.5 pr-2 font-bold text-blue-300">Snowflake</td><td class="py-0.5 text-slate-300">Freezes all prizes for 1 minute.</td></tr>
+                    <tr class="align-middle"><td class="py-0.5 pr-2 text-2xl">❄️</td><td class="py-0.5 pr-2 font-bold text-blue-300">Snowflake</td><td class="py-0.5 text-slate-300">Freezes all prizes for 15 seconds.</td></tr> <!-- MODIFIED: Text -->
                 </tbody>
             </table>
-            <button id="close-help-button" class="glassy-button mt-2 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
-            <div class="absolute bottom-4 right-4 text-xs text-slate-500">v1.0</div>
+            <div class="w-full flex justify-between items-center mt-2">
+                <div class="flex items-center gap-3">
+                    <button id="volume-toggle-button" class="text-2xl hover:text-white text-slate-300 transition-colors">
+                        <!-- Speaker icons will be injected here by JS -->
+                    </button>
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.01" class="volume-slider w-32">
+                </div>
+                <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
+            </div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.1</div>
         </div>
     </div>
 
@@ -392,9 +465,10 @@
         let startModalAnimationInterval = null;
         let maxSameEmoji = 4; // Default difficulty
         let isDraggingBomb = false;
+        let lastVolume = 0.5;
 
         // --- Word Bank & Prize Data ---
-        const wordBank = ["ABROAD","ACCEPT","ACCESS","ACROSS","ACTION","ACTIVE","ADMIRE","ADVICE","AFFAIR","AFFECT","AFFORD","AGENCY","AGENDA","ALMOST","ALWAYS","AMOUNT","ANIMAL","ANNUAL","ANSWER","ANYONE","ANYWAY","APART","APPEAL","APPEAR","APPLY","APPROVE","AROUND","ARRIVE","ARTIST","ASLEEP","ASPECT","ASSESS","ASSIST","ASSUME","ATTACK","ATTEND","ATTRACT","AUTHOR","AWARD","BALANCE","BECOME","BEHAVE","BELIEF","BELONG","BENEATH","BENEFIT","BESIDE","BEYOND","BISHOP","BORDER","BOTTLE","BOTTOM","BRANCH","BREATH","BRIDGE","BRIEFLY","BRIGHT","BROKEN","BUDGET","BURDEN","CAMERA","CANCEL","CANCER","CANDLE","CAPITAL","CAREER","CAREFUL","CENTRAL","CENTURY","CERTAIN","CHAIR","CHALLENGE","CHANCE","CHANGE","CHARGE","CHOICE","CHOOSE","CHURCH","CIRCLE","CLIENT","CLIMB","CLOSELY","CLOSER","COFFEE","COLLECT","COLLEGE","COLUMN","COMBINE","COMFORT","COMMAND","COMMENT","COMMIT","COMMON","COMPARE","COMPETE","COMPLEX","CONCEPT","CONCERN","CONFIRM","CONFLICT","CONNECT","CONSENT","CONSIST","CONTACT","CONTAIN","CONTENT","CONTEST","CONTEXT","CONTROL","CONVERT","CORNER","COUNCIL","COUNTY","COUPLE","COVER","CREATE","CREDIT","CRISIS","CRITERION","CRITIC","CROWD","CULTURE","CURRENT","CUSTOM","DAMAGE","DANGER","DEALER","DEBATE","DECADE","DECIDE","DECLARE","DECREASE","DEEPLY","DEFAULT","DEFENCE","DEFEND","DEFINE","DEGREE","DELAY","DELIVER","DEMAND","DEPEND","DEPICT","DEPOSIT","DEPUTY","DERIVE","DESIGN","DESIRE","DESPITE","DESTROY","DETAIL","DETECT","DEVELOP","DEVICE","DEVOTE","DIFFER","DIFFICULT","DINNER","DIRECT","DISCUSS","DISEASE","DISMISS","DISPLAY","DISTANT","DIVIDE","DIVISION","DOCTOR","DOCUMENT","DOUBLE","DOUBT","DOZEN","DREAM","DRINK","DRIVE","EAGER","EARLY","EARTH","EASTERN","ECONOMIC","ECONOMY","EDITOR","EDUCATE","EFFECT","EFFORT","EIGHT","EITHER","ELDERLY","ELECT","ELEMENT","ELSE","EMERGE","EMPHASIS","EMPLOY","ENABLE","ENCOURAGE","ENGINE","ENJOY","ENOUGH","ENSURE","ENTER","ENTIRE","ENTITLE","EQUALLY","EQUIP","ESCAPE","ESSAY","ESSENTIAL","ESTATE","ETHNIC","EVENT","EVERY","EXACTLY","EXAMINE","EXAMPLE","EXCEED","EXCEPT","EXCHANGE","EXCITE","EXCLUDE","EXCUSE","EXERCISE","EXIST","EXPECT","EXPENSE","EXPERIENCE","EXPERT","EXPLAIN","EXPLORE","EXPOSE","EXPRESS","EXTEND","EXTENT","EXTERNAL","EXTRA","EXTREME","FACTOR","FACULTY","FAILED","FAILURE","FAIRLY","FAITH","FAMLIAR","FAMOUS","FARMER","FASHION","FATHER","FAVOUR","FEELING","FEMALE","FIFTEEN","FIGHT","FIGURE","FINANCE","FINALLY","FINGER","FINISH","FLIGHT","FLOWER","FOLLOW","FOOTBALL","FORCE","FOREIGN","FOREST","FORGET","FORMAL","FORMER","FORWARD","FOUND","FOURTH","FRAME","FREEDOM","FRIEND","FUNCTION","FUTURE","GARDEN","GATHER","GENERAL","GENERATION","GENTLE","GLOBAL","GOLDEN","GROUND","GROWTH","GUARD","GUILTY","HANDLE","HAPPEN","HARDLY","HEALTH","HEAVILY","HEIGHT","HENCE","HOLIDAY","HORSE","HOSPITAL","HOUSE","HOWEVER","HUMAN","HUSBAND","IMPACT","IMPLY","IMPORT","IMPOSE","IMPROVE","INCLUDE","INCREASE","INDEED","INDICATE","INDIVIDUAL","INDUSTRY","INFORM","INITIAL","INJURY","INSIDE","INSIST","INSTANCE","INSTEAD","INSTITUTE","INTEND","INTEREST","INTERNAL","INVOLVE","ISLAND","ISSUE","ITSELF","JOINT","JUDGE","JUDGMENT","JUNIOR","JUSTICE","LABOUR","LANGUAGE","LARGELY","LATTER","LAUGH","LAWYER","LEADER","LEAGUE","LEARN","LEAVE","LEGAL","LENGTH","LESSON","LETTER","LEVEL","LIBERAL","LIBRARY","LICENCE","LIMIT","LIMITED","LITTLE","LOCAL","LONDON","LONGER","MACHINE","MAJOR","MANAGE","MANAGER","MANNER","MANY","MARKET","MARRIAGE","MATCH","MATERIAL","MATTER","MEASURE","MEDIA","MEDICAL","MEETING","MEMBER","MEMORY","MENTAL","MENTION","MERELY","METHOD","MIDDLE","MIGHT","MILE","MILITARY","MINISTER","MINOR","MINORITY","MINUTE","MISSION","MISTAKE","MODEL","MODERN","MODULE","MOMENT","MONEY","MONTH","MORAL","MORNING","MOTHER","MOTION","MOTOR","MOUNTAIN","MOUTH","MOVEMENT","MOVIE","MUCH","MUSIC","MYSELF","NARROW","NATION","NATIONAL","NATIVE","NATURAL","NATURE","NEARLY","NECESSARY","NEEDLE","NEITHER","NERVE","NETWORK","NEVER","NEWLY","NIGHT","NOBODY","NORMAL","NORTHERN","NOTICE","NOTION","NOWHERE","NUMBER","OBJECT","OBSERVE","OBTAIN","OBVIOUS","OCCASION","OCCUR","OFFENCE","OFFER","OFFICE","OFFICER","OFFICIAL","OFTEN","ONCE","ONLINE","ONLY","ONTO","OPENING","OPERATE","OPPORTUNITY","OPPOSE","OPPOSITE","ORDER","ORDINARY","ORGANISE","ORIGIN","ORIGINAL","OTHER","OUGHT","OUTCOME","OUTSIDE","OVERALL","OWNER","PACKAGE","PAINT","PANEL","PARENT","PARISH","PARLIAMENT","PARTLY","PARTNER","PARTY","PASSAGE","PATIENT","PATTERN","PEACE","PEOPLE","PERFORM","PERHAPS","PERIOD","PERMIT","PERSON","PERSONAL","PHONE","PHOTO","PHYSICAL","PICTURE","PIECE","PLACE","PLANNING","PLANT","PLASTIC","PLAYER","POCKET","POINT","POLICE","POLICY","POLITICAL","POLLUTION","POPULAR","POSITION","POSITIVE","POSSIBLE","POSTER","POWER","PRACTICE","PREFER","PREPARE","PRESENCE","PRESENT","PRESIDENT","PRESS","PRESSURE","PRETTY","PREVIOUS","PRICE","PRIMARY","PRINCIPLE","PRINT","PRIOR","PRIORITY","PRISON","PRIVATE","PROBABLY","PROBLEM","PROCEDURE","PROCESS","PRODUCE","PRODUCT","PROFESSION","PROFILE","PROFIT","PROGRAM","PROGRESS","PROJECT","PROMISE","PROMOTE","PROPER","PROPERTY","PROPOSE","PROTECT","PROVIDE","PUBLIC","PUBLISH","PURPOSE","PUSH","QUALITY","QUARTER","QUESTION","QUICKLY","QUITE","RAISE","RANGE","RAPIDLY","RATELY","RATHER","REACH","REACTION","READER","READING","READY","REALISE","REALLY","REASON","RECALL","RECEIVE","RECENT","RECENTLY","RECOGNISE","RECORD","RECOVER","REDUCE","REFER","REFLECT","REFORM","REFUSE","REGARD","REGION","REGIONAL","REGULAR","RELATE","RELATION","RELATIVE","RELEASE","RELEVANT","RELIEF","RELIGION","REMAIN","REMEMBER","REMOVE","REPEAT","REPLACE","REPLY","REPORT","REPRESENT","REQUEST","REQUIRE","RESEARCH","RESOURCE","RESPECT","RESPOND","RESPONSE","RESULT","RETAIN","RETURN","REVEAL","REVENUE","REVIEW","REVOLUTION","RIGHT","RING","RISE","ROAD","ROLE","ROOM","ROUND","ROUTE","ROYAL","RULE","SAFETY","SALE","SAME","SAMPLE","SAVE","SCALE","SCENE","SCHEME","SCHOOL","SCIENCE","SCORE","SCREEN","SEARCH","SEASON","SECOND","SECRETARY","SECTION","SECTOR","SECURE","SEEM","SELECT","SENIOR","SENSE","SENSITIVE","SENTENCE","SEPARATE","SEQUENCE","SERIES","SERIOUS","SERVANT","SERVICE","SESSION","SETTLE","SEVEN","SEVERAL","SEVERE","SHARE","SHEET","SHOOT","SHORT","SHOT","SHOULD","SHOULDER","SHOUT","SHOW","SIDE","SIGHT","SIGN","SIGNAL","SILENCE","SIMPLE","SIMPLY","SINCE","SINGLE","SISTER","SITE","SITUATION","SIZE","SKILL","SKIN","SLEEP","SLIGHTLY","SLOWLY","SOCIAL","SOCIETY","SOLDIER","SOLUTION","SOME","SOMEHOW","SOMEONE","SOMETHING","SOMETIMES","SOMEWHAT","SOON","SORRY","SORT","SOUND","SOURCE","SOUTHERN","SPACE","SPEAK","SPECIAL","SPECIFIC","SPEECH","SPEED","SPEND","SPIRIT","SPORT","SPOT","SPREAD","SPRING","SQUARE","STAFF","STAGE","STAND","STANDARD","START","STATE","STATEMENT","STATION","STATUS","STAY","STEP","STILL","STOCK","STONE","STOP","STORE","STORY","STRAIGHT","STRANGE","STRATEGY","STREET","STRENGTH","STRESS","STRIKE","STRONG","STRUCTURE","STUDENT","STUDIO","STUDY","STYLE","SUBJECT","SUBMIT","SUCCEED","SUCCESS","SUCH","SUDDENLY","SUFFER","SUGGEST","SUMMER","SUPPORT","SUPPOSE","SURELY","SURFACE","SURVEY","SURVIVE","SWITCH","SYSTEM","TABLE","TAKE","TALK","TARGET","TASK","TEACH","TEACHER","TEAM","TECHNOLOGY","TELEPHONE","TELEVISION","TEMPERATURE","TERM","TERRIBLE","TEST","THANKS","THEATRE","THEIR","THEME","THEMSELVES","THEN","THEORY","THERE","THESE","THEY","THING","THINK","THIRD","THIRTY","THIS","THOSE","THOUGH","THOUSAND","THREAT","THREATEN","THREE","THROUGH","THROW","TICKET","TIME","TITLE","TODAY","TOGETHER","TOMORROW","TONE","TONIGHT","TOTAL","TOTALLY","TOUCH","TOUR","TOWARDS","TOWN","TRADE","TRADITION","TRAFFIC","TRAIN","TRAINING","TRANSFER","TRANSPORT","TRAVEL","TREAT","TREATMENT","TREATY","TREE","TREND","TRIAL","TRIP","TROOP","TROUBLE","TRUE","TRUST","TRUTH","TWENTY","TWICE","TYPE","UNDER","UNDERSTAND","UNION","UNIQUE","UNIT","UNITED","UNIVERSITY","UNLESS","UNLIKE","UNTIL","UPON","UPPER","URBAN","USER","USUAL","USUALLY","VALLEY","VALUE","VARIETY","VARIOUS","VEHICLE","VERSION","VERY","VIDEO","VIEW","VILLAGE","VIOLENCE","VISION","VISIT","VISITOR","VOICE","VOLUME","VOTE","WAIT","WALK","WALL","WANT","WAR","WATCH","WATER","WAY","WEALTH","WEAPON","WEAR","WEATHER","WEEK","WEEKEND","WEIGHT","WELCOME","WELL","WESTERN","WHAT","WHATEVER","WHEN","WHERE","WHETHER","WHICH","WHILE","WHITE","WHOLE","WHOM","WHOSE","WIDE","WIDELY","WIFE","WILD","WILL","WINDOW","WINE","WINTER","WISH","WITHIN","WITHOUT","WOMAN","WONDER","WOOD","WORD","WORK","WORKER","WORLD","WORRY","WORTH","WOULD","WRITE","WRITER","WRONG","YARD","YEAR","YOUNG","YOURSELF","YOUTH"];
+        const wordBank = ["ABROAD","ACCEPT","ACCESS","ACROSS","ACTION","ACTIVE","ADMIRE","ADVICE","AFFAIR","AFFECT","AFFORD","AGENCY","AGENDA","ALMOST","ALWAYS","AMOUNT","ANIMAL","ANNUAL","ANSWER","ANYONE","ANYWAY","APART","APPEAL","APPEAR","APPLY","APPROVE","AROUND","ARRIVE","ARTIST","ASLEEP","ASPECT","ASSESS","ASSIST","ASSUME","ATTACK","ATTEND","ATTRACT","AUTHOR","AWARD","BALANCE","BECOME","BEHAVE","BELIEF","BELONG","BENEATH","BENEFIT","BESIDE","BEYOND","BISHOP","BORDER","BOTTLE","BOTTOM","BRANCH","BREATH","BRIDGE","BRIEFLY","BRIGHT","BROKEN","BUDGET","BURDEN","CAMERA","CANCEL","CANCER","CANDLE","CAPITAL","CAREER","CAREFUL","CENTRAL","CENTURY","CERTAIN","CHAIR","CHALLENGE","CHANCE","CHANGE","CHARGE","CHOICE","CHOOSE","CHURCH","CIRCLE","CLIENT","CLIMB","CLOSELY","CLOSER","COFFEE","COLLECT","COLLEGE","COLUMN","COMBINE","COMFORT","COMMAND","COMMENT","COMMIT","COMMON","COMPARE","COMPETE","COMPLEX","CONCEPT","CONCERN","CONFIRM","CONFLICT","CONNECT","CONSENT","CONSIST","CONTACT","CONTAIN","CONTENT","CONTEST","CONTEXT","CONTROL","CONVERT","CORNER","COUNCIL","COUNTY","COUPLE","COVER","CREATE","CREDIT","CRISIS","CRITERION","CRITIC","CROWD","CULTURE","CURRENT","CUSTOM","DAMAGE","DANGER","DEALER","DEBATE","DECADE","DECIDE","DECLARE","DECREASE","DEEPLY","DEFAULT","DEFENCE","DEFEND","DEFINE","DEGREE","DELAY","DELIVER","DEMAND","DEPEND","DEPICT","DEPOSIT","DEPUTY","DERIVE","DESIGN","DESIRE","DESPITE","DESTROY","DETAIL","DETECT","DEVELOP","DEVICE","DEVOTE","DIFFER","DIFFICULT","DINNER","DIRECT","DISCUSS","DISEASE","DISMISS","DISPLAY","DISTANT","DIVIDE","DIVISION","DOCTOR","DOCUMENT","DOUBLE","DOUBT","DOZEN","DREAM","DRINK","DRIVE","EAGER","EARLY","EARTH","EASTERN","ECONOMIC","ECONOMY","EDITOR","EDUCATE","EFFECT","EFFORT","EIGHT","EITHER","ELDERLY","ELECT","ELEMENT","ELSE","EMERGE","EMPHASIS","EMPLOY","ENABLE","ENCOURAGE","ENGINE","ENJOY","ENOUGH","ENSURE","ENTER","ENTIRE","ENTITLE","EQUALLY","EQUIP","ESCAPE","ESSAY","ESSENTIAL","ESTATE","ETHNIC","EVENT","EVERY","EXACTLY","EXAMINE","EXAMPLE","EXCEED","EXCEPT","EXCHANGE","EXCITE","EXCLUDE","EXCUSE","EXERCISE","EXIST","EXPECT","EXPENSE","EXPERIENCE","EXPERT","EXPLAIN","EXPLORE","EXPOSE","EXPRESS","EXTEND","EXTENT","EXTERNAL","EXTRA","EXTREME","FACTOR","FACULTY","FAILED","FAILURE","FAIRLY","FAITH","FAMLIAR","FAMOUS","FARMER","FASHION","FATHER","FAVOUR","FEELING","FEMALE","FIFTEEN","FIGHT","FIGURE","FINANCE","FINALLY","FINGER","FINISH","FLIGHT","FLOWER","FOLLOW","FOOTBALL","FORCE","FOREIGN","FOREST","FORGET","FORMAL","FORMER","FORWARD","FOUND","FOURTH","FRAME","FREEDOM","FRIEND","FUNCTION","FUTURE","GARDEN","GATHER","GENERAL","GENERATION","GENTLE","GLOBAL","GOLDEN","GROUND","GROWTH","GUARD","GUILTY","HANDLE","HAPPEN","HARDLY","HEALTH","HEAVILY","HEIGHT","HENCE","HOLIDAY","HORSE","HOSPITAL","HOUSE","HOWEVER","HUMAN","HUSBAND","IMPACT","IMPLY","IMPORT","IMPOSE","IMPROVE","INCLUDE","INCREASE","INDEED","INDICATE","INDIVIDUAL","INDUSTRY","INFORM","INITIAL","INJURY","INSIDE","INSIST","INSTANCE","INSTEAD","INSTITUTE","INTEND","INTEREST","INTERNAL","INVOLVE","ISLAND","ISSUE","ITSELF","JOINT","JUDGE","JUDGMENT","JUNIOR","JUSTICE","LABOUR","LANGUAGE","LARGELY","LATTER","LAUGH","LAWYER","LEADER","LEAGUE","LEARN","LEAVE","LEGAL","LENGTH","LESSON","LETTER","LEVEL","LIBERAL","LIBRARY","LICENCE","LIMIT","LIMITED","LITTLE","LOCAL","LONDON","LONGER","MACHINE","MAJOR","MANAGE","MANAGER","MANNER","MANY","MARKET","MARRIAGE","MATCH","MATERIAL","MATTER","MEASURE","MEDIA","MEDICAL","MEETING","MEMBER","MEMORY","MENTAL","MENTION","MERELY","METHOD","MIDDLE","MIGHT","MILE","MILITARY","MINISTER","MINOR","MINORITY","MINUTE","MISSION","MISTAKE","MODEL","MODERN","MODULE","MOMENT","MONEY","MONTH","MORAL","MORNING","MOTHER","MOTION","MOTOR","MOUNTAIN","MOUTH","MOVEMENT","MOVIE","MUCH","MUSIC","MYSELF","NARROW","NATION","NATIONAL","NATIVE","NATURAL","NATURE","NEARLY","NECESSary","NEEDLE","NEITHER","NERVE","NETWORK","NEVER","NEWLY","NIGHT","NOBODY","NORMAL","NORTHERN","NOTICE","NOTION","NOWHERE","NUMBER","OBJECT","OBSERVE","OBTAIN","OBVIOUS","OCCASION","OCCUR","OFFENCE","OFFER","OFFICE","OFFICER","OFFICIAL","OFTEN","ONCE","ONLINE","ONLY","ONTO","OPENING","OPERATE","OPPORTUNITY","OPPOSE","OPPOSITE","ORDER","ORDINARY","ORGANISE","ORIGIN","ORIGINAL","OTHER","OUGHT","OUTCOME","OUTSIDE","OVERALL","OWNER","PACKAGE","PAINT","PANEL","PARENT","PARISH","PARLIAMENT","PARTLY","PARTNER","PARTY","PASSAGE","PATIENT","PATTERN","PEACE","PEOPLE","PERFORM","PERHAPS","PERIOD","PERMIT","PERSON","PERSONAL","PHONE","PHOTO","PHYSICAL","PICTURE","PIECE","PLACE","PLANNING","PLANT","PLASTIC","PLAYER","POCKET","POINT","POLICE","POLICY","POLITICAL","POLLUTION","POPULAR","POSITION","POSITIVE","POSSIBLE","POSTER","POWER","PRACTICE","PREFER","PREPARE","PRESENCE","PRESENT","PRESIDENT","PRESS","PRESSURE","PRETTY","PREVIOUS","PRICE","PRIMARY","PRINCIPLE","PRINT","PRIOR","PRIORITY","PRISON","PRIVATE","PROBABLY","PROBLEM","PROCEDURE","PROCESS","PRODUCE","PRODUCT","PROFESSION","PROFILE","PROFIT","PROGRAM","PROGRESS","PROJECT","PROMISE","PROMOTE","PROPER","PROPERTY","PROPOSE","PROTECT","PROVIDE","PUBLIC","PUBLISH","PURPOSE","PUSH","QUALITY","QUARTER","QUESTION","QUICKLY","QUITE","RAISE","RANGE","RAPIDLY","RATELY","RATHER","REACH","REACTION","READER","READING","READY","REALISE","REALLY","REASON","RECALL","RECEIVE","RECENT","RECENTLY","RECOGNISE","RECORD","RECOVER","REDUCE","REFER","REFLECT","REFORM","REFUSE","REGARD","REGION","REGIONAL","REGULAR","RELATE","RELATION","RELATIVE","RELEASE","RELEVANT","RELIEF","RELIGION","REMAIN","REMEMBER","REMOVE","REPEAT","REPLACE","REPLY","REPORT","REPRESENT","REQUEST","REQUIRE","RESEARCH","RESOURCE","RESPECT","RESPOND","RESPONSE","RESULT","RETAIN","RETURN","REVEAL","REVENUE","REVIEW","REVOLUTION","RIGHT","RING","RISE","ROAD","ROLE","ROOM","ROUND","ROUTE","ROYAL","RULE","SAFETY","SALE","SAME","SAMPLE","SAVE","SCALE","SCENE","SCHEME","SCHOOL","SCIENCE","SCORE","SCREEN","SEARCH","SEASON","SECOND","SECRETARY","SECTION","SECTOR","SECURE","SEEM","SELECT","SENIOR","SENSE","SENSITIVE","SENTENCE","SEPARATE","SEQUENCE","SERIES","SERIOUS","SERVANT","SERVICE","SESSION","SETTLE","SEVEN","SEVERAL","SEVERE","SHARE","SHEET","SHOOT","SHORT","SHOT","SHOULD","SHOULDER","SHOUT","SHOW","SIDE","SIGHT","SIGN","SIGNAL","SILENCE","SIMPLE","SIMPLY","SINCE","SINGLE","SISTER","SITE","SITUATION","SIZE","SKILL","SKIN","SLEEP","SLIGHTLY","SLOWLY","SOCIAL","SOCIETY","SOLDIER","SOLUTION","SOME","SOMEHOW","SOMEONE","SOMETHING","SOMETIMES","SOMEWHAT","SOON","SORRY","SORT","SOUND","SOURCE","SOUTHERN","SPACE","SPEAK","SPECIAL","SPECIFIC","SPEECH","SPEED","SPEND","SPIRIT","SPORT","SPOT","SPREAD","SPRING","SQUARE","STAFF","STAGE","STAND","STANDARD","START","STATE","STATEMENT","STATION","STATUS","STAY","STEP","STILL","STOCK","STONE","STOP","STORE","STORY","STRAIGHT","STRANGE","STRATEGY","STREET","STRENGTH","STRESS","STRIKE","STRONG","STRUCTURE","STUDENT","STUDIO","STUDY","STYLE","SUBJECT","SUBMIT","SUCCEED","SUCCESS","SUCH","SUDDENLY","SUFFER","SUGGEST","SUMMER","SUPPORT","SUPPOSE","SURELY","SURFACE","SURVEY","SURVIVE","SWITCH","SYSTEM","TABLE","TAKE","TALK","TARGET","TASK","TEACH","TEACHER","TEAM","TECHNOLOGY","TELEPHONE","TELEVISION","TEMPERATURE","TERM","TERRIBLE","TEST","THANKS","THEATRE","THEIR","THEME","THEMSELVES","THEN","THEORY","THERE","THESE","THEY","THING","THINK","THIRD","THIRTY","THIS","THOSE","THOUGH","THOUSAND","THREAT","THREATEN","THREE","THROUGH","THROW","TICKET","TIME","TITLE","TODAY","TOGETHER","TOMORROW","TONE","TONIGHT","TOTAL","TOTALLY","TOUCH","TOUR","TOWARDS","TOWN","TRADE","TRADITION","TRAFFIC","TRAIN","TRAINING","TRANSFER","TRANSPORT","TRAVEL","TREAT","TREATMENT","TREATY","TREE","TREND","TRIAL","TRIP","TROOP","TROUBLE","TRUE","TRUST","TRUTH","TWENTY","TWICE","TYPE","UNDER","UNDERSTAND","UNION","UNIQUE","UNIT","UNITED","UNIVERSITY","UNLESS","UNLIKE","UNTIL","UPON","UPPER","URBAN","USER","USUAL","USUALLY","VALLEY","VALUE","VARIETY","VARIOUS","VEHICLE","VERSION","VERY","VIDEO","VIEW","VILLAGE","VIOLENCE","VISION","VISIT","VISITOR","VOICE","VOLUME","VOTE","WAIT","WALK","WALL","WANT","WAR","WATCH","WATER","WAY","WEALTH","WEAPON","WEAR","WEATHER","WEEK","WEEKEND","WEIGHT","WELCOME","WELL","WESTERN","WHAT","WHATEVER","WHEN","WHERE","WHETHER","WHICH","WHILE","WHITE","WHOLE","WHOM","WHOSE","WIDE","WIDELY","WIFE","WILD","WILL","WINDOW","WINE","WINTER","WISH","WITHIN","WITHOUT","WOMAN","WONDER","WOOD","WORD","WORK","WORKER","WORLD","WORRY","WORTH","WOULD","WRITE","WRITER","WRONG","YARD","YEAR","YOUNG","YOURSELF","YOUTH"];
         const prizeEmojis = [
             { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: '💣', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: '💰', value: 1000000, type: 'cash_money' }
         ];
@@ -402,10 +476,6 @@
             { length: 5, indices: [11, 12, 13, 14, 15] }, { length: 7, indices: [28, 29, 30, 31, 32, 33, 34] }, { length: 7, indices: [46, 47, 48, 49, 50, 51, 52] }, { length: 5, indices: [65, 66, 67, 68, 69] }
         ];
         
-        /**
-         * Generates the four word puzzles for the current level.
-         * It ensures no duplicate words are used.
-         */
         function generatePuzzlesForLevel() {
             puzzles = [];
             let availableWords = [...wordBank];
@@ -419,10 +489,6 @@
             });
         }
         
-        /**
-         * Sets up the game for a new level.
-         * Resets level-specific variables and initializes the grid.
-         */
         function startLevel() {
             document.getElementById('level-display').textContent = currentLevel;
             trophyCollectedThisLevel = false;
@@ -437,9 +503,6 @@
             initializeGrid();
         }
 
-        /**
-         * Creates the game grid, placing puzzle tiles, the jackpot square, and empty tiles.
-         */
         function initializeGrid() {
             gridContainer.innerHTML = '';
             puzzles.forEach(p => p.scrambled = shuffleWord(p.word));
@@ -451,7 +514,6 @@
                 tile.id = `tile-${i}`;
 
                 if (allPuzzleIndices.includes(i)) {
-                    // This is a puzzle tile
                     for (const puzzle of puzzles) {
                         if (puzzle.indices.includes(i)) {
                             const letterIndex = puzzle.indices.indexOf(i);
@@ -464,24 +526,17 @@
                         }
                     }
                 } else if (i === 40) {
-                    // This is the central jackpot square
                     tile.id = 'jackpot-square';
                     tile.classList.add('bg-amber-500', 'border-2', 'border-amber-300', 'text-4xl');
                     tile.textContent = '💰';
                     tile.addEventListener('click', onJackpotClick);
                 } else {
-                    // This is a standard empty tile
                     tile.classList.add('bg-slate-900/50', 'border', 'border-slate-800/50');
                 }
                 gridContainer.appendChild(tile);
             }
         }
 
-        /**
-         * Shuffles the letters of a word using the Fisher-Yates algorithm.
-         * @param {string} word - The word to shuffle.
-         * @returns {string} The shuffled word.
-         */
         function shuffleWord(word) {
             let array = word.split('');
             for (let i = array.length - 1; i > 0; i--) {
@@ -489,14 +544,9 @@
                 [array[i], array[j]] = [array[j], array[i]];
             }
             let shuffled = array.join('');
-            // Ensure the shuffled word isn't the same as the original
             return shuffled === word ? shuffleWord(word) : shuffled;
         }
 
-        /**
-         * Adds necessary drag-and-drop event listeners to a puzzle tile.
-         * @param {HTMLElement} tile - The tile element.
-         */
         function addDragListeners(tile) {
             tile.addEventListener('dragstart', handleDragStart);
             tile.addEventListener('dragover', handleDragOver);
@@ -548,7 +598,6 @@
                 draggedTile && draggedTile.classList.contains('word-puzzle-tile') &&
                 dropTarget.dataset.puzzleIndex === draggedTile.dataset.puzzleIndex &&
                 draggedTile !== dropTarget && !dropTarget.classList.contains('solved')) {
-                // Swap the letters
                 const tempText = draggedTile.textContent;
                 draggedTile.textContent = dropTarget.textContent;
                 dropTarget.textContent = tempText;
@@ -565,10 +614,6 @@
             draggedTile = null;
         }
 
-        /**
-         * Checks all puzzles on the board to see if they are solved.
-         * Awards points and handles level completion.
-         */
         function checkAllPuzzles() {
             let allWordsOnBoardAreSolved = true;
             puzzles.forEach((puzzle) => {
@@ -578,7 +623,7 @@
 
                     if (currentWord === puzzle.word) {
                         puzzle.solved = true;
-                        timeSinceLastSolve = 0; // Reset decay timer
+                        timeSinceLastSolve = 0;
                         coins += 10000;
                         updateScoreDisplay();
                         flashScore('gain');
@@ -587,7 +632,6 @@
                         if (!isFrozen) {
                             triggerCoinAnimation(startTile, document.getElementById('coins-display'));
                         }
-                        // Mark tiles as solved
                         puzzle.indices.forEach(index => {
                             const tile = document.getElementById(`tile-${index}`);
                             tile.classList.add('solved');
@@ -601,7 +645,7 @@
 
             if (allWordsOnBoardAreSolved && puzzles.length > 0) {
                 if (isFrozen) endFreeze();
-                coins += 100000; // Level completion bonus
+                coins += 100000;
                 updateScoreDisplay();
                 flashScore('gain');
                 showEventText("Level Up!");
@@ -611,9 +655,6 @@
             }
         }
 
-        /**
-         * Updates the coin and bags of money displays.
-         */
         function updateScoreDisplay() {
             bagsOfMoney = Math.floor(currentLevel * (Math.floor(coins / 1000) / 10));
             const coinsDisplay = document.getElementById('coins-display');
@@ -622,15 +663,11 @@
             coinsDisplay.classList.remove('score-decay');
         }
 
-        /**
-         * Flashes the score display to indicate a change.
-         * @param {string} type - 'gain' or 'deduct'.
-         */
         function flashScore(type = 'gain') {
             const coinsDisplay = document.getElementById('coins-display');
             const flashClass = type === 'gain' ? 'gain-flash' : 'deduct-flash';
             coinsDisplay.classList.remove('gain-flash', 'deduct-flash');
-            void coinsDisplay.offsetWidth; // Trigger reflow
+            void coinsDisplay.offsetWidth;
             coinsDisplay.classList.add(flashClass);
             setTimeout(() => { coinsDisplay.classList.remove(flashClass); }, 800);
         }
@@ -647,9 +684,6 @@
             setTimeout(() => { levelDisplay.classList.remove('level-flash'); }, 1500);
         }
         
-        /**
-         * Main game timer loop. Also triggers timed events.
-         */
         function updateTimer() {
             if (timeRemaining > 0 && !isGamePaused) {
                 timeRemaining--;
@@ -658,7 +692,6 @@
                 const seconds = (timeRemaining % 60).toString().padStart(2, '0');
                 document.getElementById('timer-display').textContent = `${minutes}:${seconds}`;
 
-                // Timed events
                 if (timeRemaining === 580 && !specialCashEmojiSpawned) {
                     specialCashEmojiSpawned = true;
                     spawnSpecialCashEmoji();
@@ -680,9 +713,6 @@
             }
         }
         
-        /**
-         * Activates the special 50M coin jackpot event for a limited time.
-         */
         function activateSpecialJackpot() {
             const jackpotSquare = document.getElementById('jackpot-square');
             jackpotSquare.classList.add('wild-pulse');
@@ -698,18 +728,12 @@
             };
             jackpotSquare.addEventListener('click', specialJackpotHandler);
 
-            // Event expires after 15 seconds
             specialJackpotTimeout = setTimeout(() => {
                 jackpotSquare.classList.remove('wild-pulse');
                 jackpotSquare.removeEventListener('click', specialJackpotHandler);
             }, 15000);
         }
 
-        /**
-         * Creates a flying coin animation from a start to an end element.
-         * @param {HTMLElement} startElement - The element to start from.
-         * @param {HTMLElement} endElement - The element to fly to.
-         */
         function triggerCoinAnimation(startElement, endElement) {
             const startRect = startElement.getBoundingClientRect();
             const endRect = endElement.getBoundingClientRect();
@@ -718,7 +742,7 @@
             const endX = endRect.left + endRect.width / 2;
             const endY = endRect.top + endRect.height / 2;
             const controlX = startX + (endX - startX) / 2;
-            const controlY = startY - 100; // Arc upwards
+            const controlY = startY - 100;
             const curve = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
 
             for (let i = 0; i < 15; i++) {
@@ -751,10 +775,6 @@
             setTimeout(() => coin.remove(), 800);
         }
 
-        /**
-         * Creates a coin implosion effect at a specific element.
-         * @param {HTMLElement} originElement - The element where the implosion occurs.
-         */
         function triggerCoinImplosion(originElement) {
             const originRect = originElement.getBoundingClientRect();
             const endRect = document.getElementById('coins-display').getBoundingClientRect();
@@ -782,9 +802,6 @@
             }
         }
 
-        /**
-         * Handles the click of the "Solve Word" button.
-         */
         function onSolveButtonClick() {
             if (timeRemaining <= 0 || solveButtonCooldown > 0) return;
             const unsolvedPuzzles = puzzles.filter(p => !p.solved);
@@ -796,7 +813,6 @@
             updateScoreDisplay();
             flashScore('deduct');
 
-            // Solve a random unsolved puzzle
             const puzzleToSolve = unsolvedPuzzles[Math.floor(Math.random() * unsolvedPuzzles.length)];
             puzzleToSolve.indices.forEach((tileIndex, letterIndex) => {
                 document.getElementById(`tile-${tileIndex}`).textContent = puzzleToSolve.word[letterIndex];
@@ -808,9 +824,6 @@
             }
         }
 
-        /**
-         * Starts the 60-second cooldown for the solve button.
-         */
         function startSolveButtonCooldown() {
             solveButtonCooldown = 60;
             const solveButton = document.getElementById('solve-button');
@@ -834,10 +847,6 @@
         }
 
         let GJACKVARNUM = 0;
-        /**
-         * Handles clicks on the central jackpot square.
-         * @param {Event} event - The click event.
-         */
         function onJackpotClick(event) {
             timeSinceLastSolve = 0; 
             
@@ -845,7 +854,6 @@
             if (jackpotSquare.classList.contains('cooldown')) return;
 
             GJACKVARNUM++; 
-            // document.getElementById('gjackvarnum-display').textContent = `GJACKVARNUM: ${GJACKVARNUM}`; 
 
             coins += 50000; 
             updateScoreDisplay();
@@ -855,7 +863,6 @@
             if (GJACKVARNUM >= 4) {
                 showEventText("Yep! You're Greedy!");
                 GJACKVARNUM = 0; 
-                // document.getElementById('gjackvarnum-display').textContent = `GJACKVARNUM: ${GJACKVARNUM}`; 
                 
                 jackpotSquare.classList.add('cooldown');
                 setTimeout(() => {
@@ -870,16 +877,12 @@
             square.classList.remove('cooldown');
         }
 
-        /**
-         * Schedules the next prize to spawn on the grid with a dynamic delay.
-         */
         function scheduleNextPrizeSpawn() {
             if (timeRemaining <= 0 || isGamePaused || isFrozen || isSpecialAnimationActive) return;
             const timeElapsed = totalGameTime - timeRemaining;
             const progress = timeElapsed / totalGameTime;
             const maxDelay = 2500;
             const minDelay = 100;
-            // Spawning speeds up as the game progresses
             const currentDelay = minDelay + (maxDelay - minDelay) * Math.pow(1 - progress, 3);
 
             prizeSpawnerTimeout = setTimeout(() => {
@@ -888,9 +891,6 @@
             }, currentDelay);
         }
 
-        /**
-         * Spawns a random prize emoji on an empty tile.
-         */
         function spawnPrizeEmoji() {
             if (timeRemaining <= 0 || isGamePaused || isFrozen) return;
 
@@ -909,8 +909,7 @@
 
             const tile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
             
-            // Modify prize pool for the first 20 seconds to be safer
-            let prizePool = prizeEmojis.filter(p => p.type !== 'cash_money'); // Exclude special emoji from random pool
+            let prizePool = prizeEmojis.filter(p => p.type !== 'cash_money');
             if (timeRemaining > 580) {
                 prizePool = prizePool.filter(p => p.type !== 'freeze' && p.type !== 'game_over' && p.type !== 'green_bomb');
             }
@@ -969,9 +968,6 @@
             }, { once: true });
         }
 
-        /**
-         * Spawns the special cash money emoji.
-         */
         function spawnSpecialCashEmoji() {
              if (isGamePaused || isGameOver || isFrozen) return;
             const allPuzzleIndices = puzzles.flatMap(p => p.indices);
@@ -1002,16 +998,6 @@
             tile.addEventListener('click', clickHandler, { once: true });
         }
 
-        // Sound effect for the imp
-        const evilLaugh = new Tone.Synth({
-            oscillator: { type: 'sawtooth' },
-            envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.5 },
-            volume: -10
-        }).toDestination();
-
-        /**
-         * Spawns an Imp that resets the player's coins if clicked.
-         */
         function spawnImp() {
             if (isGamePaused || isGameOver || isFrozen) return;
             const allPuzzleIndices = puzzles.flatMap(p => p.indices);
@@ -1029,10 +1015,6 @@
             const impElement = tile.firstChild;
 
             const clickHandler = () => {
-                Tone.start(); // Required for audio context
-                evilLaugh.triggerAttackRelease("C2", "8n");
-                setTimeout(() => evilLaugh.triggerAttackRelease("G2", "8n"), 150);
-                
                 coins = 0;
                 updateScoreDisplay();
                 showEventText("Ha ha!");
@@ -1045,7 +1027,7 @@
                 tile.innerHTML = '';
                 tile.classList.remove('prize-tile', 'red-bomb');
                 impElement.removeEventListener('click', clickHandler, { once: true });
-            }, 10000); // Imp stays for 10 seconds
+            }, 10000);
 
             impElement.addEventListener('click', clickHandler, { once: true });
         }
@@ -1054,7 +1036,7 @@
             const iconsContainer = document.getElementById('greed-icons-container');
             const trophyElement = document.createElement('div');
             trophyElement.classList.add('greed-icon');
-            trophyElement.textContent = '🏆';
+            trophyElement.textContent = ' ';
             trophyElement.addEventListener('click', () => {
                 showEventText("You're so greedy!");
             });
@@ -1074,10 +1056,6 @@
             iconsContainer.appendChild(diamondElement);
         }
 
-        /**
-         * Shows a large text event in the center of the screen.
-         * @param {string} text - The text to display.
-         */
         function showEventText(text, greenGlow = false) {
             const eventTextContainer = document.getElementById('event-text-container');
             const eventText = document.getElementById('event-text');
@@ -1091,12 +1069,8 @@
             }, 2000);
         }
 
-        /**
-         * Initiates the diamond collection sequence: clears the board and triggers a vortex animation.
-         * @param {HTMLElement} clickedTile - The diamond tile that was clicked.
-         */
         function startDiamondSequence(clickedTile) {
-            isSpecialAnimationActive = true; // Pause prize spawning
+            isSpecialAnimationActive = true;
             coins += currentDiamondValue;
             updateScoreDisplay();
             flashScore('gain');
@@ -1104,7 +1078,6 @@
             currentDiamondValue = Math.floor(currentDiamondValue / 2);
             updateGreedPanelWithDiamond();
 
-            // Clear other prizes
             document.querySelectorAll('.prize-tile').forEach(t => {
                 if (t !== clickedTile) { 
                     t.textContent = ''; 
@@ -1112,7 +1085,6 @@
                 }
             });
 
-            // Fill empty tiles with temporary diamonds for the animation
             const allPuzzleIndices = puzzles.flatMap(p => p.indices);
             const diamondTiles = [];
             for(let i=0; i<81; i++) {
@@ -1131,10 +1103,6 @@
             }, 2000);
         }
 
-        /**
-         * Creates a vortex animation, pulling all diamonds to the center.
-         * @param {HTMLElement[]} diamondTiles - An array of the temporary diamond tiles.
-         */
         function triggerVortexAnimation(diamondTiles) {
             const vortexCenterEl = document.getElementById('jackpot-square');
             if (!vortexCenterEl) return;
@@ -1162,24 +1130,17 @@
                 flyingDiamond.style.animation = `diamond-vortex 1s ease-in forwards`;
                 document.body.appendChild(flyingDiamond);
 
-                // Reset the grid tile underneath
                 tile.textContent = '';
                 tile.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
                 setTimeout(() => { flyingDiamond.remove(); }, 1000);
             });
 
-            // Resume game logic after the animation
             setTimeout(() => {
                  isSpecialAnimationActive = false;
                  scheduleNextPrizeSpawn();
             }, 1500);
         }
         
-        /**
-         * Gets the indices of all tiles adjacent to a given index.
-         * @param {number} index - The center tile index (0-80).
-         * @returns {number[]} An array of adjacent indices.
-         */
         function getAdjacentIndices(index) {
             const indices = [];
             const row = Math.floor(index / 9);
@@ -1196,10 +1157,6 @@
             return indices;
         }
 
-        /**
-         * Handles the green bomb effect: solves adjacent letters and collects adjacent prizes.
-         * @param {HTMLElement} bombTile - The green bomb tile that was clicked.
-         */
         function startGreenBombSequence(bombTile) {
             const bombIndex = parseInt(bombTile.id.split('-')[1]);
             const adjacentIndices = getAdjacentIndices(bombIndex);
@@ -1207,20 +1164,17 @@
             adjacentIndices.forEach(index => {
                 const adjTile = document.getElementById(`tile-${index}`);
                 if (adjTile && adjTile.classList.contains('prize-tile')) {
-                    // Collect prize
                     const prizeValue = parseInt(adjTile.dataset.prizeValue) || 0;
                     coins += prizeValue;
                     triggerCoinAnimation(adjTile, document.getElementById('coins-display'));
                     adjTile.textContent = '';
                     adjTile.classList.remove('prize-tile', 'red-bomb', 'green-bomb');
                 } else if (adjTile && adjTile.classList.contains('word-puzzle-tile') && !adjTile.classList.contains('solved')) {
-                    // Solve letter
                     const puzzleIndex = parseInt(adjTile.dataset.puzzleIndex);
                     const puzzle = puzzles[puzzleIndex];
                     const letterIndex = puzzle.indices.indexOf(index);
                     const correctLetter = puzzle.word[letterIndex];
                     
-                    // Find where the correct letter currently is and swap with it
                     for (const i of puzzle.indices) {
                         const sourceTile = document.getElementById(`tile-${i}`);
                         if (sourceTile && sourceTile.textContent === correctLetter) {
@@ -1230,7 +1184,7 @@
                             break;
                         }
                     }
-                    coins += 1; // Small bonus for the help
+                    coins += 1;
                     triggerBigCoinAnimation(adjTile, document.getElementById('coins-display'));
                 }
             });
@@ -1241,10 +1195,6 @@
             }, 100);
         }
 
-        /**
-         * Handles the fire column effect: solves all letters in the column.
-         * @param {HTMLElement} fireTile - The fire tile that was clicked.
-         */
         function startFireColumnSequence(fireTile) {
             const fireIndex = parseInt(fireTile.id.split('-')[1]);
             const column = fireIndex % 9;
@@ -1253,11 +1203,9 @@
                 const tileInColumn = document.getElementById(`tile-${i}`);
                 if (tileInColumn) {
                     if (tileInColumn.classList.contains('prize-tile')) {
-                        // Clear prize
                         tileInColumn.textContent = '';
                         tileInColumn.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
                     } else if (tileInColumn.classList.contains('word-puzzle-tile') && !tileInColumn.classList.contains('solved')) {
-                        // Solve letter
                         const puzzleIndex = parseInt(tileInColumn.dataset.puzzleIndex);
                         const puzzle = puzzles[puzzleIndex];
                         const letterIndex = puzzle.indices.indexOf(i);
@@ -1282,10 +1230,6 @@
             checkAllPuzzles();
         }
 
-        /**
-         * Ends the game, stops all timers and spawners, and shows the game over modal.
-         * @param {boolean} [isBomb=false] - Whether the game ended due to a bomb.
-         */
         function endGame(isBomb = false) {
             isGameOver = true;
             clearInterval(mainTimerInterval);
@@ -1300,9 +1244,6 @@
             setTimeout(showGameOverModal, 1500);
         }
 
-        /**
-         * Creates a swirl animation that pulls all grid elements to the center on game over.
-         */
         function triggerSwirlAnimation() {
             const elementsToSwirl = document.querySelectorAll('#game-grid > div');
             const vortexCenterEl = document.getElementById('jackpot-square');
@@ -1339,9 +1280,6 @@
             document.getElementById('game-over-modal').classList.remove('hidden');
         }
         
-        /**
-         * Displays the final leaderboard with the player's score.
-         */
         function displayLeaderboard() {
             const fakeScores = [
                 { name: 'Olivia', score: 234000000 },
@@ -1385,12 +1323,8 @@
             scoreDecayInterval = setInterval(handleScoreDecay, 1000);
         }
 
-        /**
-         * Handles score decay when the player is inactive.
-         */
         function handleScoreDecay() {
             if (isGamePaused || isGameOver) return;
-            // Start decaying score after 20 seconds of no solves
             if (timeSinceLastSolve > 20) {
                 const decayAmount = Math.floor(Math.pow(timeSinceLastSolve - 19, 1.5) * 10);
                 coins -= decayAmount;
@@ -1403,7 +1337,7 @@
         }
 
         /**
-         * Initiates the freeze sequence, stopping prize spawns and thawing tiles over time.
+         * MODIFIED: Initiates the freeze sequence with shorter duration.
          */
         function startFreezeSequence() {
             isFrozen = true;
@@ -1423,7 +1357,7 @@
             });
 
             thawTimeout = setTimeout(() => {
-                const thawDuration = 30000; // 30 seconds to thaw
+                const thawDuration = 15000; // MODIFIED: 15 seconds to thaw
                 if (frozenTiles.length === 0) {
                     endFreeze();
                     return;
@@ -1442,7 +1376,7 @@
                     }
                 }
                 thawNext();
-            }, 30000); // Freeze lasts for 30 seconds
+            }, 15000); // MODIFIED: Freeze lasts for 15 seconds
         }
 
         function endFreeze() {
@@ -1450,15 +1384,19 @@
             isFrozen = false;
             document.querySelectorAll('.ice-block').forEach(block => block.remove());
             if (!isGamePaused && !isGameOver) {
-                // Add a small delay to prevent emoji burst
                 setTimeout(() => scheduleNextPrizeSpawn(), 500);
             }
         }
         
-        /**
-         * Hides the start modal and begins the main game loop.
-         */
         function startGame() {
+            const music = document.getElementById('background-music');
+            music.volume = 0.5;
+            lastVolume = 0.5;
+            document.getElementById('volume-slider').value = 0.5;
+            updateVolumeIcon(0.5);
+
+            music.play().catch(error => console.error("Audio play failed:", error));
+
             document.getElementById('start-modal').classList.add('hidden');
             document.getElementById('game-container').classList.remove('hidden');
             document.getElementById('game-container').classList.add('flex');
@@ -1468,15 +1406,55 @@
             scoreDecayInterval = setInterval(handleScoreDecay, 1000);
             scheduleNextPrizeSpawn();
         }
+        
+        function setupAudioControls() {
+            const music = document.getElementById('background-music');
+            const volumeSlider = document.getElementById('volume-slider');
+            const volumeToggleButton = document.getElementById('volume-toggle-button');
 
-        /**
-         * Initializes the game on window load. Sets up event listeners.
-         */
+            volumeSlider.value = lastVolume;
+            updateVolumeIcon(music.volume);
+
+            volumeSlider.addEventListener('input', (e) => {
+                const newVolume = parseFloat(e.target.value);
+                music.volume = newVolume;
+                updateVolumeIcon(newVolume);
+                if (newVolume > 0) {
+                    lastVolume = newVolume;
+                }
+            });
+
+            volumeToggleButton.addEventListener('click', () => {
+                if (music.volume > 0) {
+                    music.volume = 0;
+                    volumeSlider.value = 0;
+                    updateVolumeIcon(0);
+                } else {
+                    music.volume = lastVolume;
+                    volumeSlider.value = lastVolume;
+                    updateVolumeIcon(lastVolume);
+                }
+            });
+        }
+
+        function updateVolumeIcon(volume) {
+            const volumeToggleButton = document.getElementById('volume-toggle-button');
+            if (volume === 0) {
+                volumeToggleButton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                `;
+            } else {
+                 volumeToggleButton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                `;
+            }
+        }
+
         function initGame() {
             startLevel();
             updateScoreDisplay();
+            setupAudioControls();
             
-            // Fun animation for the start modal
             const startModal = document.getElementById('start-modal');
             startModalAnimationInterval = setInterval(() => {
                 const coin = document.createElement('div');
@@ -1499,7 +1477,6 @@
                 }
             }, 300);
 
-            // --- Event Listeners ---
             document.getElementById('start-game-button').addEventListener('click', startGame);
             document.getElementById('play-again-button').addEventListener('click', () => { location.reload(); });
             document.getElementById('help-button').addEventListener('click', () => {
@@ -1521,15 +1498,15 @@
                     if (clickedButton.id === 'difficulty-easy') maxSameEmoji = 8;
                     else if (clickedButton.id === 'difficulty-medium') maxSameEmoji = 4;
                     else if (clickedButton.id === 'difficulty-hard') maxSameEmoji = 2;
-                    else maxSameEmoji = 4; // Default
+                    else maxSameEmoji = 4;
                 });
             });
         }
 
-        // --- Start Game ---
         window.onload = () => {
             initGame();
         };
     </script>
 </body>
 </html>
+ 
