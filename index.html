@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -289,7 +288,6 @@
         </div>
     </div>
 
-    <!-- NEW: Playlist Modal -->
     <div id="playlist-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-md relative text-center">
             <h2 class="text-2xl font-bold text-amber-300">Soundtrack Playlist</h2>
@@ -312,7 +310,8 @@
 
         // --- Playlist Data ---
         const playlist = [ 'wordgreed001.mp3', 'wordgreed002.mp3', 'wordgreed003.mp3', 'wordgreed004.mp3', 'wordgreed005.mp3' ];
-        let userPlaylist = [...playlist];
+        let verifiedPlaylist = [];
+        let userPlaylist = [];
         let currentTrackIndex = 0;
         const musicBaseURL = 'https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/';
 
@@ -751,7 +750,7 @@
         }
 
         function reinitializeJackpotSquare(square) {
-            square.textContent = '💰';
+            square.textContent = ' ';
             square.style.backgroundColor = '';
             square.classList.remove('cooldown');
         }
@@ -1188,6 +1187,7 @@
             clearTimeout(prizeSpawnerTimeout);
             clearInterval(scoreDecayInterval);
             clearTimeout(impTimeout);
+            document.querySelectorAll('.ice-block').forEach(block => block.style.display = 'none');
         }
 
         function resumeGame() {
@@ -1198,6 +1198,7 @@
                 scheduleNextPrizeSpawn();
             }
             scoreDecayInterval = setInterval(handleScoreDecay, 1000);
+            document.querySelectorAll('.ice-block').forEach(block => block.style.display = 'block');
         }
 
         function handleScoreDecay() {
@@ -1282,15 +1283,12 @@
 
         function playNextTrack() {
             if (userPlaylist.length === 0) {
-                console.log("Playlist is empty. Music stopped.");
-                return;
+                return; 
             }
-            // Ensure index is within bounds
-            currentTrackIndex = currentTrackIndex % userPlaylist.length;
+            currentTrackIndex = (currentTrackIndex + 1) % userPlaylist.length;
             const trackName = userPlaylist[currentTrackIndex];
             musicPlayer.src = musicBaseURL + trackName;
-            musicPlayer.play().catch(error => console.error("Audio play failed:", error));
-            currentTrackIndex++;
+            musicPlayer.play().catch(error => console.error("Audio play failed for " + trackName + ":", error));
         }
         
         function setupAudioControls() {
@@ -1334,7 +1332,7 @@
         function populatePlaylistModal() {
             const container = document.getElementById('playlist-container');
             container.innerHTML = '';
-            playlist.forEach(trackName => {
+            verifiedPlaylist.forEach(trackName => {
                 const isChecked = userPlaylist.includes(trackName);
                 const item = document.createElement('label');
                 item.className = 'playlist-item';
@@ -1353,13 +1351,29 @@
                     } else {
                         userPlaylist = userPlaylist.filter(t => t !== e.target.value);
                     }
-                    // Sort to maintain original order
-                    userPlaylist.sort((a, b) => playlist.indexOf(a) - playlist.indexOf(b));
+                    userPlaylist.sort((a, b) => verifiedPlaylist.indexOf(a) - verifiedPlaylist.indexOf(b));
                 });
             });
         }
+        
+        async function buildVerifiedPlaylist() {
+            const checkTrack = async (trackName) => {
+                try {
+                    const response = await fetch(musicBaseURL + trackName, { method: 'HEAD' });
+                    return response.ok;
+                } catch (error) {
+                    console.error("Network error checking track:", trackName, error);
+                    return false;
+                }
+            };
+            const checks = playlist.map(track => checkTrack(track));
+            const results = await Promise.all(checks);
+            verifiedPlaylist = playlist.filter((_, index) => results[index]);
+            userPlaylist = [...verifiedPlaylist];
+        }
 
-        function initGame() {
+        async function initGame() {
+            await buildVerifiedPlaylist();
             startLevel();
             updateScoreDisplay();
             setupAudioControls();
@@ -1407,7 +1421,7 @@
             });
             document.getElementById('close-about-button').addEventListener('click', () => {
                 document.getElementById('about-modal').classList.add('hidden');
-                document.getElementById('help-modal').classList.remove('hidden'); // Go back to help
+                document.getElementById('help-modal').classList.remove('hidden');
             });
             
             document.getElementById('playlist-button').addEventListener('click', () => {
@@ -1416,7 +1430,7 @@
             });
             document.getElementById('close-playlist-button').addEventListener('click', () => {
                 document.getElementById('playlist-modal').classList.add('hidden');
-                document.getElementById('help-modal').classList.remove('hidden'); // Go back to help
+                document.getElementById('help-modal').classList.remove('hidden');
             });
 
 
@@ -1434,9 +1448,8 @@
             });
         }
 
-        window.onload = () => {
-            initGame();
-        };
+        window.onload = initGame;
     </script>
 </body>
 </html>
+ 
