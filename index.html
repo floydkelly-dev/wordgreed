@@ -7,7 +7,7 @@
     <link id="favicon" rel="icon" href="https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/WordGreedSiteIcon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Lobster+Two:ital,wght@1,700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -90,9 +90,10 @@
         @keyframes start-button-pulse { 0%, 100% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 10px #60a5fa, 0 0 20px #60a5fa; } 5% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 20px #3b82f6, 0 0 40px #3b82f6; } 15% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 10px #60a5fa, 0 0 20px #60a5fa; } }
         #start-game-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; animation: start-button-pulse 15s infinite; }
 
-        #play-again-button, #about-button, #playlist-button { background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af; border-bottom: 4px solid #1f2937; }
+        #play-again-button { background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af; border-bottom: 4px solid #1f2937; }
         #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
-        #setup-button { background: linear-gradient(145deg, #4ade80, #22c55e); border-color: #86efac; border-bottom: 4px solid #14532d; }
+        #about-button { background: linear-gradient(145deg, #c4b5fd, #a78bfa); border-color: #ddd6fe; border-bottom: 4px solid #7c3aed; }
+        #setup-button { background: linear-gradient(145deg, #22c55e, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
         #confirm-reset-button { background: linear-gradient(145deg, #f87171, #ef4444); border-color: #fca5a5; border-bottom: 4px solid #7f1d1d; }
 
 
@@ -242,13 +243,14 @@
     </div>
 
     <div id="start-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-        <div class="glass-panel p-8 rounded-2xl text-center flex flex-col items-center gap-6 w-full max-w-md relative overflow-hidden">
+        <div class="glass-panel p-8 pb-12 rounded-2xl text-center flex flex-col items-center gap-6 w-full max-w-md relative overflow-hidden">
             <h1 class="game-title-style text-8xl relative" style="width: 22rem; height: 10rem;">
                 <span class="absolute" style="top: 0; left: 0;">Word</span>
                 <span class="absolute" style="top: 4rem; left: 4rem;">Greed</span>
             </h1>
             <p class="text-lg text-slate-300">Drag and drop letters to solve jumbled words. Grab Big Prizes and Get Greedy!</p>
             <button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl">Start Game</button>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.5</div>
         </div>
     </div>
 
@@ -287,15 +289,15 @@
                 <div class="flex items-center gap-3">
                     <button id="volume-toggle-button" class="text-2xl hover:text-white text-slate-300 transition-colors"></button>
                     <input type="range" id="volume-slider" min="0" max="1" step="0.01" class="volume-slider w-32">
+                    <button id="playlist-button" class="glassy-button text-white font-bold py-2 px-4 rounded-lg text-base">Playlist</button>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button id="playlist-button" class="glassy-button text-white font-bold py-2 px-4 rounded-lg text-base">Playlist</button>
                     <button id="setup-button" class="glassy-button text-white font-bold py-2 px-4 rounded-lg text-base">Setup</button>
                     <button id="about-button" class="glassy-button text-white font-bold py-2 px-4 rounded-lg text-base">About</button>
                     <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-4 rounded-lg text-base">Close</button>
                 </div>
             </div>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.4</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.5</div>
         </div>
     </div>
 
@@ -305,8 +307,8 @@
             <div class="text-slate-300 space-y-2">
                 <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
-                <p>Version: <span class="font-bold text-white">1.4</span></p>
-                <p>Build Date: <span class="font-bold text-white">August 3, 2025</span></p>
+                <p>Version: <span class="font-bold text-white">1.5</span></p>
+                <p>Build Date: <span class="font-bold text-white">August 4, 2025</span></p>
             </div>
             <p class="text-xs text-slate-500 mt-4">Copyright © 2025</p>
             <button id="close-about-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
@@ -385,7 +387,13 @@
         let playerData = {};
 
         // --- Playlist Data ---
-        const playlist = [ 'wordgreed001.mp3', 'wordgreed002.mp3', 'wordgreed003.mp3', 'wordgreed004.mp3', 'wordgreed005.mp3' ];
+        const songDatabase = [
+            { id: '001', title: 'Word Greed', filename: 'wordgreed001.mp3' },
+            { id: '002', title: 'Diamond Focus', filename: 'wordgreed002.mp3' },
+            { id: '003', title: 'Elevated Echoes', filename: 'wordgreed003.mp3' },
+            { id: '004', title: 'Song Four', filename: 'wordgreed004.mp3' },
+            { id: '005', title: 'Song Five', filename: 'wordgreed005.mp3' }
+        ];
         let verifiedPlaylist = [];
         let userPlaylist = [];
         let currentTrackIndex = 0;
@@ -427,7 +435,7 @@
 
         const wordBank = ["ABROAD","ACCEPT","ACCESS","ACROSS","ACTION","ACTIVE","ADMIRE","ADVICE","AFFAIR","AFFECT","AFFORD","AGENCY","AGENDA","ALMOST","ALWAYS","AMOUNT","ANIMAL","ANNUAL","ANSWER","ANYONE","ANYWAY","APART","APPEAL","APPEAR","APPLY","APPROVE","AROUND","ARRIVE","ARTIST","ASLEEP","ASPECT","ASSESS","ASSIST","ASSUME","ATTACK","ATTEND","ATTRACT","AUTHOR","AWARD","BALANCE","BECOME","BEHAVE","BELIEF","BELONG","BENEATH","BENEFIT","BESIDE","BEYOND","BISHOP","BORDER","BOTTLE","BOTTOM","BRANCH","BREATH","BRIDGE","BRIEFLY","BRIGHT","BROKEN","BUDGET","BURDEN","CAMERA","CANCEL","CANCER","CANDLE","CAPITAL","CAREER","CAREFUL","CENTRAL","CENTURY","CERTAIN","CHAIR","CHALLENGE","CHANCE","CHANGE","CHARGE","CHOICE","CHOOSE","CHURCH","CIRCLE","CLIENT","CLIMB","CLOSELY","CLOSER","COFFEE","COLLECT","COLLEGE","COLUMN","COMBINE","COMFORT","COMMAND","COMMENT","COMMIT","COMMON","COMPARE","COMPETE","COMPLEX","CONCEPT","CONCERN","CONFIRM","CONFLICT","CONNECT","CONSENT","CONSIST","CONTACT","CONTAIN","CONTENT","CONTEST","CONTEXT","CONTROL","CONVERT","CORNER","COUNCIL","COUNTY","COUPLE","COVER","CREATE","CREDIT","CRISIS","CRITERION","CRITIC","CROWD","CULTURE","CURRENT","CUSTOM","DAMAGE","DANGER","DEALER","DEBATE","DECADE","DECIDE","DECLARE","DECREASE","DEEPLY","DEFAULT","DEFENCE","DEFEND","DEFINE","DEGREE","DELAY","DELIVER","DEMAND","DEPEND","DEPICT","DEPOSIT","DEPUTY","DERIVE","DESIGN","DESIRE","DESPITE","DESTROY","DETAIL","DETECT","DEVELOP","DEVICE","DEVOTE","DIFFER","DIFFICULT","DINNER","DIRECT","DISCUSS","DISEASE","DISMISS","DISPLAY","DISTANT","DIVIDE","DIVISION","DOCTOR","DOCUMENT","DOUBLE","DOUBT","DOZEN","DREAM","DRINK","DRIVE","EAGER","EARLY","EARTH","EASTERN","ECONOMIC","ECONOMY","EDITOR","EDUCATE","EFFECT","EFFORT","EIGHT","EITHER","ELDERLY","ELECT","ELEMENT","ELSE","EMERGE","EMPHASIS","EMPLOY","ENABLE","ENCOURAGE","ENGINE","ENJOY","ENOUGH","ENSURE","ENTER","ENTIRE","ENTITLE","EQUALLY","EQUIP","ESCAPE","ESSAY","ESSENTIAL","ESTATE","ETHNIC","EVENT","EVERY","EXACTLY","EXAMINE","EXAMPLE","EXCEED","EXCEPT","EXCHANGE","EXCITE","EXCLUDE","EXCUSE","EXERCISE","EXIST","EXPECT","EXPENSE","EXPERIENCE","EXPERT","EXPLAIN","EXPLORE","EXPOSE","EXPRESS","EXTEND","EXTENT","EXTERNAL","EXTRA","EXTREME","FACTOR","FACULTY","FAILED","FAILURE","FAIRLY","FAITH","FAMLIAR","FAMOUS","FARMER","FASHION","FATHER","FAVOUR","FEELING","FEMALE","FIFTEEN","FIGHT","FIGURE","FINANCE","FINALLY","FINGER","FINISH","FLIGHT","FLOWER","FOLLOW","FOOTBALL","FORCE","FOREIGN","FOREST","FORGET","FORMAL","FORMER","FORWARD","FOUND","FOURTH","FRAME","FREEDOM","FRIEND","FUNCTION","FUTURE","GARDEN","GATHER","GENERAL","GENERATION","GENTLE","GLOBAL","GOLDEN","GROUND","GROWTH","GUARD","GUILTY","HANDLE","HAPPEN","HARDLY","HEALTH","HEAVILY","HEIGHT","HENCE","HOLIDAY","HORSE","HOSPITAL","HOUSE","HOWEVER","HUMAN","HUSBAND","IMPACT","IMPLY","IMPORT","IMPOSE","IMPROVE","INCLUDE","INCREASE","INDEED","INDICATE","INDIVIDUAL","INDUSTRY","INFORM","INITIAL","INJURY","INSIDE","INSIST","INSTANCE","INSTEAD","INSTITUTE","INTEND","INTEREST","INTERNAL","INVOLVE","ISLAND","ISSUE","ITSELF","JOINT","JUDGE","JUDGMENT","JUNIOR","JUSTICE","LABOUR","LANGUAGE","LARGELY","LATTER","LAUGH","LAWYER","LEADER","LEAGUE","LEARN","LEAVE","LEGAL","LENGTH","LESSON","LETTER","LEVEL","LIBERAL","LIBRARY","LICENCE","LIMIT","LIMITED","LITTLE","LOCAL","LONDON","LONGER","MACHINE","MAJOR","MANAGE","MANAGER","MANNER","MANY","MARKET","MARRIAGE","MATCH","MATERIAL","MATTER","MEASURE","MEDIA","MEDICAL","MEETING","MEMBER","MEMORY","MENTAL","MENTION","MERELY","METHOD","MIDDLE","MIGHT","MILE","MILITARY","MINISTER","MINOR","MINORITY","MINUTE","MISSION","MISTAKE","MODEL","MODERN","MODULE","MOMENT","MONEY","MONTH","MORAL","MORNING","MOTHER","MOTION","MOTOR","MOUNTAIN","MOUTH","MOVEMENT","MOVIE","MUCH","MUSIC","MYSELF","NARROW","NATION","NATIONAL","NATIVE","NATURAL","NATURE","NEARLY","NECESSary","NEEDLE","NEITHER","NERVE","NETWORK","NEVER","NEWLY","NIGHT","NOBODY","NORMAL","NORTHERN","NOTICE","NOTION","NOWHERE","NUMBER","OBJECT","OBSERVE","OBTAIN","OBVIOUS","OCCASION","OCCUR","OFFENCE","OFFER","OFFICE","OFFICER","OFFICIAL","OFTEN","ONCE","ONLINE","ONLY","ONTO","OPENING","OPERATE","OPPORTUNITY","OPPOSE","OPPOSITE","ORDER","ORDINARY","ORGANISE","ORIGIN","ORIGINAL","OTHER","OUGHT","OUTCOME","OUTSIDE","OVERALL","OWNER","PACKAGE","PAINT","PANEL","PARENT","PARISH","PARLIAMENT","PARTLY","PARTNER","PARTY","PASSAGE","PATIENT","PATTERN","PEACE","PEOPLE","PERFORM","PERHAPS","PERIOD","PERMIT","PERSON","PERSONAL","PHONE","PHOTO","PHYSICAL","PICTURE","PIECE","PLACE","PLANNING","PLANT","PLASTIC","PLAYER","POCKET","POINT","POLICE","POLICY","POLITICAL","POLLUTION","POPULAR","POSITION","POSITIVE","POSSIBLE","POSTER","POWER","PRACTICE","PREFER","PREPARE","PRESENCE","PRESENT","PRESIDENT","PRESS","PRESSURE","PRETTY","PREVIOUS","PRICE","PRIMARY","PRINCIPLE","PRINT","PRIOR","PRIORITY","PRISON","PRIVATE","PROBABLY","PROBLEM","PROCEDURE","PROCESS","PRODUCE","PRODUCT","PROFESSION","PROFILE","PROFIT","PROGRAM","PROGRESS","PROJECT","PROMISE","PROMOTE","PROPER","PROPERTY","PROPOSE","PROTECT","PROVIDE","PUBLIC","PUBLISH","PURPOSE","PUSH","QUALITY","QUARTER","QUESTION","QUICKLY","QUITE","RAISE","RANGE","RAPIDLY","RATELY","RATHER","REACH","REACTION","READER","READING","READY","REALISE","REALLY","REASON","RECALL","RECEIVE","RECENT","RECENTLY","RECOGNISE","RECORD","RECOVER","REDUCE","REFER","REFLECT","REFORM","REFUSE","REGARD","REGION","REGIONAL","REGULAR","RELATE","RELATION","RELATIVE","RELEASE","RELEVANT","RELIEF","RELIGION","REMAIN","REMEMBER","REMOVE","REPEAT","REPLACE","REPLY","REPORT","REPRESENT","REQUEST","REQUIRE","RESEARCH","RESOURCE","RESPECT","RESPOND","RESPONSE","RESULT","RETAIN","RETURN","REVEAL","REVENUE","REVIEW","REVOLUTION","RIGHT","RING","RISE","ROAD","ROLE","ROOM","ROUND","ROUTE","ROYAL","RULE","SAFETY","SALE","SAME","SAMPLE","SAVE","SCALE","SCENE","SCHEME","SCHOOL","SCIENCE","SCORE","SCREEN","SEARCH","SEASON","SECOND","SECRETARY","SECTION","SECTOR","SECURE","SEEM","SELECT","SENIOR","SENSE","SENSITIVE","SENTENCE","SEPARATE","SEQUENCE","SERIES","SERIOUS","SERVANT","SERVICE","SESSION","SETTLE","SEVEN","SEVERAL","SEVERE","SHARE","SHEET","SHOOT","SHORT","SHOT","SHOULD","SHOULDER","SHOUT","SHOW","SIDE","SIGHT","SIGN","SIGNAL","SILENCE","SIMPLE","SIMPLY","SINCE","SINGLE","SISTER","SITE","SITUATION","SIZE","SKILL","SKIN","SLEEP","SLIGHTLY","SLOWLY","SOCIAL","SOCIETY","SOLDIER","SOLUTION","SOME","SOMEHOW","SOMEONE","SOMETHING","SOMETIMES","SOMEWHAT","SOON","SORRY","SORT","SOUND","SOURCE","SOUTHERN","SPACE","SPEAK","SPECIAL","SPECIFIC","SPEECH","SPEED","SPEND","SPIRIT","SPORT","SPOT","SPREAD","SPRING","SQUARE","STAFF","STAGE","STAND","STANDARD","START","STATE","STATEMENT","STATION","STATUS","STAY","STEP","STILL","STOCK","STONE","STOP","STORE","STORY","STRAIGHT","STRANGE","STRATEGY","STREET","STRENGTH","STRESS","STRIKE","STRONG","STRUCTURE","STUDENT","STUDIO","STUDY","STYLE","SUBJECT","SUBMIT","SUCCEED","SUCCESS","SUCH","SUDDENLY","SUFFER","SUGGEST","SUMMER","SUPPORT","SUPPOSE","SURELY","SURFACE","SURVEY","SURVIVE","SWITCH","SYSTEM","TABLE","TAKE","TALK","TARGET","TASK","TEACH","TEACHER","TEAM","TECHNOLOGY","TELEPHONE","TELEVISION","TEMPERATURE","TERM","TERRIBLE","TEST","THANKS","THEATRE","THEIR","THEME","THEMSELVES","THEN","THEORY","THERE","THESE","THEY","THING","THINK","THIRD","THIRTY","THIS","THOSE","THOUGH","THOUSAND","THREAT","THREATEN","THREE","THROUGH","THROW","TICKET","TIME","TITLE","TODAY","TOGETHER","TOMORROW","TONE","TONIGHT","TOTAL","TOTALLY","TOUCH","TOUR","TOWARDS","TOWN","TRADE","TRADITION","TRAFFIC","TRAIN","TRAINING","TRANSFER","TRANSPORT","TRAVEL","TREAT","TREATMENT","TREATY","TREE","TREND","TRIAL","TRIP","TROOP","TROUBLE","TRUE","TRUST","TRUTH","TWENTY","TWICE","TYPE","UNDER","UNDERSTAND","UNION","UNIQUE","UNIT","UNITED","UNIVERSITY","UNLESS","UNLIKE","UNTIL","UPON","UPPER","URBAN","USER","USUAL","USUALLY","VALLEY","VALUE","VARIETY","VARIOUS","VEHICLE","VERSION","VERY","VIDEO","VIEW","VILLAGE","VIOLENCE","VISION","VISIT","VISITOR","VOICE","VOLUME","VOTE","WAIT","WALK","WALL","WANT","WAR","WATCH","WATER","WAY","WEALTH","WEAPON","WEAR","WEATHER","WEEK","WEEKEND","WEIGHT","WELCOME","WELL","WESTERN","WHAT","WHATEVER","WHEN","WHERE","WHETHER","WHICH","WHILE","WHITE","WHOLE","WHOM","WHOSE","WIDE","WIDELY","WIFE","WILD","WILL","WINDOW","WINE","WINTER","WISH","WITHIN","WITHOUT","WOMAN","WONDER","WOOD","WORD","WORK","WORKER","WORLD","WORRY","WORTH","WOULD","WRITE","WRITER","WRONG","YARD","YEAR","YOUNG","YOURSELF","YOUTH"];
         const prizeEmojis = [
-            { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: '💣', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: '💰', value: 1000000, type: 'cash_money' }
+            { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: '💣', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: ' ', value: 1000000, type: 'cash_money' }
         ];
         const puzzleLayouts = [
             { length: 5, indices: [11, 12, 13, 14, 15] }, { length: 7, indices: [28, 29, 30, 31, 32, 33, 34] }, { length: 7, indices: [46, 47, 48, 49, 50, 51, 52] }, { length: 5, indices: [65, 66, 67, 68, 69] }
@@ -631,7 +639,7 @@
         }
 
         function updateScoreDisplay() {
-            bagsOfMoney = Math.floor(currentLevel * (Math.floor(coins / 1000) / 10));
+            bagsOfMoney = Math.floor(Math.sqrt(coins));
             document.getElementById('coins-display').textContent = formatScore(coins);
             document.getElementById('bags-of-money-display').textContent = bagsOfMoney.toLocaleString();
             document.getElementById('coins-display').classList.remove('score-decay');
@@ -1378,6 +1386,54 @@
             scheduleNextPrizeSpawn();
         }
 
+        function restartGame() {
+            // 1. Hide game over modal
+            document.getElementById('game-over-modal').classList.add('hidden');
+
+            // 2. Reset game state variables
+            coins = 0;
+            bagsOfMoney = 0;
+            currentLevel = 1;
+            timeRemaining = totalGameTime;
+            isGameOver = false;
+            isGamePaused = false;
+            trophyCollectedThisLevel = false;
+            diamondCollectedThisLevel = false;
+            currentDiamondValue = 20000000;
+            solveButtonClicks = 0;
+            solveButtonCooldown = 0;
+            timeSinceLastSolve = 0;
+            isFrozen = false;
+            jackpotEventAvailable = true;
+            specialCashEmojiSpawned = false;
+            impEvents = { sixMin: true, threeMin: true };
+            isSpecialAnimationActive = false;
+
+            // 3. Clear any running timers/intervals
+            clearInterval(mainTimerInterval);
+            clearTimeout(prizeSpawnerTimeout);
+            clearTimeout(diamondSequenceTimeout);
+            clearInterval(solveButtonTimerInterval);
+            clearInterval(scoreDecayInterval);
+            clearTimeout(impTimeout);
+            clearTimeout(thawTimeout);
+
+            // 4. Reset UI elements
+            document.getElementById('timer-display').textContent = "10:00";
+            const solveButton = document.getElementById('solve-button');
+            solveButton.textContent = '✅';
+            solveButton.classList.remove('cooldown-timer');
+            solveButton.classList.add('text-3xl');
+            solveButton.disabled = false;
+            updateScoreDisplay();
+
+            // 5. Start the new game
+            startLevel(); // This initializes the grid and puzzles
+            mainTimerInterval = setInterval(updateTimer, 1000);
+            scoreDecayInterval = setInterval(handleScoreDecay, 1000);
+            scheduleNextPrizeSpawn();
+        }
+
         function playNextTrack() {
             if (userPlaylist.length === 0) {
                 return; 
@@ -1433,16 +1489,16 @@
         function populatePlaylistModal() {
             const container = document.getElementById('playlist-container');
             container.innerHTML = '';
-            verifiedPlaylist.forEach(trackName => {
-                const isChecked = userPlaylist.includes(trackName);
+            verifiedPlaylist.forEach(track => {
+                const isChecked = userPlaylist.includes(track.filename);
                 const item = document.createElement('label');
                 item.className = 'playlist-item';
                 item.innerHTML = `
-                    <input type="checkbox" value="${trackName}" ${isChecked ? 'checked' : ''}>
+                    <input type="checkbox" value="${track.filename}" ${isChecked ? 'checked' : ''}>
                     <span class="custom-checkbox">
                         <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
                     </span>
-                    <span>${trackName}</span>
+                    <span>${track.title}</span>
                 `;
                 container.appendChild(item);
 
@@ -1450,27 +1506,31 @@
                     if (e.target.checked) {
                         userPlaylist.push(e.target.value);
                     } else {
-                        userPlaylist = userPlaylist.filter(t => t !== e.target.value);
+                        userPlaylist = userPlaylist.filter(filename => filename !== e.target.value);
                     }
-                    userPlaylist.sort((a, b) => verifiedPlaylist.indexOf(a) - verifiedPlaylist.indexOf(b));
+                    userPlaylist.sort((a, b) => {
+                        const indexA = verifiedPlaylist.findIndex(track => track.filename === a);
+                        const indexB = verifiedPlaylist.findIndex(track => track.filename === b);
+                        return indexA - indexB;
+                    });
                 });
             });
         }
         
         async function buildVerifiedPlaylist() {
-            const checkTrack = async (trackName) => {
+            const checkTrack = async (track) => {
                 try {
-                    const response = await fetch(musicBaseURL + trackName, { method: 'HEAD' });
+                    const response = await fetch(musicBaseURL + track.filename, { method: 'HEAD' });
                     return response.ok;
                 } catch (error) {
-                    console.error("Network error checking track:", trackName, error);
+                    console.error("Network error checking track:", track.filename, error);
                     return false;
                 }
             };
-            const checks = playlist.map(track => checkTrack(track));
+            const checks = songDatabase.map(track => checkTrack(track));
             const results = await Promise.all(checks);
-            verifiedPlaylist = playlist.filter((_, index) => results[index]);
-            userPlaylist = [...verifiedPlaylist];
+            verifiedPlaylist = songDatabase.filter((_, index) => results[index]);
+            userPlaylist = verifiedPlaylist.map(track => track.filename);
         }
 
         async function initGame() {
@@ -1509,7 +1569,7 @@
             document.getElementById('start-game-button').addEventListener('click', startGame);
             document.getElementById('play-again-button').addEventListener('click', () => { 
                 savePlayerData();
-                location.reload(); 
+                restartGame(); 
             });
             document.getElementById('help-button').addEventListener('click', () => {
                 pauseGame();
@@ -1694,3 +1754,4 @@
     </script>
 </body>
 </html>
+ 
