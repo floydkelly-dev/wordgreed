@@ -41,14 +41,14 @@
         @keyframes game-over-swirl { 0% { transform: translate(var(--start-x), var(--start-y)) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--end-x), var(--end-y)) scale(0) rotate(-360deg); opacity: 0; } }
         @keyframes big-coin-tumble { 0% { transform: scale(8) rotate(0deg); opacity: 1; } 50% { transform: scale(5) rotate(360deg); } 100% { transform: scale(1) rotate(720deg); opacity: 1; } }
         .coin { position: absolute; top: 0; left: 0; width: 20px; height: 20px; background-color: #FFD700; border-radius: 50%; border: 2px solid #B8860B; pointer-events: none; z-index: 100; }
-        @keyframes pulse-glow-red { 0%, 100% { box-shadow: 0 0 10px #f87171, 0 0 20px #f87171; } 50% { box-shadow: 0 0 15px #ef4444, 0 0 30px #ef4444; } }
+        @keyframes pulse-glow-red { 0%, 100% { box-shadow: 0 0 10px #D9534F, 0 0 20px #D9534F; } 50% { box-shadow: 0 0 15px #E4726F, 0 0 30px #E4726F; } }
         @keyframes pulse-glow-fire { 0%, 100% { box-shadow: 0 0 10px #fb923c, 0 0 20px #fb923c; } 50% { box-shadow: 0 0 15px #f97316, 0 0 30px #f97316; } }
         @keyframes wild-pulse-animation { 0%, 100% { transform: scale(1); box-shadow: 0 0 15px #F59E0B, 0 0 30px #F59E0B; } 50% { transform: scale(1.2) rotate(10deg); box-shadow: 0 0 25px #facc15, 0 0 50px #facc15; } }
         @keyframes big-pulse-animation { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.25); } }
         #jackpot-square.wild-pulse { animation: wild-pulse-animation 0.5s infinite ease-in-out !important; }
         #solve-button.big-pulse { animation: big-pulse-animation 1.5s ease-in-out infinite; }
         .prize-tile { animation: pulse-glow-blue 1.5s infinite; cursor: pointer; font-size: 2rem; }
-        .prize-tile.red-bomb { background-color: #ef4444 !important; animation-name: pulse-glow-red; }
+        .prize-tile.red-bomb { background-color: #C50000 !important; animation-name: pulse-glow-red; }
         .prize-tile.green-bomb { background-color: #22c55e !important; animation-name: pulse-glow-green; cursor: grab; }
         .prize-tile.fire-bomb { background-color: #f97316 !important; animation-name: pulse-glow-fire; }
         .glass-panel { background-color: rgba(20, 20, 40, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
@@ -164,6 +164,7 @@
         .playlist-item.now-playing .now-playing-indicator { display: block; }
 
         #player-name-input { background-color: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); }
+        #player-name-input.invalid-input { border-color: #ef4444 !important; box-shadow: 0 0 8px #ef4444; }
         #theme-store-container { display: flex; gap: 0.75rem; overflow-x: auto; padding-bottom: 1rem; }
         #theme-store-container::-webkit-scrollbar { height: 8px; }
         #theme-store-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
@@ -174,7 +175,7 @@
         }
         .theme-item.active { border-color: var(--primary-color-light); box-shadow: 0 0 10px var(--primary-color); }
         .theme-item.locked::after {
-            content: ' ';
+            content: '🔒';
             position: absolute; inset: 0; background: rgba(0,0,0,0.7);
             display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
         }
@@ -344,7 +345,7 @@
                     <div id="total-bags-display" class="text-2xl font-bold text-green-400">0</div>
                 </div>
                 <div class="greed-panel p-3 rounded-lg">
-                    <div class="text-sm font-bold text-slate-300">HIGH SCORE</div>
+                    <div class="text-sm font-bold text-slate-300">Highest Score</div>
                     <div id="high-score-display" class="text-2xl font-bold text-white">0</div>
                 </div>
                 <div class="greed-panel p-3 rounded-lg">
@@ -397,7 +398,7 @@
             { id: '002', title: 'Diamond Focus', filename: 'wordgreed002.mp3' },
             { id: '003', title: 'Elevated Echoes', filename: 'wordgreed003.mp3' },
             { id: '004', title: 'Smooth Vibes', filename: 'wordgreed004.mp3' },
-            { id: '005', title: 'Song Five', filename: 'wordgreed005.mp3' }
+            { id: '005', title: 'Cash Flow', filename: 'wordgreed005.mp3' }
         ];
         let verifiedPlaylist = [];
         let userPlaylist = [];
@@ -1722,7 +1723,9 @@
         }
 
         function populateSetupModal() {
-            document.getElementById('player-name-input').value = playerData.name;
+            const nameInput = document.getElementById('player-name-input');
+            nameInput.value = playerData.name;
+            nameInput.classList.toggle('invalid-input', !playerData.name.trim());
             document.getElementById('total-bags-display').textContent = playerData.moneyBags.toLocaleString();
             document.getElementById('high-score-display').textContent = formatScore(playerData.highScore);
             document.getElementById('games-played-display').textContent = playerData.gamesPlayed;
@@ -1783,8 +1786,9 @@
             });
         }
 
-        document.getElementById('player-name-input').addEventListener('change', (e) => {
+        document.getElementById('player-name-input').addEventListener('input', (e) => {
             playerData.name = e.target.value;
+            e.target.classList.toggle('invalid-input', !e.target.value.trim());
             localStorage.setItem('wordGreedPlayerData', JSON.stringify(playerData));
         });
 
@@ -1806,4 +1810,3 @@
     </script>
 </body>
 </html>
- 
