@@ -16,6 +16,11 @@
         body.theme-red { --primary-color: #f87171; --primary-color-dark: #ef4444; --primary-color-light: #fca5a5; --primary-text-dark: #7f1d1d; --panel-bg: rgba(127, 29, 29, 0.4); --panel-border: rgba(239, 68, 68, 0.3); }
         body.theme-green { --primary-color: #4ade80; --primary-color-dark: #22c55e; --primary-color-light: #86efac; --primary-text-dark: #14532d; --panel-bg: rgba(22, 101, 52, 0.4); --panel-border: rgba(34, 197, 94, 0.3); }
         body.theme-blue { --primary-color: #60a5fa; --primary-color-dark: #3b82f6; --primary-color-light: #93c5fd; --primary-text-dark: #1e3a8a; --panel-bg: rgba(30, 58, 138, 0.4); --panel-border: rgba(59, 130, 246, 0.3); }
+        /* Holiday Themes */
+        body.theme-christmas { --primary-color: #ef4444; --primary-color-dark: #b91c1c; --primary-color-light: #fca5a5; --primary-text-dark: #ffffff; --panel-bg: rgba(22, 101, 52, 0.6); --panel-border: rgba(34, 197, 94, 0.5); }
+        body.theme-halloween { --primary-color: #f97316; --primary-color-dark: #ea580c; --primary-color-light: #fb923c; --primary-text-dark: #ffffff; --panel-bg: rgba(28, 25, 23, 0.6); --panel-border: rgba(249, 115, 22, 0.5); }
+        body.theme-july4th { --primary-color: #3b82f6; --primary-color-dark: #2563eb; --primary-color-light: #60a5fa; --primary-text-dark: #ffffff; --panel-bg: rgba(185, 28, 28, 0.6); --panel-border: rgba(220, 38, 38, 0.5); }
+        
         @keyframes move-gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         body { font-family: 'Inter', sans-serif; background: linear-gradient(125deg, #000000, #0c1e42, #1e3a8a, #000000); background-size: 400% 400%; animation: move-gradient 20s ease infinite; overflow-x: hidden; }
         
@@ -153,9 +158,13 @@
         .playlist-item input[type="checkbox"]:checked + .custom-checkbox { background-color: var(--primary-color); }
         .playlist-item input[type="checkbox"]:checked + .custom-checkbox svg { display: block; }
         #player-name-input { background-color: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); }
+        #theme-store-container { display: flex; gap: 0.75rem; overflow-x: auto; padding-bottom: 1rem; }
+        #theme-store-container::-webkit-scrollbar { height: 8px; }
+        #theme-store-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        #theme-store-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
         .theme-item {
             cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
-            position: relative; overflow: hidden;
+            position: relative; overflow: hidden; flex-shrink: 0; width: 120px; height: 80px;
         }
         .theme-item.active { border-color: var(--primary-color-light); box-shadow: 0 0 10px var(--primary-color); }
         .theme-item.locked::after {
@@ -286,7 +295,7 @@
                     <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-4 rounded-lg text-base">Close</button>
                 </div>
             </div>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.3</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.4</div>
         </div>
     </div>
 
@@ -296,7 +305,7 @@
             <div class="text-slate-300 space-y-2">
                 <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
-                <p>Version: <span class="font-bold text-white">1.3</span></p>
+                <p>Version: <span class="font-bold text-white">1.4</span></p>
                 <p>Build Date: <span class="font-bold text-white">August 3, 2025</span></p>
             </div>
             <p class="text-xs text-slate-500 mt-4">Copyright © 2025</p>
