@@ -189,7 +189,7 @@
         }
         .bonus-item { animation: bonus-reveal 0.5s ease-out forwards; }
         /* Awarded Goodies in Setup */
-        .goodies-container { display: flex; justify-content: space-between; align-items: center; }
+        .goodies-container { display: flex; justify-content: flex-start; align-items: center; }
         #nonsense-freebies-container {
             display: flex;
             flex-wrap: wrap;
@@ -408,7 +408,7 @@
                 </div>
             </div>
             <div class="mt-2">
-                <h3 class="text-lg font-bold text-amber-300">Theme Store</h3>
+                <h3 class="text-lg font-bold text-amber-300 text-left">Theme Store</h3>
                 <div id="theme-store-container" class="mt-2">
                     <!-- Themes will be injected here -->
                 </div>
@@ -498,7 +498,7 @@
             { id: '001', title: 'Money Bags!', filename: 'vid-001-moneybags.gif' }
             // Add more videos here as they become available
         ];
-        const videoBaseURL = 'https://github.com/floydkelly-dev/wordgreed/raw/main/public/';
+        const videoBaseURL = 'https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/';
 
 
         // --- Game State ---
@@ -1187,7 +1187,7 @@
             const iconsContainer = document.getElementById('greed-icons-container');
             const trophyElement = document.createElement('div');
             trophyElement.classList.add('greed-icon');
-            trophyElement.textContent = '🏆';
+            trophyElement.textContent = ' ';
             trophyElement.addEventListener('click', () => {
                 showEventText("You're so greedy!");
             });
@@ -1287,7 +1287,7 @@
                 const startY = startRect.top;
 
                 const flyingDiamond = document.createElement('div');
-                flyingDiamond.textContent = ' ';
+                flyingDiamond.textContent = '💎';
                 flyingDiamond.classList.add('temp-diamond');
                 flyingDiamond.style.position = 'absolute';
                 flyingDiamond.style.left = `${startX}px`;
@@ -1503,7 +1503,9 @@
                 scheduleNextPrizeSpawn();
             }
             scoreDecayInterval = setInterval(handleScoreDecay, 1000);
-            document.querySelectorAll('.ice-block').forEach(block => block.style.display = 'block');
+            if (isFrozen) {
+                document.querySelectorAll('.ice-block').forEach(block => block.style.display = 'block');
+            }
         }
 
         /**
