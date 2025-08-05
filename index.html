@@ -984,6 +984,8 @@
                 flashScore('deduct');
                 flashBagsPanel();
                 GJACKVARNUM = 0; 
+            } else if (GJACKVARNUM === 4) {
+                showEventText("Yep! You're Greedy!");
             }
         }
 
@@ -1048,7 +1050,7 @@
                 GJACKVARNUM = 0; // Reset jackpot click counter
                 if (tile.dataset.prizeType === 'game_over') { endGame(true); } 
                 else if (tile.dataset.prizeType === 'diamond') { startDiamondSequence(tile); } 
-                else if (tile.dataset.prizeType === 'green_bomb') { /* Green bomb is drag-only */ }
+                else if (tile.dataset.prizeType === 'green_bomb') { startGreenBombSequence(tile); }
                 else if (tile.dataset.prizeType === 'fire_column') { startFireColumnSequence(tile); }
                 else if (tile.dataset.prizeType === 'freeze') { startFreezeSequence(); }
                 else if (tile.dataset.prizeType === 'lightning') {
@@ -1069,7 +1071,7 @@
                         showEventText("Oh Yeah!");
                     }
                 }
-                if (tile.dataset.prizeType !== 'green_bomb') {
+                if (tile.dataset.prizeType !== 'green_bomb' || !isDraggingBomb) {
                     tile.textContent = '';
                     tile.classList.remove('prize-tile', 'red-bomb', 'green-bomb', 'fire-bomb', 'cash-money-prize');
                 }
@@ -1081,7 +1083,10 @@
                 tile.removeEventListener('click', clickHandler);
             }, 5000);
 
-            tile.addEventListener('click', clickHandler);
+            tile.addEventListener('click', () => {
+                 clearTimeout(despawnTimer);
+                 clickHandler();
+            });
         }
 
         function spawnSpecialCashEmoji() {
@@ -1334,17 +1339,26 @@
         function startFireColumnSequence(fireTile) {
             const fireIndex = parseInt(fireTile.id.split('-')[1]);
             const column = fireIndex % 9;
+            let collectedFromColumn = 0;
+
             for (let i = column; i < 81; i += 9) {
                 const tileInColumn = document.getElementById(`tile-${i}`);
-                if (tileInColumn) {
+                if (tileInColumn && tileInColumn !== fireTile) { 
                     if (tileInColumn.classList.contains('prize-tile')) {
+                        const prizeValue = parseInt(tileInColumn.dataset.prizeValue) || 0;
+                        if (prizeValue > 0) {
+                            collectedFromColumn += prizeValue;
+                            triggerCoinAnimation(tileInColumn, document.getElementById('coins-display'));
+                        }
                         tileInColumn.textContent = '';
                         tileInColumn.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
+
                     } else if (tileInColumn.classList.contains('word-puzzle-tile') && !tileInColumn.classList.contains('solved')) {
                         const puzzleIndex = parseInt(tileInColumn.dataset.puzzleIndex);
                         const puzzle = puzzles[puzzleIndex];
                         const letterIndex = puzzle.indices.indexOf(i);
                         const correctLetter = puzzle.word[letterIndex];
+                        
                         if (tileInColumn.textContent !== correctLetter) {
                             for (const sourceIndex of puzzle.indices) {
                                 const sourceTile = document.getElementById(`tile-${sourceIndex}`);
@@ -1359,7 +1373,10 @@
                     }
                 }
             }
-            coins += 400;
+
+            const fireBombValue = parseInt(fireTile.dataset.prizeValue) || 400;
+            coins += fireBombValue + collectedFromColumn;
+            
             updateScoreDisplay();
             flashScore('gain');
             checkAllPuzzles();
