@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,6 +17,10 @@
         body.theme-red { --primary-color: #f87171; --primary-color-dark: #ef4444; --primary-color-light: #fca5a5; --primary-text-dark: #7f1d1d; --panel-bg: rgba(127, 29, 29, 0.4); --panel-border: rgba(239, 68, 68, 0.3); }
         body.theme-green { --primary-color: #4ade80; --primary-color-dark: #22c55e; --primary-color-light: #86efac; --primary-text-dark: #14532d; --panel-bg: rgba(22, 101, 52, 0.4); --panel-border: rgba(34, 197, 94, 0.3); }
         body.theme-blue { --primary-color: #60a5fa; --primary-color-dark: #3b82f6; --primary-color-light: #93c5fd; --primary-text-dark: #1e3a8a; --panel-bg: rgba(30, 58, 138, 0.4); --panel-border: rgba(59, 130, 246, 0.3); }
+        body.theme-christmas { --primary-color: #ef4444; --primary-color-dark: #b91c1c; --primary-color-light: #fca5a5; --primary-text-dark: #166534; --panel-bg: rgba(22, 101, 52, 0.6); --panel-border: rgba(220, 38, 38, 0.5); }
+        body.theme-halloween { --primary-color: #f97316; --primary-color-dark: #ea580c; --primary-color-light: #fb923c; --primary-text-dark: #4a044e; --panel-bg: rgba(28, 25, 23, 0.6); --panel-border: rgba(249, 115, 22, 0.5); }
+        body.theme-winter { --primary-color: #67e8f9; --primary-color-dark: #0891b2; --primary-color-light: #a5f3fc; --primary-text-dark: #1e3a8a; --panel-bg: rgba(224, 242, 254, 0.4); --panel-border: rgba(56, 189, 248, 0.5); }
+        body.theme-beach { --primary-color: #2dd4bf; --primary-color-dark: #0d9488; --primary-color-light: #5eead4; --primary-text-dark: #134e4a; --panel-bg: rgba(253, 230, 138, 0.4); --panel-border: rgba(6, 182, 212, 0.5); }
         
         @keyframes move-gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         body { font-family: 'Inter', sans-serif; background: linear-gradient(125deg, #000000, #0c1e42, #1e3a8a, #000000); background-size: 400% 400%; animation: move-gradient 20s ease infinite; overflow-x: hidden; }
@@ -137,6 +142,7 @@
         input[type=range].volume-slider::-moz-range-track { width: 100%; height: 8px; cursor: pointer; background: rgba(0, 0, 0, 0.5); border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); }
         input[type=range].volume-slider::-moz-range-thumb { height: 20px; width: 20px; border-radius: 50%; background: #a78bfa; cursor: pointer; border: 2px solid #c4b5fd; box-shadow: 0 0 5px #8b5cf6; }
         /* Playlist & Setup Styles */
+        #playlist-container { max-height: 220px; overflow-y: auto; }
         .playlist-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background-color: rgba(0,0,0,0.2); border-radius: 0.5rem; transition: background-color 0.2s; cursor: pointer; }
         .playlist-item:hover { background-color: rgba(0,0,0,0.4); }
         .playlist-item input[type="checkbox"] { display: none; }
@@ -151,12 +157,16 @@
         .now-playing-indicator { font-size: 0.75rem; color: var(--primary-color-light); font-style: italic; display: none; }
         .playlist-item.now-playing { background-color: rgba(139, 92, 246, 0.3); }
         .playlist-item.now-playing .now-playing-indicator { display: block; }
+        #playlist-controls button.shuffle-active { background: var(--primary-color); }
         #player-name-input { background-color: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); }
         #player-name-input.invalid-input { border-color: #ef4444 !important; box-shadow: 0 0 8px #ef4444; }
-        #theme-store-container { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        #theme-store-container { display: flex; gap: 0.75rem; overflow-x: auto; padding-bottom: 1rem; flex-wrap: nowrap; }
+        #theme-store-container::-webkit-scrollbar { height: 8px; }
+        #theme-store-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        #theme-store-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
         .theme-item {
             cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
-            position: relative; overflow: hidden; flex-shrink: 0; width: 120px; height: 80px;
+            position: relative; overflow: hidden; flex-shrink: 0; width: 150px; height: 100px;
         }
         .theme-item.active { border-color: var(--primary-color-light); box-shadow: 0 0 10px var(--primary-color); }
         .theme-item.locked::after {
@@ -169,18 +179,19 @@
         .calendar-day {
             background-color: rgba(0,0,0,0.2); border: 2px solid var(--panel-border);
             border-radius: 0.5rem; padding: 0.25rem; text-align: center;
-            display: flex; flex-direction: column; justify-content: space-between;
-            min-height: 70px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            min-height: 80px; position: relative;
         }
         .calendar-day.claimed { background-color: #166534; color: #a7f3d0; cursor: not-allowed; }
         .calendar-day.today { background-color: var(--primary-color); border-color: var(--primary-color-light); cursor: pointer; }
         .calendar-day.today.claimed { background-color: #166534; border-color: #14532d; }
         .calendar-day.future { background-color: rgba(0,0,0,0.1); color: #6b7280; }
-        .calendar-day.past-day { background-color: rgba(10,10,10,0.2); color: #4b5563; cursor: not-allowed; }
+        .calendar-day.past-day { background-color: rgba(22, 59, 41, 0.5); color: #4b5563; cursor: not-allowed; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5); }
         .calendar-day.double-bonus { border-color: #fde047; }
         .calendar-day.triple-bonus { border-color: #f87171; }
-        .day-number { font-weight: bold; font-size: 0.9rem; }
+        .day-number { font-weight: bold; font-size: 0.9rem; position: absolute; top: 2px; right: 5px; }
         .reward-text { font-size: 0.65rem; line-height: 1; }
+        #calendar-legend { grid-column: span 4; align-self: stretch; background-color: rgba(0,0,0,0.2); border-radius: 0.5rem; padding: 0.5rem 0.75rem; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.5rem;}
         /* Welcome Bonus Animation */
         @keyframes bonus-reveal {
             0% { transform: scale(0.5); opacity: 0; }
@@ -188,7 +199,12 @@
         }
         .bonus-item { animation: bonus-reveal 0.5s ease-out forwards; }
         /* Awarded Goodies in Setup */
-        .goodies-container { display: flex; justify-content: flex-start; align-items: center; }
+        .goodies-container { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 0.75rem; 
+            align-items: center;
+        }
         #nonsense-freebies-container {
             display: flex;
             flex-wrap: wrap;
@@ -245,10 +261,10 @@
                         <div id="coins-display" class="text-lg font-bold text-white">0</div>
                         <div id="bags-of-money-display" class="text-lg font-bold text-green-400">0</div>
                     </div>
-                    <hr class="border-violet-300/20">
                     <!-- Greed Score and Solve Button -->
                     <div id="greed-content" class="mx-auto flex flex-col items-center justify-center gap-1">
-                         <div class="flex items-center justify-center gap-2"><span class="text-sm font-bold text-violet-200">GREED SCORE</span></div>
+                        <div class="flex items-center justify-center gap-2"><span class="text-sm font-bold text-violet-200">GREED SCORE</span></div>
+                        <hr class="border-violet-300/20 w-full my-1">
                         <div class="flex items-center justify-center gap-2 mt-1">
                             <button id="solve-button" class="w-12 h-12 rounded-full text-3xl font-black flex items-center justify-center">✅</button>
                             <div id="greed-icons-container" class="flex items-center justify-center gap-2"></div>
@@ -306,7 +322,7 @@
     
     <!-- Floating Event Text (e.g., "Level Up!") -->
     <div id="event-text-container" class="hidden fixed inset-0 flex items-center justify-center pointer-events-none z-[60]">
-        <div id="event-text" class="event-text"></div>
+        <div id="event-text" class="event-text text-center"></div>
     </div>
 
     <!-- Help Modal -->
@@ -315,7 +331,7 @@
             <h2 class="text-2xl font-bold text-amber-300">How to Play</h2>
             <table class="w-full text-sm my-2">
                 <tbody>
-                    <tr class="align-middle"><td class="py-1 pr-2 text-2xl">✅</td><td class="py-1 pr-2 font-bold text-green-400">Complete Words</td><td class="py-1 text-slate-300">Drag letters to solve words for <strong>10,000 coins</strong>. Solve all 4 for a big bonus! Press the green checkmark for Quick Solve.</td></tr>
+                    <tr class="align-middle"><td class="py-1 pr-2 text-2xl">✅</td><td class="py-1 pr-2 font-bold text-green-400">Complete Words</td><td class="py-1 text-slate-300">Drag letters to solve words for <strong>10,000 coins</strong>. Solve all 4 for a big bonus!<br>Press the green checkmark for Quick Solve.</td></tr>
                     <tr class="align-middle"><td class="py-1 pr-2 text-2xl">🎁</td><td class="py-1 pr-2 font-bold text-white">Present</td><td class="py-1 text-slate-300">+<span class="font-bold text-white">1,500,000</span> coins.</td></tr>
                     <tr class="align-middle"><td class="py-1 pr-2 text-2xl">🏆</td><td class="py-1 pr-2 font-bold text-white">Trophy</td><td class="py-1 text-slate-300">+<span class="font-bold text-white">3,500,000</span> coins.</td></tr>
                     <tr class="align-middle"><td class="py-1 pr-2 text-2xl">💎</td><td class="py-1 pr-2 font-bold text-white">Diamond</td><td class="py-1 text-slate-300">+<span class="font-bold text-white">20,000,000</span> coins & board clear.</td></tr>
@@ -359,12 +375,26 @@
 
     <!-- Playlist Modal -->
     <div id="playlist-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-        <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-md relative text-center">
+        <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-md relative">
             <h2 class="text-2xl font-bold text-amber-300">Soundtrack Playlist</h2>
             <div id="playlist-container" class="w-full space-y-2 my-2 text-left">
                 <!-- Playlist items will be injected here by JS -->
             </div>
-            <button id="close-playlist-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
+            <div id="playlist-controls" class="flex items-center justify-center gap-4 my-4">
+                <button id="playlist-prev" class="glassy-button p-2 rounded-full" style="background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af;">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M8.445 14.832A1 1 0 0010 14.006V5.994a1 1 0 00-1.555-.832L4.16 9.168a1 1 0 000 1.664l4.286 4.001zM11 5h2v10h-2V5z"></path></svg>
+                </button>
+                <button id="playlist-play-pause" class="glassy-button p-3 rounded-full w-14 h-14" style="background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd;">
+                    <!-- Play/Pause SVG will be injected here -->
+                </button>
+                <button id="playlist-next" class="glassy-button p-2 rounded-full" style="background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af;">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M11.555 5.168A1 1 0 0010 5.994v8.012a1 1 0 001.555.832l4.286-4.001a1 1 0 000-1.664l-4.286-4.001zM7 5h2v10H7V5z"></path></svg>
+                </button>
+                <button id="playlist-shuffle" class="glassy-button p-2 rounded-full" style="background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af;">
+                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M.22 3.22a.75.75 0 011.06 0L4 5.94l1.22-1.22a.75.75 0 111.06 1.06L5.06 7l1.22 1.22a.75.75 0 11-1.06 1.06L4 8.06l-2.72 2.72a.75.75 0 01-1.06-1.06L2.94 7 .22 4.28a.75.75 0 010-1.06zM8.25 5.5a.75.75 0 01.75-.75h8a.75.75 0 010 1.5h-8a.75.75 0 01-.75-.75zM8.25 9.5a.75.75 0 01.75-.75h8a.75.75 0 010 1.5h-8a.75.75 0 01-.75-.75zm.75 3.25a.75.75 0 000 1.5h8a.75.75 0 000-1.5h-8z" clip-rule="evenodd" /></svg>
+                </button>
+            </div>
+            <button id="close-playlist-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
         </div>
     </div>
 
@@ -388,11 +418,15 @@
                 </div>
             </div>
             <div class="goodies-container mt-2">
-                <h3 class="text-lg font-bold text-amber-300 flex-shrink-0 mr-4">Awarded Goodies</h3>
-                <div id="nonsense-freebies-container">
+                 <h3 class="text-lg font-bold text-amber-300 text-right self-center">Awarded Goodies</h3>
+                <div id="nonsense-freebies-container" class="col-span-1">
                     <!-- Nonsense freebies will be injected here -->
                 </div>
+                <div class="flex items-center justify-center">
+                    <button id="trade-goodies-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg" style="background: linear-gradient(145deg, #f59e0b, #d97706); border-color: #fbbf24;">Trade</button>
+                </div>
             </div>
+            <hr class="border-violet-300/20 w-full my-2">
             <div class="mt-2">
                 <h3 class="text-lg font-bold text-amber-300 text-left">Theme Store</h3>
                 <div id="theme-store-container" class="mt-2">
@@ -464,7 +498,9 @@
         ];
         let verifiedPlaylist = [];
         let userPlaylist = [];
+        let originalUserPlaylist = [];
         let currentTrackIndex = 0;
+        let isShuffled = false;
         const musicBaseURL = 'https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/';
         const mutedIconHref = 'https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/WordGreedSiteIcon.png';
         const speakerSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M 20 40 L 40 40 L 60 20 L 60 80 L 40 60 L 20 60 Z" fill="white" stroke="black" stroke-width="2"/><path d="M 70 30 C 80 40, 80 60, 70 70" stroke="white" stroke-width="5" fill="none"/><path d="M 80 20 C 95 35, 95 65, 80 80" stroke="white" stroke-width="5" fill="none"/></svg>`;
@@ -978,9 +1014,8 @@
 
             if (GJACKVARNUM >= 8) {
                 showEventText("Get outta here!");
-                coins = Math.floor(coins / 2);
-                playerData.moneyBags = Math.floor(playerData.moneyBags / 2); // Halve persistent bags
-                updateScoreDisplay(); // This will recalculate session bags
+                coins = Math.floor(coins / 2); // Halve session coins
+                updateScoreDisplay(); 
                 flashScore('deduct');
                 flashBagsPanel();
                 GJACKVARNUM = 0; 
@@ -1054,7 +1089,7 @@
                 else if (tile.dataset.prizeType === 'fire_column') { startFireColumnSequence(tile); }
                 else if (tile.dataset.prizeType === 'freeze') { startFreezeSequence(); }
                 else if (tile.dataset.prizeType === 'lightning') {
-                    playerData.moneyBags = 0; // Reset persistent bags
+                    coins = 0; // Reset session coins, which resets session bags
                     coins += parseInt(tile.dataset.prizeValue);
                     updateScoreDisplay();
                     flashBagsPanel();
@@ -1574,7 +1609,7 @@
             lastVolume = 0.5;
             document.getElementById('volume-slider').value = 0.5;
             updateVolumeIcon(0.5);
-            playNextTrack();
+            playTrack(currentTrackIndex);
             document.getElementById('start-modal').classList.add('hidden');
             document.getElementById('game-container').classList.remove('hidden');
             document.getElementById('game-container').classList.add('flex');
@@ -1662,19 +1697,55 @@
          * Plays the next track in the user's playlist.
          */
         function playNextTrack() {
-            if (userPlaylist.length === 0) {
-                return; 
-            }
-            currentTrackIndex = (currentTrackIndex + 1) % userPlaylist.length;
+            if (userPlaylist.length === 0) return;
+            const nextIndex = (currentTrackIndex + 1) % userPlaylist.length;
+            playTrack(nextIndex);
+        }
+
+        /**
+         * Plays the previous track in the user's playlist.
+         */
+        function playPreviousTrack() {
+            if (userPlaylist.length === 0) return;
+            const prevIndex = (currentTrackIndex - 1 + userPlaylist.length) % userPlaylist.length;
+            playTrack(prevIndex);
+        }
+
+        /**
+         * Plays a specific track by its index in the userPlaylist.
+         * @param {number} index The index of the track to play.
+         */
+        function playTrack(index) {
+            if (userPlaylist.length === 0 || index < 0 || index >= userPlaylist.length) return;
+            currentTrackIndex = index;
             const trackName = userPlaylist[currentTrackIndex];
             musicPlayer.src = musicBaseURL + trackName;
-            musicPlayer.play().catch(error => console.error("Audio play failed for " + trackName + ":", error));
-            updateNowPlayingIndicator();
+            
+            // The play() method returns a promise which we can use to handle interruptions.
+            const playPromise = musicPlayer.play();
+
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Playback started successfully.
+                    updateNowPlayingIndicator();
+                }).catch(error => {
+                    // The play() request can be interrupted by a new load request (e.g., skipping tracks quickly).
+                    // We only want to log errors that are not the expected AbortError.
+                    if (error.name !== 'AbortError') {
+                         console.error("Audio play failed for " + trackName + ":", error);
+                    }
+                });
+            }
         }
         
         function setupAudioControls() {
             const volumeSlider = document.getElementById('volume-slider');
             const volumeToggleButton = document.getElementById('volume-toggle-button');
+            const playlistPlayPauseBtn = document.getElementById('playlist-play-pause');
+            const playlistNextBtn = document.getElementById('playlist-next');
+            const playlistPrevBtn = document.getElementById('playlist-prev');
+            const playlistShuffleBtn = document.getElementById('playlist-shuffle');
+
             volumeSlider.value = lastVolume;
             updateVolumeIcon(musicPlayer.volume);
 
@@ -1698,6 +1769,54 @@
                     updateVolumeIcon(lastVolume);
                 }
             });
+
+            playlistPlayPauseBtn.addEventListener('click', () => {
+                if (musicPlayer.paused) {
+                    musicPlayer.play();
+                } else {
+                    musicPlayer.pause();
+                }
+            });
+            playlistNextBtn.addEventListener('click', playNextTrack);
+            playlistPrevBtn.addEventListener('click', playPreviousTrack);
+            playlistShuffleBtn.addEventListener('click', toggleShuffle);
+
+            musicPlayer.addEventListener('play', updatePlayPauseIcon);
+            musicPlayer.addEventListener('pause', updatePlayPauseIcon);
+
+            updatePlayPauseIcon(); // Set initial icon state
+        }
+
+        function updatePlayPauseIcon() {
+            const playlistPlayPauseBtn = document.getElementById('playlist-play-pause');
+            if (musicPlayer.paused) {
+                playlistPlayPauseBtn.innerHTML = `<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path></svg>`;
+            } else {
+                playlistPlayPauseBtn.innerHTML = `<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M5.75 4.5a.75.75 0 00-.75.75v10.5a.75.75 0 001.5 0V5.25a.75.75 0 00-.75-.75zM14.25 4.5a.75.75 0 00-.75.75v10.5a.75.75 0 001.5 0V5.25a.75.75 0 00-.75-.75z"></path></svg>`;
+            }
+        }
+
+        function toggleShuffle() {
+            isShuffled = !isShuffled;
+            document.getElementById('playlist-shuffle').classList.toggle('shuffle-active', isShuffled);
+            
+            if (isShuffled) {
+                // Save the current track to find it after shuffling
+                const currentTrackFilename = userPlaylist[currentTrackIndex];
+                // Shuffle the userPlaylist array
+                for (let i = userPlaylist.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [userPlaylist[i], userPlaylist[j]] = [userPlaylist[j], userPlaylist[i]];
+                }
+                // Find the new index of the current track
+                currentTrackIndex = userPlaylist.findIndex(filename => filename === currentTrackFilename);
+            } else {
+                // Restore the original order
+                const currentTrackFilename = userPlaylist[currentTrackIndex];
+                userPlaylist = [...originalUserPlaylist];
+                currentTrackIndex = userPlaylist.findIndex(filename => filename === currentTrackFilename);
+            }
+            updateNowPlayingIndicator();
         }
 
         function updateVolumeIcon(volume) {
@@ -1714,9 +1833,9 @@
         }
 
         function updateNowPlayingIndicator() {
-            document.querySelectorAll('.playlist-item').forEach((item, index) => {
+            document.querySelectorAll('.playlist-item').forEach((item) => {
                 item.classList.remove('now-playing');
-                const trackFilename = verifiedPlaylist[index]?.filename;
+                const trackFilename = item.querySelector('input').value;
                 const currentTrackFilename = userPlaylist[currentTrackIndex];
                 if (trackFilename === currentTrackFilename) {
                     item.classList.add('now-playing');
@@ -1749,9 +1868,10 @@
                         userPlaylist = userPlaylist.filter(filename => filename !== e.target.value);
                     }
                     // Keep the playlist sorted in its original order
+                    originalUserPlaylist = verifiedPlaylist.map(t => t.filename).filter(f => userPlaylist.includes(f));
                     userPlaylist.sort((a, b) => {
-                        const indexA = verifiedPlaylist.findIndex(track => track.filename === a);
-                        const indexB = verifiedPlaylist.findIndex(track => track.filename === b);
+                        const indexA = originalUserPlaylist.indexOf(a);
+                        const indexB = originalUserPlaylist.indexOf(b);
                         return indexA - indexB;
                     });
                 });
@@ -1776,6 +1896,7 @@
             const results = await Promise.all(checks);
             verifiedPlaylist = songDatabase.filter((_, index) => results[index]);
             userPlaylist = verifiedPlaylist.map(track => track.filename);
+            originalUserPlaylist = [...userPlaylist]; // Store the original order
         }
 
         /**
@@ -1890,6 +2011,9 @@
                 document.getElementById('daily-rewards-modal').classList.add('hidden');
                 document.getElementById('help-modal').classList.remove('hidden');
             });
+            document.getElementById('trade-goodies-button')?.addEventListener('click', () => {
+                showEventText("Coming Soon!");
+            });
         }
 
         // --- Player Data & Store Logic ---
@@ -1935,7 +2059,7 @@
             nameInput.value = playerData.name;
             nameInput.classList.toggle('invalid-input', !playerData.name.trim());
             document.getElementById('total-bags-display').textContent = playerData.moneyBags.toLocaleString();
-            document.getElementById('high-score-display').textContent = coins.toLocaleString();
+            document.getElementById('high-score-display').textContent = playerData.highScore.toLocaleString();
             populateThemeStore();
             populateNonsenseFreebies();
         }
@@ -1966,7 +2090,11 @@
             { id: 'default', name: 'Purple Haze', cost: 0, colors: ['#a78bfa', '#8b5cf6'] },
             { id: 'blue', name: 'Ocean Blue', cost: 100, colors: ['#60a5fa', '#3b82f6'] },
             { id: 'green', name: 'Emerald City', cost: 250, colors: ['#4ade80', '#22c55e'] },
-            { id: 'red', name: 'Ruby Rush', cost: 500, colors: ['#f87171', '#ef4444'] }
+            { id: 'red', name: 'Ruby Rush', cost: 500, colors: ['#f87171', '#ef4444'] },
+            { id: 'christmas', name: 'Christmas', cost: 1000, colors: ['#dc2626', '#166534'] },
+            { id: 'halloween', name: 'Halloween', cost: 1000, colors: ['#f97316', '#4a044e'] },
+            { id: 'winter', name: 'Winter', cost: 750, colors: ['#67e8f9', '#0c4a6e'] },
+            { id: 'beach', name: 'Beach', cost: 750, colors: ['#fde047', '#2dd4bf'] }
         ];
 
         function populateThemeStore() {
@@ -2053,7 +2181,7 @@
             };
         }
 
-        const dailyRewards = Array.from({ length: 30 }, (_, i) => {
+        const dailyRewards = Array.from({ length: 31 }, (_, i) => {
             const day = i + 1;
             const coinReward = Math.floor(1000 * Math.pow(day, 2.5));
             const bagReward = Math.floor(5 * Math.pow(day, 1.5));
@@ -2062,7 +2190,7 @@
             if (day === 10 || day === 20 || day === 30) bonus = 3; // Triple bonus days
             return { day, coins: coinReward, bags: bagReward, bonus: bonus };
         });
-        dailyRewards[29] = { day: 30, coins: 100000000, bags: 5000, bonus: 3 };
+        dailyRewards[30] = { day: 31, coins: 100000000, bags: 5000, bonus: 3 };
 
         function populateCalendar() {
             const grid = document.getElementById('calendar-grid');
@@ -2071,37 +2199,50 @@
             const todayStr = today.toISOString().split('T')[0];
             const todayDay = today.getDate();
 
-            dailyRewards.forEach(reward => {
-                const dayEl = document.createElement('div');
-                dayEl.classList.add('calendar-day');
-                const isClaimed = playerData.claimedDays.includes(reward.day);
-                const isToday = reward.day === todayDay;
+            for (let i = 1; i <= 35; i++) {
+                if (i <= dailyRewards.length) {
+                    const reward = dailyRewards[i - 1];
+                    const dayEl = document.createElement('div');
+                    dayEl.classList.add('calendar-day');
+                    const isClaimed = playerData.claimedDays.includes(reward.day);
+                    const isToday = reward.day === todayDay;
 
-                dayEl.innerHTML = `
-                    <div class="day-number">${reward.day}</div>
-                    <div class="reward-text">🪙 ${formatScore(reward.coins * reward.bonus)}</div>
-                    <div class="reward-text">💰 ${formatScore(reward.bags * reward.bonus)}</div>
-                `;
+                    dayEl.innerHTML = `
+                        <div class="day-number">${reward.day}</div>
+                        <div class="reward-text">🪙 ${formatScore(reward.coins * reward.bonus)}</div>
+                        <div class="reward-text">💰 ${formatScore(reward.bags * reward.bonus)}</div>
+                    `;
 
-                if (reward.bonus === 2) dayEl.classList.add('double-bonus');
-                if (reward.bonus === 3) dayEl.classList.add('triple-bonus');
+                    if (reward.bonus === 2) dayEl.classList.add('double-bonus');
+                    if (reward.bonus === 3) dayEl.classList.add('triple-bonus');
 
-                if (isClaimed) {
-                    dayEl.classList.add('claimed');
-                    dayEl.innerHTML += '<div class="text-xs font-bold mt-1">CLAIMED</div>';
-                } else if (isToday && playerData.lastDailyClaim !== todayStr) {
-                    dayEl.classList.add('today');
-                    dayEl.addEventListener('click', () => claimDailyReward(reward));
-                } else if (isToday && playerData.lastDailyClaim === todayStr) {
-                    dayEl.classList.add('today', 'claimed');
-                    dayEl.innerHTML += '<div class="text-xs font-bold mt-1">CLAIMED</div>';
-                } else if (reward.day > todayDay) {
-                    dayEl.classList.add('future');
-                } else {
-                    dayEl.classList.add('past-day');
+                    if (isClaimed) {
+                        dayEl.classList.add('claimed');
+                        dayEl.innerHTML += '<div class="text-xs font-bold mt-1">CLAIMED</div>';
+                    } else if (isToday && playerData.lastDailyClaim !== todayStr) {
+                        dayEl.classList.add('today');
+                        dayEl.addEventListener('click', () => claimDailyReward(reward));
+                    } else if (isToday && playerData.lastDailyClaim === todayStr) {
+                        dayEl.classList.add('today', 'claimed');
+                        dayEl.innerHTML += '<div class="text-xs font-bold mt-1">CLAIMED</div>';
+                    } else if (reward.day > todayDay) {
+                        dayEl.classList.add('future');
+                    } else {
+                        dayEl.classList.add('past-day');
+                    }
+                    grid.appendChild(dayEl);
+                } else if (i === 32) { // Start the legend in the first empty spot
+                    const legendEl = document.createElement('div');
+                    legendEl.id = 'calendar-legend';
+                    legendEl.className = 'text-xs text-center greed-panel p-2 rounded-lg flex flex-col justify-center items-center';
+                    legendEl.style.gridColumn = 'span 4'; // Make it span the remaining 4 columns
+                    legendEl.innerHTML = `
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full border-2 border-yellow-300"></div> 2x Bonus</div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full border-2 border-red-500"></div> 3x Bonus</div>
+                    `;
+                    grid.appendChild(legendEl);
                 }
-                grid.appendChild(dayEl);
-            });
+            }
         }
 
         function claimDailyReward(reward) {
@@ -2117,18 +2258,14 @@
             playerData.moneyBags += (reward.bags * reward.bonus);
             coins += (reward.coins * reward.bonus);
             updateScoreDisplay();
-            showEventText(`+${randomFreebie} Claimed!`, true);
+            showEventText(`+${randomFreebie} Claimed! New Prizes Tomorrow!`, true, true);
 
             playerData.claimedDays.push(reward.day);
             playerData.lastDailyClaim = todayStr;
             localStorage.setItem('wordGreedPlayerData', JSON.stringify(playerData));
             
-            // Refresh calendar and close
+            // Refresh calendar
             populateCalendar();
-            setTimeout(() => {
-                document.getElementById('daily-rewards-modal').classList.add('hidden');
-                document.getElementById('help-modal').classList.remove('hidden');
-            }, 1000);
         }
 
         document.getElementById('player-name-input').addEventListener('input', (e) => {
