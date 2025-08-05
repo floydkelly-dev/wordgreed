@@ -495,10 +495,9 @@
 
         // --- Video Playlist Data ---
         const videoDatabase = [
-            { id: '001', title: 'Money Bags!', filename: 'vid-001-moneybags.gif' }
+            { id: '001', title: 'Money Bags!', url: 'http://localhost:8096/Items/817955f88c8049c14f5d23c985ed0825/Download?api_key=8a472a2904b9472ca190558e092ac55d' }
             // Add more videos here as they become available
         ];
-        const videoBaseURL = 'https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/';
 
 
         // --- Game State ---
@@ -825,11 +824,6 @@
                 if (timeRemaining === 580 && !specialCashEmojiSpawned) {
                     specialCashEmojiSpawned = true;
                     spawnSpecialCashEmoji();
-                }
-                if (timeRemaining === 420 && timedEvents.sevenMin) {
-                    timedEvents.sevenMin = false;
-                    const randomFreebie = nonsenseFreebies[Math.floor(Math.random() * nonsenseFreebies.length)];
-                    showEventText(randomFreebie, false, true); // Show for 4 seconds
                 }
                 if (timeRemaining === 360 && timedEvents.sixMin) {
                     timedEvents.sixMin = false;
@@ -1187,7 +1181,7 @@
             const iconsContainer = document.getElementById('greed-icons-container');
             const trophyElement = document.createElement('div');
             trophyElement.classList.add('greed-icon');
-            trophyElement.textContent = ' ';
+            trophyElement.textContent = '🏆';
             trophyElement.addEventListener('click', () => {
                 showEventText("You're so greedy!");
             });
@@ -1913,7 +1907,7 @@
             });
             document.getElementById('watch-tutorial-button').addEventListener('click', () => {
                 pauseGame();
-                document.getElementById('gif-player').src = videoBaseURL + 'vid-001-moneybags.gif'; // Tutorial video
+                document.getElementById('gif-player').src = videoDatabase[0].url; // Tutorial video
                 document.getElementById('video-modal').classList.remove('hidden');
             });
             document.getElementById('video-playlist-button').addEventListener('click', () => {
@@ -2179,7 +2173,7 @@
                 item.innerHTML = `<span>${video.title}</span><span class="text-2xl">▶️</span>`;
                 item.addEventListener('click', () => {
                     document.getElementById('video-playlist-modal').classList.add('hidden');
-                    document.getElementById('gif-player').src = videoBaseURL + video.filename;
+                    document.getElementById('gif-player').src = video.url;
                     document.getElementById('video-modal').classList.remove('hidden');
                 });
                 container.appendChild(item);
@@ -2213,4 +2207,3 @@
     </script>
 </body>
 </html>
- 
