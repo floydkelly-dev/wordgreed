@@ -85,11 +85,10 @@
         #start-game-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; animation: start-button-pulse 15s infinite; }
         #claim-bonus-button { background: linear-gradient(145deg, #16a34a, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
         #play-again-button { background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af; border-bottom: 4px solid #1f2937; }
-        #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button, #close-daily-rewards-button, #close-video-button, #close-video-playlist-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
+        #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button, #close-daily-rewards-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
         #about-button { background: linear-gradient(145deg, #8b5cf6, #7c3aed); border-color: #a78bfa; border-bottom: 4px solid #5b21b6; }
         #setup-button { background: linear-gradient(145deg, #22c55e, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
         #daily-rewards-button { background: linear-gradient(145deg, #f59e0b, #d97706); border-color: #fbbf24; border-bottom: 4px solid #92400e; }
-        #watch-tutorial-button { background: linear-gradient(145deg, #8b5cf6, #7c3aed); border-color: #a78bfa; border-bottom: 4px solid #5b21b6; }
         #confirm-reset-button { background: linear-gradient(145deg, #f87171, #ef4444); border-color: #fca5a5; border-bottom: 4px solid #7f1d1d; }
         .theme-button { width: 2.5rem; height: 2.5rem; border-radius: 50%; background-color: var(--panel-bg); border: 1px solid var(--panel-border); color: white; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; padding: 0; position: relative; }
         .theme-button:hover .tooltip { opacity: 1; visibility: visible; }
@@ -138,8 +137,8 @@
         input[type=range].volume-slider::-moz-range-track { width: 100%; height: 8px; cursor: pointer; background: rgba(0, 0, 0, 0.5); border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); }
         input[type=range].volume-slider::-moz-range-thumb { height: 20px; width: 20px; border-radius: 50%; background: #a78bfa; cursor: pointer; border: 2px solid #c4b5fd; box-shadow: 0 0 5px #8b5cf6; }
         /* Playlist & Setup Styles */
-        .playlist-item, .video-playlist-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background-color: rgba(0,0,0,0.2); border-radius: 0.5rem; transition: background-color 0.2s; cursor: pointer; }
-        .playlist-item:hover, .video-playlist-item:hover { background-color: rgba(0,0,0,0.4); }
+        .playlist-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background-color: rgba(0,0,0,0.2); border-radius: 0.5rem; transition: background-color 0.2s; cursor: pointer; }
+        .playlist-item:hover { background-color: rgba(0,0,0,0.4); }
         .playlist-item input[type="checkbox"] { display: none; }
         .playlist-item .custom-checkbox {
             width: 20px; height: 20px; border: 2px solid var(--primary-color-light); border-radius: 4px;
@@ -333,8 +332,6 @@
                 </div>
                 <div class="flex justify-center w-full flex-wrap items-center gap-2">
                     <button id="playlist-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Playlist</button>
-                    <button id="video-playlist-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Videos</button>
-                    <button id="watch-tutorial-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Tutorial</button>
                     <button id="daily-rewards-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Daily</button>
                     <button id="setup-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Setup</button>
                     <button id="about-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">About</button>
@@ -368,17 +365,6 @@
                 <!-- Playlist items will be injected here by JS -->
             </div>
             <button id="close-playlist-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
-        </div>
-    </div>
-
-    <!-- Video Playlist Modal -->
-    <div id="video-playlist-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-        <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-md relative text-center">
-            <h2 class="text-2xl font-bold text-amber-300">Video Library</h2>
-            <div id="video-playlist-container" class="w-full space-y-2 my-2 text-left">
-                <!-- Video items will be injected here by JS -->
-            </div>
-            <button id="close-video-playlist-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
         </div>
     </div>
 
@@ -455,15 +441,6 @@
         </div>
     </div>
 
-    <!-- Video Player Modal -->
-    <div id="video-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[70] p-4">
-        <div class="relative w-full max-w-4xl">
-            <img id="gif-player" class="w-full rounded-lg" src="">
-            <button id="close-video-button" class="absolute -top-4 -right-4 glassy-button rounded-full w-10 h-10 text-white font-bold text-lg">X</button>
-        </div>
-    </div>
-
-
     <script>
         // --- DOM Elements ---
         const gridContainer = document.getElementById('game-grid');
@@ -493,13 +470,6 @@
         const speakerSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M 20 40 L 40 40 L 60 20 L 60 80 L 40 60 L 20 60 Z" fill="white" stroke="black" stroke-width="2"/><path d="M 70 30 C 80 40, 80 60, 70 70" stroke="white" stroke-width="5" fill="none"/><path d="M 80 20 C 95 35, 95 65, 80 80" stroke="white" stroke-width="5" fill="none"/></svg>`;
         const speakerIconHref = `data:image/svg+xml,${encodeURIComponent(speakerSVG)}`;
 
-        // --- Video Playlist Data ---
-        const videoDatabase = [
-            { id: '001', title: 'Money Bags!', url: 'http://localhost:8096/Items/817955f88c8049c14f5d23c985ed0825/Download?api_key=8a472a2904b9472ca190558e092ac55d' }
-            // Add more videos here as they become available
-        ];
-
-
         // --- Game State ---
         let currentLevel = 1;
         const totalGameTime = 600;
@@ -524,7 +494,7 @@
         let jackpotEventAvailable = true; 
         let specialJackpotTimeout = null;
         let specialCashEmojiSpawned = false;
-        let timedEvents = { sixMin: true, threeMin: true, sevenMin: true };
+        let timedEvents = { sixMin: true, threeMin: true };
         let isSpecialAnimationActive = false;
         let startModalAnimationInterval = null;
         let maxSameEmoji = 4;
@@ -1632,7 +1602,7 @@
             isFrozen = false;
             jackpotEventAvailable = true;
             specialCashEmojiSpawned = false;
-            timedEvents = { sixMin: true, threeMin: true, sevenMin: true };
+            timedEvents = { sixMin: true, threeMin: true };
             isSpecialAnimationActive = false;
             // Clear all timers and intervals
             clearInterval(mainTimerInterval);
@@ -1801,8 +1771,6 @@
             updateScoreDisplay();
             setupAudioControls();
             populatePlaylistModal();
-            populateVideoPlaylistModal();
-            populateSetupModal();
             
             // Start the falling coin animation on the start modal
             const startModal = document.getElementById('start-modal');
@@ -1904,24 +1872,6 @@
             document.getElementById('close-daily-rewards-button').addEventListener('click', () => {
                 document.getElementById('daily-rewards-modal').classList.add('hidden');
                 document.getElementById('help-modal').classList.remove('hidden');
-            });
-            document.getElementById('watch-tutorial-button').addEventListener('click', () => {
-                pauseGame();
-                document.getElementById('gif-player').src = videoDatabase[0].url; // Tutorial video
-                document.getElementById('video-modal').classList.remove('hidden');
-            });
-            document.getElementById('video-playlist-button').addEventListener('click', () => {
-                document.getElementById('help-modal').classList.add('hidden');
-                document.getElementById('video-playlist-modal').classList.remove('hidden');
-            });
-            document.getElementById('close-video-playlist-button').addEventListener('click', () => {
-                document.getElementById('video-playlist-modal').classList.add('hidden');
-                document.getElementById('help-modal').classList.remove('hidden');
-            });
-            document.getElementById('close-video-button').addEventListener('click', () => {
-                document.getElementById('gif-player').src = '';
-                document.getElementById('video-modal').classList.add('hidden');
-                resumeGame();
             });
         }
 
@@ -2162,22 +2112,6 @@
                 document.getElementById('daily-rewards-modal').classList.add('hidden');
                 document.getElementById('help-modal').classList.remove('hidden');
             }, 1000);
-        }
-
-        function populateVideoPlaylistModal() {
-            const container = document.getElementById('video-playlist-container');
-            container.innerHTML = '';
-            videoDatabase.forEach(video => {
-                const item = document.createElement('div');
-                item.className = 'video-playlist-item';
-                item.innerHTML = `<span>${video.title}</span><span class="text-2xl">▶️</span>`;
-                item.addEventListener('click', () => {
-                    document.getElementById('video-playlist-modal').classList.add('hidden');
-                    document.getElementById('gif-player').src = video.url;
-                    document.getElementById('video-modal').classList.remove('hidden');
-                });
-                container.appendChild(item);
-            });
         }
 
         document.getElementById('player-name-input').addEventListener('input', (e) => {
