@@ -304,7 +304,7 @@
             </h1>
             <p class="text-lg text-slate-300">Drag and drop letters to solve jumbled words. Grab Big Prizes and Get Greedy!</p>
             <button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl">Start Game</button>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.8</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.9</div>
         </div>
     </div>
 
@@ -354,7 +354,7 @@
                     <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Close</button>
                 </div>
             </div>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.8</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.9</div>
         </div>
     </div>
 
@@ -365,8 +365,8 @@
             <div class="text-slate-300 space-y-2">
                 <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
-                <p>Version: <span class="font-bold text-white">1.8</span></p>
-                <p>Build Date: <span class="font-bold text-white">August 4, 2025</span></p>
+                <p>Version: <span class="font-bold text-white">1.9</span></p>
+                <p>Build Date: <span class="font-bold text-white">August 5, 2025</span></p>
             </div>
             <p class="text-xs text-slate-500 mt-4">Copyright © 2025</p>
             <button id="close-about-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
@@ -494,7 +494,8 @@
             { id: '002', title: 'Diamond Focus', filename: 'wordgreed002.mp3' },
             { id: '003', title: 'Elevated Echoes', filename: 'wordgreed003.mp3' },
             { id: '004', title: 'Smooth Vibes', filename: 'wordgreed004.mp3' },
-            { id: '005', title: 'Cash Flow', filename: 'wordgreed005.mp3' }
+            { id: '005', title: 'Cash Flow', filename: 'wordgreed005.mp3' },
+            { id: '006', title: 'Golden Glow', filename: 'wordgreed006.mp3' }
         ];
         let verifiedPlaylist = [];
         let userPlaylist = [];
@@ -1721,16 +1722,12 @@
             const trackName = userPlaylist[currentTrackIndex];
             musicPlayer.src = musicBaseURL + trackName;
             
-            // The play() method returns a promise which we can use to handle interruptions.
             const playPromise = musicPlayer.play();
 
             if (playPromise !== undefined) {
                 playPromise.then(_ => {
-                    // Playback started successfully.
                     updateNowPlayingIndicator();
                 }).catch(error => {
-                    // The play() request can be interrupted by a new load request (e.g., skipping tracks quickly).
-                    // We only want to log errors that are not the expected AbortError.
                     if (error.name !== 'AbortError') {
                          console.error("Audio play failed for " + trackName + ":", error);
                     }
@@ -2088,13 +2085,13 @@
 
         const themes = [
             { id: 'default', name: 'Purple Haze', cost: 0, colors: ['#a78bfa', '#8b5cf6'] },
-            { id: 'blue', name: 'Ocean Blue', cost: 100, colors: ['#60a5fa', '#3b82f6'] },
-            { id: 'green', name: 'Emerald City', cost: 250, colors: ['#4ade80', '#22c55e'] },
-            { id: 'red', name: 'Ruby Rush', cost: 500, colors: ['#f87171', '#ef4444'] },
-            { id: 'christmas', name: 'Christmas', cost: 1000, colors: ['#dc2626', '#166534'] },
-            { id: 'halloween', name: 'Halloween', cost: 1000, colors: ['#f97316', '#4a044e'] },
-            { id: 'winter', name: 'Winter', cost: 750, colors: ['#67e8f9', '#0c4a6e'] },
-            { id: 'beach', name: 'Beach', cost: 750, colors: ['#fde047', '#2dd4bf'] }
+            { id: 'blue', name: 'Ocean Blue', cost: 100000, colors: ['#60a5fa', '#3b82f6'] },
+            { id: 'green', name: 'Emerald City', cost: 250000, colors: ['#4ade80', '#22c55e'] },
+            { id: 'red', name: 'Ruby Rush', cost: 500000, colors: ['#f87171', '#ef4444'] },
+            { id: 'christmas', name: 'Christmas', cost: 1000000, colors: ['#dc2626', '#166534'] },
+            { id: 'halloween', name: 'Halloween', cost: 1000000, colors: ['#f97316', '#4a044e'] },
+            { id: 'winter', name: 'Winter', cost: 750000, colors: ['#67e8f9', '#0c4a6e'] },
+            { id: 'beach', name: 'Beach', cost: 750000, colors: ['#fde047', '#2dd4bf'] }
         ];
 
         function populateThemeStore() {
@@ -2108,7 +2105,7 @@
                 item.style.background = `linear-gradient(145deg, ${theme.colors[0]}, ${theme.colors[1]})`;
                 item.dataset.themeId = theme.id;
                 
-                let costHTML = isUnlocked ? '<span class="text-xs text-green-300">Unlocked</span>' : `<span class="text-xs">💰 ${theme.cost}</span>`;
+                let costHTML = isUnlocked ? '<span class="text-xs text-green-300">Unlocked</span>' : `<span class="text-xs">💰 ${theme.cost.toLocaleString()}</span>`;
                 item.innerHTML = `<span class="font-bold text-sm">${theme.name}</span>${costHTML}`;
 
                 if (isUnlocked) {
@@ -2258,7 +2255,7 @@
             playerData.moneyBags += (reward.bags * reward.bonus);
             coins += (reward.coins * reward.bonus);
             updateScoreDisplay();
-            showEventText(`+${randomFreebie} Claimed! New Prizes Tomorrow!`, true, true);
+            showEventText(`+${randomFreebie} Claimed!<br>New Prizes Tomorrow!`, true, true);
 
             playerData.claimedDays.push(reward.day);
             playerData.lastDailyClaim = todayStr;
