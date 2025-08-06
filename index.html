@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -403,7 +404,7 @@
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M11.555 5.168A1 1 0 0010 5.994v8.012a1 1 0 001.555.832l4.286-4.001a1 1 0 000-1.664l-4.286-4.001zM7 5h2v10H7V5z"></path></svg>
                 </button>
                 <button id="playlist-shuffle" class="glassy-button p-2 rounded-full" style="background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af;">
-                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M.22 3.22a.75.75 0 011.06 0L4 5.94l1.22-1.22a.75.75 0 111.06 1.06L5.06 7l1.22 1.22a.75.75 0 11-1.06 1.06L4 8.06l-2.72 2.72a.75.75 0 01-1.06-1.06L2.94 7 .22 4.28a.75.75 0 010-1.06zM8.25 5.5a.75.75 0 01.75-.75h8a.75.75 0 010 1.5h-8a.75.75 0 01-.75-.75zM8.25 9.5a.75.75 0 01.75-.75h8a.75.75 0 010 1.5h-8a.75.75 0 01-.75-.75zm.75 3.25a.75.75 0 000 1.5h8a.75.75 0 000-1.5h-8z" clip-rule="evenodd" /></svg>
+                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.083 4.083a.75.75 0 011.06 0L9.47 8.414l1.72-1.72a.75.75 0 111.06 1.06l-1.72 1.72 4.327 4.327a.75.75 0 01-1.06 1.06L9.47 10.586l-1.72 1.72a.75.75 0 11-1.06-1.06l1.72-1.72L4.083 5.143a.75.75 0 010-1.06zM6.5 14.25a.75.75 0 01.75-.75h8a.75.75 0 010 1.5h-8a.75.75 0 01-.75-.75zm0-8.5a.75.75 0 01.75-.75h8a.75.75 0 010 1.5h-8a.75.75 0 01-.75-.75z" clip-rule="evenodd" /></svg>
                 </button>
             </div>
             <button id="close-playlist-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
@@ -487,7 +488,29 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDhYY3L2HI1Ovb2yNICs055M_7xrsR5uo4",
+          authDomain: "wordgreed-cc5eb.firebaseapp.com",
+          projectId: "wordgreed-cc5eb",
+          storageBucket: "wordgreed-cc5eb.appspot.com",
+          messagingSenderId: "395706904910",
+          appId: "1:395706904910:web:4675b1a9cc8b6cdf826e1f",
+          measurementId: "G-DSPDTH86X2"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let userId = null;
+
         // --- DOM Elements ---
         const gridContainer = document.getElementById('game-grid');
         const musicPlayer = document.getElementById('background-music');
@@ -1921,7 +1944,19 @@
          */
         async function initGame() {
             await buildVerifiedPlaylist();
-            loadPlayerData();
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    // User is signed in anonymously.
+                    userId = user.uid;
+                    loadPlayerData();
+                } else {
+                    // User is signed out.
+                    signInAnonymously(auth).catch(error => {
+                        console.error("Anonymous sign-in failed:", error);
+                    });
+                }
+            });
+
             startLevel();
             updateScoreDisplay();
             setupAudioControls();
@@ -2001,7 +2036,7 @@
             });
             document.getElementById('confirm-reset-button').addEventListener('click', () => {
                 playerData = getDefaultPlayerData();
-                localStorage.removeItem('wordGreedPlayerData');
+                savePlayerData(); // Overwrite cloud data with default data
                 populateSetupModal();
                 applyTheme('default');
                 document.getElementById('confirm-reset-modal').classList.add('hidden');
@@ -2048,27 +2083,29 @@
             };
         }
 
-        function loadPlayerData() {
-            const savedData = localStorage.getItem('wordGreedPlayerData');
-            if (savedData) {
-                const parsedData = JSON.parse(savedData);
-                playerData = { ...getDefaultPlayerData(), ...parsedData };
-                // Ensure nonsenseFreebiesCollected is an object to prevent errors
-                if (!playerData.nonsenseFreebiesCollected) {
-                    playerData.nonsenseFreebiesCollected = {};
-                }
+        async function loadPlayerData() {
+            if (!userId) return;
+            const playerDocRef = doc(db, "players", userId);
+            const docSnap = await getDoc(playerDocRef);
+
+            if (docSnap.exists()) {
+                playerData = { ...getDefaultPlayerData(), ...docSnap.data() };
             } else {
                 playerData = getDefaultPlayerData();
+                // Create a new document in Firestore for the new player
+                await setDoc(playerDocRef, playerData);
             }
             applyTheme(playerData.activeSkin);
         }
 
-        function savePlayerData() {
+        async function savePlayerData() {
+            if (!userId) return;
             playerData.moneyBags += bagsOfMoney;
             if (coins > playerData.highScore) {
                 playerData.highScore = coins;
             }
-            localStorage.setItem('wordGreedPlayerData', JSON.stringify(playerData));
+            const playerDocRef = doc(db, "players", userId);
+            await setDoc(playerDocRef, playerData, { merge: true });
         }
 
         function populateSetupModal() {
@@ -2132,7 +2169,7 @@
                     item.addEventListener('click', () => {
                         playerData.activeSkin = theme.id;
                         applyTheme(theme.id);
-                        localStorage.setItem('wordGreedPlayerData', JSON.stringify(playerData));
+                        savePlayerData();
                         populateThemeStore(); // Refresh to show active state
                     });
                 } else {
@@ -2142,7 +2179,7 @@
                             playerData.unlockedSkins.push(theme.id);
                             playerData.activeSkin = theme.id;
                             applyTheme(theme.id);
-                            localStorage.setItem('wordGreedPlayerData', JSON.stringify(playerData));
+                            savePlayerData();
                             populateSetupModal(); // Refresh whole modal
                         } else {
                             showEventText("Not Enough Bags!");
@@ -2192,7 +2229,7 @@
                 coins += bonusCoins; // Add to session coins
                 updateScoreDisplay();
                 playerData.lastLoginDate = new Date().toISOString().split('T')[0];
-                localStorage.setItem('wordGreedPlayerData', JSON.stringify(playerData));
+                savePlayerData();
                 document.getElementById('welcome-bonus-modal').classList.add('hidden');
                 actuallyStartGame();
             };
@@ -2279,7 +2316,7 @@
 
             playerData.claimedDays.push(reward.day);
             playerData.lastDailyClaim = todayStr;
-            localStorage.setItem('wordGreedPlayerData', JSON.stringify(playerData));
+            savePlayerData();
             
             // Refresh calendar
             populateCalendar();
@@ -2288,7 +2325,7 @@
         document.getElementById('player-name-input').addEventListener('input', (e) => {
             playerData.name = e.target.value;
             e.target.classList.toggle('invalid-input', !e.target.value.trim());
-            localStorage.setItem('wordGreedPlayerData', JSON.stringify(playerData));
+            savePlayerData();
         });
 
         document.getElementById('reset-progress-button').addEventListener('click', () => {
@@ -2301,7 +2338,7 @@
 
         document.getElementById('confirm-reset-button').addEventListener('click', () => {
             playerData = getDefaultPlayerData();
-            localStorage.removeItem('wordGreedPlayerData');
+            savePlayerData(); // Overwrite cloud data with default data
             populateSetupModal();
             applyTheme('default');
             document.getElementById('confirm-reset-modal').classList.add('hidden');
