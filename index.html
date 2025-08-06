@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -492,7 +491,7 @@
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -1455,7 +1454,6 @@
 
         /**
          * Ends the game and shows the game over screen.
-         * @param {boolean} isBomb Whether the game ended due to a bomb.
          */
         function endGame(isBomb = false) {
             isGameOver = true;
@@ -1515,27 +1513,33 @@
         /**
          * Displays a fake leaderboard on the game over screen.
          */
-        function displayLeaderboard() {
-            const fakeScores = [
-                { name: 'Olivia', score: 234000000 }, { name: 'James', score: 42000000 },
-                { name: 'Sophia', score: 35000000 }, { name: 'Liam', score: 28000000 },
-            ];
-            
-            const allScores = [...fakeScores, { name: playerData.name || 'You', score: coins }];
-            allScores.sort((a, b) => b.score - a.score);
-            const top5 = allScores.slice(0, 5);
+        async function displayLeaderboard() {
             const container = document.getElementById('leaderboard-container');
-            container.innerHTML = `
-                <h3 class="text-2xl font-bold text-amber-300 mb-4">Top 5 Players</h3>
-                <ol class="text-left w-full space-y-2">
-                    ${top5.map((entry, index) => `
-                        <li class="flex justify-between p-2 rounded-lg ${entry.name === (playerData.name || 'You') ? 'bg-purple-600' : 'bg-black/20'}">
-                            <span class="font-bold">${index + 1}. ${entry.name} (Lvl ${entry.name === (playerData.name || 'You') ? currentLevel : Math.floor(Math.random() * 15) + 5})</span>
-                            <span class="font-semibold">${coins.toLocaleString()}</span>
-                        </li>
-                    `).join('')}
-                </ol>
-            `;
+            container.innerHTML = `<h3 class="text-2xl font-bold text-amber-300 mb-4">Top 5 Players</h3><div class="text-white">Loading...</div>`;
+
+            try {
+                const q = query(collection(db, "leaderboard"), orderBy("score", "desc"), limit(5));
+                const querySnapshot = await getDocs(q);
+                const topScores = [];
+                querySnapshot.forEach((doc) => {
+                    topScores.push(doc.data());
+                });
+
+                container.innerHTML = `
+                    <h3 class="text-2xl font-bold text-amber-300 mb-4">Top 5 Players</h3>
+                    <ol class="text-left w-full space-y-2">
+                        ${topScores.map((entry, index) => `
+                            <li class="flex justify-between p-2 rounded-lg ${entry.userId === userId ? 'bg-purple-600' : 'bg-black/20'}">
+                                <span class="font-bold">${index + 1}. ${entry.name || 'Anonymous'} (Lvl ${entry.level})</span>
+                                <span class="font-semibold">${entry.score.toLocaleString()}</span>
+                            </li>
+                        `).join('')}
+                    </ol>
+                `;
+            } catch (error) {
+                console.error("Error getting leaderboard:", error);
+                container.innerHTML = `<h3 class="text-2xl font-bold text-amber-300 mb-4">Top 5 Players</h3><div class="text-red-400">Could not load leaderboard.</div>`;
+            }
         }
 
         function pauseGame() {
@@ -2106,6 +2110,16 @@
             }
             const playerDocRef = doc(db, "players", userId);
             await setDoc(playerDocRef, playerData, { merge: true });
+
+            // Also save the game result to the leaderboard
+            const leaderboardRef = collection(db, "leaderboard");
+            await addDoc(leaderboardRef, {
+                name: playerData.name || 'Anonymous',
+                score: coins,
+                level: currentLevel,
+                userId: userId,
+                timestamp: new Date()
+            });
         }
 
         function populateSetupModal() {
