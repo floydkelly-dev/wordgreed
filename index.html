@@ -2141,6 +2141,13 @@
             document.getElementById('trade-goodies-button')?.addEventListener('click', () => {
                 showEventText("Coming Soon!");
             });
+
+            // FIX: Use 'blur' event to save player name only when they exit the field
+            document.getElementById('player-name-input').addEventListener('blur', (e) => {
+                playerData.name = e.target.value;
+                e.target.classList.toggle('invalid-input', !e.target.value.trim());
+                savePlayerData();
+            });
         }
 
         // --- Player Data & Store Logic ---
@@ -2411,28 +2418,6 @@
             // Refresh calendar
             populateCalendar();
         }
-
-        document.getElementById('player-name-input').addEventListener('change', (e) => {
-            playerData.name = e.target.value;
-            e.target.classList.toggle('invalid-input', !e.target.value.trim());
-            savePlayerData();
-        });
-
-        document.getElementById('reset-progress-button').addEventListener('click', () => {
-            document.getElementById('confirm-reset-modal').classList.remove('hidden');
-        });
-
-        document.getElementById('cancel-reset-button').addEventListener('click', () => {
-            document.getElementById('confirm-reset-modal').classList.add('hidden');
-        });
-
-        document.getElementById('confirm-reset-button').addEventListener('click', () => {
-            playerData = getDefaultPlayerData();
-            savePlayerData(); // Overwrite cloud data with default data
-            populateSetupModal();
-            applyTheme('default');
-            document.getElementById('confirm-reset-modal').classList.add('hidden');
-        });
 
         // Start the game initialization process when the window loads.
         window.onload = initGame;
