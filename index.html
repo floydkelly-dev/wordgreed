@@ -229,9 +229,37 @@
         }
         /* Setup Modal Scroll */
         #setup-modal > .glass-panel { max-height: 90vh; overflow-y: auto; }
+        /* Background Clouds */
+        @keyframes slide {
+            0% { transform: translateX(-25%); }
+            100% { transform: translateX(25%); }
+        }
+        .clouds {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 200%;
+            height: 100%;
+            display: block;
+            z-index: -1;
+            background-repeat: repeat-x;
+            animation: slide 120s linear infinite;
+            opacity: 0.3;
+        }
+        #clouds-day {
+            background-image: url('https://placehold.co/2048x1024/87CEEB/FFFFFF?text=Day+Clouds+Here'); /* Replace with your day cloud PNG */
+        }
+        #clouds-night {
+            background-image: url('https://placehold.co/2048x1024/000033/FFFFFF?text=Night+Clouds+Here'); /* Replace with your night cloud PNG */
+        }
     </style>
 </head>
 <body class="text-white flex items-center justify-center min-h-screen p-4">
+
+    <div id="clouds-day" class="clouds hidden"></div>
+    <div id="clouds-night" class="clouds hidden"></div>
 
     <!-- Audio Player for background music -->
     <audio id="background-music">
@@ -819,7 +847,7 @@
          * Updates the score and money bags display.
          */
         function updateScoreDisplay() {
-            bagsOfMoney = Math.floor(Math.sqrt(coins));
+            bagsOfMoney = Math.floor(coins * 0.01);
             document.getElementById('coins-display').textContent = coins.toLocaleString();
             document.getElementById('bags-of-money-display').textContent = bagsOfMoney.toLocaleString();
             document.getElementById('coins-display').classList.remove('score-decay');
@@ -1454,6 +1482,7 @@
 
         /**
          * Ends the game and shows the game over screen.
+         * @param {boolean} isBomb Whether the game ended due to a bomb.
          */
         function endGame(isBomb = false) {
             isGameOver = true;
