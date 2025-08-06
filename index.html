@@ -2365,7 +2365,7 @@
             populateCalendar();
         }
 
-        document.getElementById('player-name-input').addEventListener('input', (e) => {
+        document.getElementById('player-name-input').addEventListener('change', (e) => {
             playerData.name = e.target.value;
             e.target.classList.toggle('invalid-input', !e.target.value.trim());
             savePlayerData();
