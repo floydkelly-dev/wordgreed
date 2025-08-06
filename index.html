@@ -6,8 +6,8 @@
     <title>Word Greed</title>
     <link id="favicon" rel="icon" href="https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/WordGreedSiteIcon.png">
     
-    <!-- This script will hold your secret Firebase keys. We will create this file next. -->
-    <script src="./config.js"></script>
+    <!-- This script will hold your secret Firebase keys. -->
+    <script src="./config.js" onerror="window.firebaseConfig = {}"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -518,19 +518,39 @@
         </div>
     </div>
 
+    <!-- Warning for disabled Firebase features -->
+    <div id="firebase-warning" class="hidden fixed bottom-4 left-4 bg-yellow-500 text-black p-3 rounded-lg shadow-lg text-sm z-[100]">
+        Firebase features (saving, leaderboard) are disabled in this preview due to your security settings. They will work on your live site.
+    </div>
+
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-        // Initialize Firebase
-        // The 'firebaseConfig' object is now loaded from the 'config.js' file
-        // which is not committed to GitHub.
-        const app = initializeApp(window.firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        let userId = null;
+        // --- Firebase Initialization ---
+        let app, auth, db, userId = null;
+        let firebaseFeaturesEnabled = false;
+
+        try {
+            let config = window.firebaseConfig;
+            // Check if the config object is present and has keys. The `onerror` on the script tag
+            // will set it to an empty object if config.js fails to load.
+            if (config && Object.keys(config).length > 0) {
+                app = initializeApp(config);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                firebaseFeaturesEnabled = true; // Assume enabled until an auth error proves otherwise
+            } else {
+                // This case handles when config.js is missing, like in a local or preview environment
+                // without the file. We'll proceed without Firebase.
+                console.warn("config.js not found or is empty. Running in offline mode.");
+            }
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+            firebaseFeaturesEnabled = false;
+        }
 
         // --- DOM Elements ---
         const gridContainer = document.getElementById('game-grid');
@@ -1538,6 +1558,10 @@
          */
         async function displayLeaderboard() {
             const container = document.getElementById('leaderboard-container');
+            if (!firebaseFeaturesEnabled) {
+                 container.innerHTML = `<h3 class="text-2xl font-bold text-amber-300 mb-4">Leaderboard</h3><div class="text-yellow-400 text-sm">Leaderboard is disabled in this preview due to your security settings. It will work on your live Netlify site.</div>`;
+                 return;
+            }
             container.innerHTML = `<h3 class="text-2xl font-bold text-amber-300 mb-4">Top 5 Players</h3><div class="text-white">Loading...</div>`;
 
             try {
@@ -1659,6 +1683,13 @@
          * Starts the game from the initial modal.
          */
         function startGame() {
+            // --- FIX: Start playing music on the first user interaction ---
+            // This is required by browser autoplay policies.
+            // We start it muted and then set the real volume later.
+            musicPlayer.muted = true;
+            playTrack(currentTrackIndex);
+            musicPlayer.play().catch(e => console.error("Audio play failed on initial click:", e));
+
             const todayStr = new Date().toISOString().split('T')[0];
             if (playerData.lastLoginDate !== todayStr) {
                 showWelcomeBonus();
@@ -1668,11 +1699,12 @@
         }
 
         function actuallyStartGame() {
-            musicPlayer.volume = 0.5;
-            lastVolume = 0.5;
-            document.getElementById('volume-slider').value = 0.5;
-            updateVolumeIcon(0.5);
-            playTrack(currentTrackIndex);
+            // --- FIX: Unmute the music and set the correct volume ---
+            musicPlayer.muted = false;
+            musicPlayer.volume = lastVolume;
+            document.getElementById('volume-slider').value = lastVolume;
+            updateVolumeIcon(lastVolume);
+            
             document.getElementById('start-modal').classList.add('hidden');
             document.getElementById('game-container').classList.remove('hidden');
             document.getElementById('game-container').classList.add('flex');
@@ -1966,23 +1998,39 @@
             originalUserPlaylist = [...userPlaylist]; // Store the original order
         }
 
+        function showFirebaseDisabledWarning() {
+            const warning = document.getElementById('firebase-warning');
+            warning.classList.remove('hidden');
+            setTimeout(() => {
+                warning.classList.add('hidden');
+            }, 8000);
+        }
+
         /**
          * Initializes the entire game on page load.
          */
         async function initGame() {
             await buildVerifiedPlaylist();
-            onAuthStateChanged(auth, user => {
-                if (user) {
-                    // User is signed in anonymously.
-                    userId = user.uid;
-                    loadPlayerData();
-                } else {
-                    // User is signed out.
-                    signInAnonymously(auth).catch(error => {
-                        console.error("Anonymous sign-in failed:", error);
-                    });
-                }
-            });
+            
+            if (firebaseFeaturesEnabled) {
+                onAuthStateChanged(auth, user => {
+                    if (user) {
+                        userId = user.uid;
+                        loadPlayerData();
+                    } else {
+                        signInAnonymously(auth).catch(error => {
+                            console.error("Anonymous sign-in failed:", error);
+                            if (error.code === 'auth/requests-from-referer-are-blocked') {
+                                showFirebaseDisabledWarning();
+                            }
+                            firebaseFeaturesEnabled = false;
+                            loadPlayerData(); // Load default data now
+                        });
+                    }
+                });
+            } else {
+                loadPlayerData(); // Load default data if Firebase isn't set up
+            }
 
             startLevel();
             updateScoreDisplay();
@@ -2111,7 +2159,11 @@
         }
 
         async function loadPlayerData() {
-            if (!userId) return;
+            if (!userId || !firebaseFeaturesEnabled) {
+                playerData = getDefaultPlayerData();
+                applyTheme(playerData.activeSkin);
+                return;
+            }
             const playerDocRef = doc(db, "players", userId);
             const docSnap = await getDoc(playerDocRef);
 
@@ -2119,14 +2171,16 @@
                 playerData = { ...getDefaultPlayerData(), ...docSnap.data() };
             } else {
                 playerData = getDefaultPlayerData();
-                // Create a new document in Firestore for the new player
                 await setDoc(playerDocRef, playerData);
             }
             applyTheme(playerData.activeSkin);
         }
 
         async function savePlayerData() {
-            if (!userId) return;
+            if (!userId || !firebaseFeaturesEnabled) {
+                console.warn("Firebase features disabled. Skipping save.");
+                return;
+            }
             playerData.moneyBags += bagsOfMoney;
             if (coins > playerData.highScore) {
                 playerData.highScore = coins;
@@ -2134,7 +2188,6 @@
             const playerDocRef = doc(db, "players", userId);
             await setDoc(playerDocRef, playerData, { merge: true });
 
-            // Also save the game result to the leaderboard
             const leaderboardRef = collection(db, "leaderboard");
             await addDoc(leaderboardRef, {
                 name: playerData.name || 'Anonymous',
