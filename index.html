@@ -297,11 +297,17 @@
                 </div>
                 <!-- Score Container -->
                 <div id="score-container" class="greed-panel p-3 rounded-lg text-center flex flex-col gap-2">
-                    <div class="grid grid-cols-2 gap-2 text-center">
-                        <div class="text-4xl coin-rotate" style="filter: drop-shadow(0 0 5px #fde047);">🪙</div>
-                        <div class="text-4xl" style="filter: drop-shadow(0 0 5px #fde047);">💰</div>
-                        <div id="coins-display" class="text-lg font-bold text-white">0</div>
-                        <div id="bags-of-money-display" class="text-lg font-bold text-green-400">0</div>
+                    <!-- FIX: Changed to a flex column layout to prevent overlap -->
+                    <div class="flex flex-col items-center justify-center gap-2 text-center">
+                        <div class="flex items-center gap-4">
+                            <!-- FIX: Reduced icon size slightly -->
+                            <div class="text-3xl coin-rotate" style="filter: drop-shadow(0 0 5px #fde047);">🪙</div>
+                            <div class="text-3xl" style="filter: drop-shadow(0 0 5px #fde047);">💰</div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div id="coins-display" class="text-lg font-bold text-white text-center">0</div>
+                            <div id="bags-of-money-display" class="text-lg font-bold text-green-400 text-center">0</div>
+                        </div>
                     </div>
                     <!-- Greed Score and Solve Button -->
                     <div id="greed-content" class="mx-auto flex flex-col items-center justify-center gap-1">
@@ -346,7 +352,8 @@
             </h1>
             <p class="text-lg text-slate-300">Drag and drop letters to solve jumbled words. Grab Big Prizes and Get Greedy!</p>
             <button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl">Start Game</button>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.9</div>
+            <!-- FIX: Version updated to 2.0 -->
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.0</div>
         </div>
     </div>
 
@@ -396,7 +403,8 @@
                     <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Close</button>
                 </div>
             </div>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v1.9</div>
+            <!-- FIX: Version updated to 2.0 -->
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.0</div>
         </div>
     </div>
 
@@ -407,8 +415,9 @@
             <div class="text-slate-300 space-y-2">
                 <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
-                <p>Version: <span class="font-bold text-white">1.9</span></p>
-                <p>Build Date: <span class="font-bold text-white">August 5, 2025</span></p>
+                <!-- FIX: Version updated to 2.0 -->
+                <p>Version: <span class="font-bold text-white">2.0</span></p>
+                <p>Build Date: <span class="font-bold text-white">August 6, 2025</span></p>
                 <p><a href="https://floydkellycreates.wordpress.com/contact-me/" target="_blank" class="text-purple-300 hover:text-purple-200">Contact the Developer</a></p>
             </div>
             <p class="text-xs text-slate-500 mt-4">Copyright © 2025</p>
