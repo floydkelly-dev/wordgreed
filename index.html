@@ -57,6 +57,7 @@
         @keyframes wild-pulse-animation { 0%, 100% { transform: scale(1); box-shadow: 0 0 15px #F59E0B, 0 0 30px #F59E0B; } 50% { transform: scale(1.2) rotate(10deg); box-shadow: 0 0 25px #facc15, 0 0 50px #facc15; } }
         @keyframes big-pulse-animation { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.25); } }
         #jackpot-square.wild-pulse { animation: wild-pulse-animation 0.5s infinite ease-in-out !important; }
+        #jackpot-square.cooldown { background-color: #4b5563 !important; border-color: #6b7280 !important; cursor: not-allowed; }
         #solve-button.big-pulse { animation: big-pulse-animation 1.5s ease-in-out infinite; }
         .prize-tile { animation: pulse-glow-blue 1.5s infinite; cursor: pointer; font-size: 2rem; }
         .prize-tile.red-bomb { background-color: #ef4444 !important; animation-name: pulse-glow-red; }
@@ -297,17 +298,13 @@
                 </div>
                 <!-- Score Container -->
                 <div id="score-container" class="greed-panel p-3 rounded-lg text-center flex flex-col gap-2">
-                    <!-- FIX: Changed to a flex column layout to prevent overlap -->
-                    <div class="flex flex-col items-center justify-center gap-2 text-center">
-                        <div class="flex items-center gap-4">
-                            <!-- FIX: Reduced icon size slightly -->
-                            <div class="text-3xl coin-rotate" style="filter: drop-shadow(0 0 5px #fde047);">🪙</div>
-                            <div class="text-3xl" style="filter: drop-shadow(0 0 5px #fde047);">💰</div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div id="coins-display" class="text-lg font-bold text-white text-center">0</div>
-                            <div id="bags-of-money-display" class="text-lg font-bold text-green-400 text-center">0</div>
-                        </div>
+                    <!-- FIX: Reverted to the original, better-looking 2x2 grid layout. -->
+                    <!-- The `min-w-0` class is added to the score divs to prevent overflow with large numbers. -->
+                    <div class="grid grid-cols-2 gap-2 text-center">
+                        <div class="text-4xl coin-rotate" style="filter: drop-shadow(0 0 5px #fde047);">🪙</div>
+                        <div class="text-4xl" style="filter: drop-shadow(0 0 5px #fde047);">💰</div>
+                        <div id="coins-display" class="text-lg font-bold text-white min-w-0 break-words">0</div>
+                        <div id="bags-of-money-display" class="text-lg font-bold text-green-400 min-w-0 break-words">0</div>
                     </div>
                     <!-- Greed Score and Solve Button -->
                     <div id="greed-content" class="mx-auto flex flex-col items-center justify-center gap-1">
@@ -1087,10 +1084,8 @@
 
         let GJACKVARNUM = 0; // Tracks clicks on the jackpot square for a small easter egg.
         function onJackpotClick(event) {
-            timeSinceLastSolve = 0; 
-            
             const jackpotSquare = event.currentTarget;
-            if (jackpotSquare.classList.contains('cooldown')) return;
+            if (jackpotSquare.classList.contains('cooldown') || jackpotSquare.classList.contains('wild-pulse')) return;
 
             GJACKVARNUM++; 
             coins += 50000; 
@@ -1098,15 +1093,12 @@
             flashScore('gain');
             triggerCoinAnimation(jackpotSquare, document.getElementById('coins-display'));
 
-            if (GJACKVARNUM >= 8) {
-                showEventText("Get outta here!");
-                coins = Math.floor(coins / 2); // Halve session coins
-                updateScoreDisplay(); 
-                flashScore('deduct');
-                flashBagsPanel();
-                GJACKVARNUM = 0; 
-            } else if (GJACKVARNUM === 4) {
-                showEventText("Yep! You're Greedy!");
+            if (GJACKVARNUM >= 12) {
+                jackpotSquare.classList.add('cooldown');
+                setTimeout(() => {
+                    jackpotSquare.classList.remove('cooldown');
+                    GJACKVARNUM = 0;
+                }, 15000);
             }
         }
 
@@ -1567,13 +1559,14 @@
          */
         async function displayLeaderboard() {
             const container = document.getElementById('leaderboard-container');
-            if (!firebaseFeaturesEnabled) {
-                 container.innerHTML = `<h3 class="text-2xl font-bold text-amber-300 mb-4">Leaderboard</h3><div class="text-yellow-400 text-sm">Leaderboard is disabled in this preview due to your security settings. It will work on your live Netlify site.</div>`;
-                 return;
-            }
+            // FIX: Removed the special message for the preview environment.
+            // The try/catch block will now handle any errors gracefully.
             container.innerHTML = `<h3 class="text-2xl font-bold text-amber-300 mb-4">Top 5 Players</h3><div class="text-white">Loading...</div>`;
 
             try {
+                if (!firebaseFeaturesEnabled) {
+                    throw new Error("Firebase is not available.");
+                }
                 const q = query(collection(db, "leaderboard"), orderBy("score", "desc"), limit(5));
                 const querySnapshot = await getDocs(q);
                 const topScores = [];
