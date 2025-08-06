@@ -151,8 +151,8 @@
         input[type=range].volume-slider::-moz-range-track { width: 100%; height: 8px; cursor: pointer; background: rgba(0, 0, 0, 0.5); border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); }
         input[type=range].volume-slider::-moz-range-thumb { height: 20px; width: 20px; border-radius: 50%; background: #a78bfa; cursor: pointer; border: 2px solid #c4b5fd; box-shadow: 0 0 5px #8b5cf6; }
         /* Playlist & Setup Styles */
-        #playlist-container { max-height: 220px; overflow-y: auto; }
-        .playlist-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background-color: rgba(0,0,0,0.2); border-radius: 0.5rem; transition: background-color 0.2s; cursor: pointer; }
+        #playlist-container { max-height: 220px; overflow-y: auto; background-color: rgba(0,0,0,0.2); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5); padding: 0.5rem; border-radius: 0.5rem;}
+        .playlist-item { display: flex; justify-content: space-between; align-items: center; padding: 0.25rem 0.75rem; background-color: rgba(0,0,0,0.2); border-radius: 0.5rem; transition: background-color 0.2s; user-select: none; }
         .playlist-item:hover { background-color: rgba(0,0,0,0.4); }
         .playlist-item input[type="checkbox"] { display: none; }
         .playlist-item .custom-checkbox {
@@ -166,6 +166,8 @@
         .now-playing-indicator { font-size: 0.75rem; color: var(--primary-color-light); font-style: italic; display: none; }
         .playlist-item.now-playing { background-color: rgba(139, 92, 246, 0.3); }
         .playlist-item.now-playing .now-playing-indicator { display: block; }
+        #playlist-controls { background-color: rgba(0,0,0,0.2); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5); padding: 0.5rem; border-radius: 9999px; display: flex; align-items: center; gap: 0.5rem;}
+        #playlist-controls button { width: 2.5rem; height: 2.5rem; }
         #playlist-controls button.shuffle-active { background: var(--primary-color); }
         #player-name-input { background-color: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); }
         #player-name-input.invalid-input { border-color: #ef4444 !important; box-shadow: 0 0 8px #ef4444; }
@@ -376,6 +378,7 @@
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
                 <p>Version: <span class="font-bold text-white">1.9</span></p>
                 <p>Build Date: <span class="font-bold text-white">August 5, 2025</span></p>
+                <p><a href="https://floydkellycreates.wordpress.com/contact-me/" target="_blank" class="text-purple-300 hover:text-purple-200">Contact the Developer</a></p>
             </div>
             <p class="text-xs text-slate-500 mt-4">Copyright © 2025</p>
             <button id="close-about-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
@@ -386,7 +389,7 @@
     <div id="playlist-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-md relative">
             <h2 class="text-2xl font-bold text-amber-300">Soundtrack Playlist</h2>
-            <div id="playlist-container" class="w-full space-y-2 my-2 text-left">
+            <div id="playlist-container" class="w-full space-y-1 my-2 text-left">
                 <!-- Playlist items will be injected here by JS -->
             </div>
             <div id="playlist-controls" class="flex items-center justify-center gap-4 my-4">
@@ -400,7 +403,7 @@
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M11.555 5.168A1 1 0 0010 5.994v8.012a1 1 0 001.555.832l4.286-4.001a1 1 0 000-1.664l-4.286-4.001zM7 5h2v10H7V5z"></path></svg>
                 </button>
                 <button id="playlist-shuffle" class="glassy-button p-2 rounded-full" style="background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af;">
-                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M.22 3.22a.75.75 0 011.06 0L4 5.94l1.22-1.22a.75.75 0 111.06 1.06L5.06 7l1.22 1.22a.75.75 0 11-1.06 1.06L4 8.06l-2.72 2.72a.75.75 0 01-1.06-1.06L2.94 7 .22 4.28a.75.75 0 010-1.06zM8.25 5.5a.75.75 0 01.75-.75h8a.75.75 0 010 1.5h-8a.75.75 0 01-.75-.75zM8.25 9.5a.75.75 0 01.75-.75h8a.75.75 0 010 1.5h-8a.75.75 0 01-.75-.75zm.75 3.25a.75.75 0 000 1.5h8a.75.75 0 000-1.5h-8z" clip-rule="evenodd" /></svg>
+                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.083 4.083a.75.75 0 011.06 0L9.47 8.414l1.72-1.72a.75.75 0 111.06 1.06l-1.72 1.72 4.327 4.327a.75.75 0 01-1.06 1.06L9.47 10.586l-1.72 1.72a.75.75 0 11-1.06-1.06l1.72-1.72L4.083 5.143a.75.75 0 010-1.06zM6.5 14.25a.75.75 0 01.75-.75h8a.75.75 0 010 1.5h-8a.75.75 0 01-.75-.75zm0-8.5a.75.75 0 01.75-.75h8a.75.75 0 010 1.5h-8a.75.75 0 01-.75-.75z" clip-rule="evenodd" /></svg>
                 </button>
             </div>
             <button id="close-playlist-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
@@ -1854,19 +1857,27 @@
             container.innerHTML = '';
             verifiedPlaylist.forEach(track => {
                 const isChecked = userPlaylist.includes(track.filename);
-                const item = document.createElement('label');
+                const item = document.createElement('div');
                 item.className = 'playlist-item';
                 item.innerHTML = `
-                    <div class="flex items-center">
+                    <label class="flex items-center cursor-pointer">
                         <input type="checkbox" value="${track.filename}" ${isChecked ? 'checked' : ''}>
                         <span class="custom-checkbox">
                             <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
                         </span>
-                        <span>${track.title}</span>
-                    </div>
+                        <span class="song-title">${track.title}</span>
+                    </label>
                     <span class="now-playing-indicator">Now Playing...</span>
                 `;
                 container.appendChild(item);
+                item.querySelector('.song-title').addEventListener('dblclick', (e) => {
+                    e.stopPropagation(); // Prevent the label from toggling the checkbox
+                    const trackFilename = item.querySelector('input').value;
+                    const playIndex = userPlaylist.findIndex(filename => filename === trackFilename);
+                    if (playIndex !== -1) {
+                        playTrack(playIndex);
+                    }
+                });
                 item.querySelector('input').addEventListener('change', (e) => {
                     if (e.target.checked) {
                         userPlaylist.push(e.target.value);
