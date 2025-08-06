@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Greed</title>
     <link id="favicon" rel="icon" href="https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/WordGreedSiteIcon.png">
+    
+    <!-- This script will hold your secret Firebase keys. We will create this file next. -->
+    <script src="./config.js"></script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -521,19 +524,10 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-          apiKey: "AIzaSyDhYY3L2HI1Ovb2yNICs055M_7xrsR5uo4",
-          authDomain: "wordgreed-cc5eb.firebaseapp.com",
-          projectId: "wordgreed-cc5eb",
-          storageBucket: "wordgreed-cc5eb.appspot.com",
-          messagingSenderId: "395706904910",
-          appId: "1:395706904910:web:4675b1a9cc8b6cdf826e1f",
-          measurementId: "G-DSPDTH86X2"
-        };
-
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
+        // The 'firebaseConfig' object is now loaded from the 'config.js' file
+        // which is not committed to GitHub.
+        const app = initializeApp(window.firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         let userId = null;
