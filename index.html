@@ -6,7 +6,7 @@
     <title>Word Greed</title>
     <link id="favicon" rel="icon" href="https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/WordGreedSiteIcon.png">
     
-    <!-- This script will hold your secret Firebase keys. -->
+    <!-- This script will hold your secret Firebase keys for local development -->
     <script src="./config.js" onerror="window.firebaseConfig = {}"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -455,7 +455,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-center">
                 <div class="greed-panel p-2 rounded-lg">
                     <label for="player-name-input" class="text-sm font-bold text-slate-300">PLAYER NAME</label>
-                    <input type="text" id="player-name-input" class="w-full mt-1 p-1 rounded-md text-center text-lg font-bold" placeholder="Enter Name">
+                    <input type="text" id="player-name-input" class="w-full mt-1 p-1 rounded-md text-center text-lg font-bold" placeholder="Connecting..." disabled>
                 </div>
                 <div class="greed-panel p-2 rounded-lg">
                     <div class="text-sm font-bold text-slate-300">TOTAL MONEY BAGS</div>
@@ -524,11 +524,6 @@
         </div>
     </div>
 
-    <!-- Warning for disabled Firebase features -->
-    <div id="firebase-warning" class="hidden fixed bottom-4 left-4 bg-yellow-500 text-black p-3 rounded-lg shadow-lg text-sm z-[100]">
-        Firebase features (saving, leaderboard) are disabled in this preview due to your security settings. They will work on your live site.
-    </div>
-
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
@@ -537,39 +532,40 @@
 
         // --- Firebase Initialization ---
         let app, auth, db, userId = null;
-        let firebaseFeaturesEnabled = false;
 
-        try {
-            let config = window.firebaseConfig;
-            // Check if the config object is present and has keys. The `onerror` on the script tag
-            // will set it to an empty object if config.js fails to load.
-            if (config && Object.keys(config).length > 0) {
-                app = initializeApp(config);
+        const firebaseConfig = window.firebaseConfig;
+
+        if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
+            try {
+                app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
-                firebaseFeaturesEnabled = true; // Assume enabled until an auth error proves otherwise
-            } else {
-                // This case handles when config.js is missing, like in a local or preview environment
-                // without the file. We'll proceed without Firebase.
-                console.warn("config.js not found or is empty. Running in offline mode.");
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
             }
-        } catch (error) {
-            console.error("Firebase initialization failed:", error);
-            firebaseFeaturesEnabled = false;
+        } else {
+            console.warn("Firebase config not found or is empty. Running in offline mode.");
         }
 
         // --- DOM Elements ---
         const gridContainer = document.getElementById('game-grid');
         const musicPlayer = document.getElementById('background-music');
+        const playerNameInput = document.getElementById('player-name-input');
 
-        // --- Game Data ---
-        let coins = 0;
-        let bagsOfMoney = 0;
-        let draggedTile = null;
-
-        // --- Player Data (Persistent) ---
-        let playerData = {};
-
+        // --- Game Data & State ---
+        let coins = 0, bagsOfMoney = 0, draggedTile = null, playerData = {}, currentLevel = 1;
+        const totalGameTime = 600;
+        let timeRemaining = totalGameTime, mainTimerInterval = null, prizeSpawnerTimeout = null;
+        let diamondSequenceTimeout = null, puzzles = [], trophyCollectedThisLevel = false;
+        let diamondCollectedThisLevel = false, currentDiamondValue = 20000000;
+        let solveButtonClicks = 0, solveButtonCooldown = 0, solveButtonTimerInterval = null;
+        let isGamePaused = true, isGameOver = false, timeSinceLastSolve = 0;
+        let scoreDecayInterval = null, impTimeout = null, isFrozen = false, thawTimeout = null;
+        let jackpotEventAvailable = true, specialJackpotTimeout = null, specialCashEmojiSpawned = false;
+        let timedEvents = { sixMin: true, threeMin: true }, isSpecialAnimationActive = false;
+        let startModalAnimationInterval = null, maxSameEmoji = 4, isDraggingBomb = false;
+        let lastVolume = 0.5, solveButtonPulseManager = null;
+        
         // --- Playlist Data ---
         const songDatabase = [
             { id: '001', title: 'Word Greed', filename: 'wordgreed001.mp3' },
@@ -579,65 +575,20 @@
             { id: '005', title: 'Cash Flow', filename: 'wordgreed005.mp3' },
             { id: '006', title: 'Golden Glow', filename: 'wordgreed006.mp3' }
         ];
-        let verifiedPlaylist = [];
-        let userPlaylist = [];
-        let originalUserPlaylist = [];
-        let currentTrackIndex = 0;
-        let isShuffled = false;
+        let verifiedPlaylist = [], userPlaylist = [], originalUserPlaylist = [];
+        let currentTrackIndex = 0, isShuffled = false;
         const musicBaseURL = 'https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/';
         const mutedIconHref = 'https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/WordGreedSiteIcon.png';
         const speakerSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M 20 40 L 40 40 L 60 20 L 60 80 L 40 60 L 20 60 Z" fill="white" stroke="black" stroke-width="2"/><path d="M 70 30 C 80 40, 80 60, 70 70" stroke="white" stroke-width="5" fill="none"/><path d="M 80 20 C 95 35, 95 65, 80 80" stroke="white" stroke-width="5" fill="none"/></svg>`;
         const speakerIconHref = `data:image/svg+xml,${encodeURIComponent(speakerSVG)}`;
 
-        // --- Game State ---
-        let currentLevel = 1;
-        const totalGameTime = 600;
-        let timeRemaining = totalGameTime;
-        let mainTimerInterval = null;
-        let prizeSpawnerTimeout = null;
-        let diamondSequenceTimeout = null;
-        let puzzles = [];
-        let trophyCollectedThisLevel = false;
-        let diamondCollectedThisLevel = false;
-        let currentDiamondValue = 20000000;
-        let solveButtonClicks = 0;
-        let solveButtonCooldown = 0;
-        let solveButtonTimerInterval = null;
-        let isGamePaused = true;
-        let isGameOver = false;
-        let timeSinceLastSolve = 0;
-        let scoreDecayInterval = null;
-        let impTimeout = null;
-        let isFrozen = false;
-        let thawTimeout = null;
-        let jackpotEventAvailable = true; 
-        let specialJackpotTimeout = null;
-        let specialCashEmojiSpawned = false;
-        let timedEvents = { sixMin: true, threeMin: true };
-        let isSpecialAnimationActive = false;
-        let startModalAnimationInterval = null;
-        let maxSameEmoji = 4;
-        let isDraggingBomb = false;
-        let lastVolume = 0.5;
-        let solveButtonPulseManager = null;
-
-        // --- Word Bank ---
-        const wordBank = ["ABROAD","ACCEPT","ACCESS","ACROSS","ACTION","ACTIVE","ADMIRE","ADVICE","AFFAIR","AFFECT","AFFORD","AGENCY","AGENDA","ALMOST","ALWAYS","AMOUNT","ANIMAL","ANNUAL","ANSWER","ANYONE","ANYWAY","APART","APPEAL","APPEAR","APPLY","APPROVE","AROUND","ARRIVE","ARTIST","ASLEEP","ASPECT","ASSESS","ASSIST","ASSUME","ATTACK","ATTEND","ATTRACT","AUTHOR","AWARD","BALANCE","BECOME","BEHAVE","BELIEF","BELONG","BENEATH","BENEFIT","BESIDE","BEYOND","BISHOP","BORDER","BOTTLE","BOTTOM","BRANCH","BREATH","BRIDGE","BRIEFLY","BRIGHT","BROKEN","BUDGET","BURDEN","CAMERA","CANCEL","CANCER","CANDLE","CAPITAL","CAREER","CAREFUL","CENTRAL","CENTURY","CERTAIN","CHAIR","CHALLENGE","CHANCE","CHANGE","CHARGE","CHOICE","CHOOSE","CHURCH","CIRCLE","CLIENT","CLIMB","CLOSELY","CLOSER","COFFEE","COLLECT","COLLEGE","COLUMN","COMBINE","COMFORT","COMMAND","COMMENT","COMMIT","COMMON","COMPARE","COMPETE","COMPLEX","CONCEPT","CONCERN","CONFIRM","CONFLICT","CONNECT","CONSENT","CONSIST","CONTACT","CONTAIN","CONTENT","CONTEST","CONTEXT","CONTROL","CONVERT","CORNER","COUNCIL","COUNTY","COUPLE","COVER","CREATE","CREDIT","CRISIS","CRITERION","CRITIC","CROWD","CULTURE","CURRENT","CUSTOM","DAMAGE","DANGER","DEALER","DEBATE","DECADE","DECIDE","DECLARE","DECREASE","DEEPLY","DEFAULT","DEFENCE","DEFEND","DEFINE","DEGREE","DELAY","DELIVER","DEMAND","DEPEND","DEPICT","DEPOSIT","DEPUTY","DERIVE","DESIGN","DESIRE","DESPITE","DESTROY","DETAIL","DETECT","DEVELOP","DEVICE","DEVOTE","DIFFER","DIFFICULT","DINNER","DIRECT","DISCUSS","DISEASE","DISMISS","DISPLAY","DISTANT","DIVIDE","DIVISION","DOCTOR","DOCUMENT","DOUBLE","DOUBT","DOZEN","DREAM","DRINK","DRIVE","EAGER","EARLY","EARTH","EASTERN","ECONOMIC","ECONOMY","EDITOR","EDUCATE","EFFECT","EFFORT","EIGHT","EITHER","ELDERLY","ELECT","ELEMENT","ELSE","EMERGE","EMPHASIS","EMPLOY","ENABLE","ENCOURAGE","ENGINE","ENJOY","ENOUGH","ENSURE","ENTER","ENTIRE","ENTITLE","EQUALLY","EQUIP","ESCAPE","ESSAY","ESSENTIAL","ESTATE","ETHNIC","EVENT","EVERY","EXACTLY","EXAMINE","EXAMPLE","EXCEED","EXCEPT","EXCHANGE","EXCITE","EXCLUDE","EXCUSE","EXERCISE","EXIST","EXPECT","EXPENSE","EXPERIENCE","EXPERT","EXPLAIN","EXPLORE","EXPOSE","EXPRESS","EXTEND","EXTENT","EXTERNAL","EXTRA","EXTREME","FACTOR","FACULTY","FAILED","FAILURE","FAIRLY","FAITH","FAMLIAR","FAMOUS","FARMER","FASHION","FATHER","FAVOUR","FEELING","FEMALE","FIFTEEN","FIGHT","FIGURE","FINANCE","FINALLY","FINGER","FINISH","FLIGHT","FLOWER","FOLLOW","FOOTBALL","FORCE","FOREIGN","FOREST","FORGET","FORMAL","FORMER","FORWARD","FOUND","FOURTH","FRAME","FREEDOM","FRIEND","FUNCTION","FUTURE","GARDEN","GATHER","GENERAL","GENERATION","GENTLE","GLOBAL","GOLDEN","GROUND","GROWTH","GUARD","GUILTY","HANDLE","HAPPEN","HARDLY","HEALTH","HEAVILY","HEIGHT","HENCE","HOLIDAY","HORSE","HOSPITAL","HOUSE","HOWEVER","HUMAN","HUSBAND","IMPACT","IMPLY","IMPORT","IMPOSE","IMPROVE","INCLUDE","INCREASE","INDEED","INDICATE","INDIVIDUAL","INDUSTRY","INFORM","INITIAL","INJURY","INSIDE","INSIST","INSTANCE","INSTEAD","INSTITUTE","INTEND","INTEREST","INTERNAL","INVOLVE","ISLAND","ISSUE","ITSELF","JOINT","JUDGE","JUDGMENT","JUNIOR","JUSTICE","LABOUR","LANGUAGE","LARGELY","LATTER","LAUGH","LAWYER","LEADER","LEAGUE","LEARN","LEAVE","LEGAL","LENGTH","LESSON","LETTER","LEVEL","LIBERAL","LIBRARY","LICENCE","LIMIT","LIMITED","LITTLE","LOCAL","LONDON","LONGER","MACHINE","MAJOR","MANAGE","MANAGER","MANNER","MANY","MARKET","MARRIAGE","MATCH","MATERIAL","MATTER","MEASURE","MEDIA","MEDICAL","MEETING","MEMBER","MEMORY","MENTAL","MENTION","MERELY","METHOD","MIDDLE","MIGHT","MILE","MILITARY","MINISTER","MINOR","MINORITY","MINUTE","MISSION","MISTAKE","MODEL","MODERN","MODULE","MOMENT","MONEY","MONTH","MORAL","MORNING","MOTHER","MOTION","MOTOR","MOUNTAIN","MOUTH","MOVEMENT","MOVIE","MUCH","MUSIC","MYSELF","NARROW","NATION","NATIONAL","NATIVE","NATURAL","NATURE","NEARLY","NECESSary","NEEDLE","NEITHER","NERVE","NETWORK","NEVER","NEWLY","NIGHT","NOBODY","NORMAL","NORTHERN","NOTICE","NOTION","NOWHERE","NUMBER","OBJECT","OBSERVE","OBTAIN","OBVIOUS","OCCASION","OCCUR","OFFENCE","OFFER","OFFICE","OFFICER","OFFICIAL","OFTEN","ONCE","ONLINE","ONLY","ONTO","OPENING","OPERATE","OPPORTUNITY","OPPOSE","OPPOSITE","ORDER","ORDINARY","ORGANISE","ORIGIN","ORIGINAL","OTHER","OUGHT","OUTCOME","OUTSIDE","OVERALL","OWNER","PACKAGE","PAINT","PANEL","PARENT","PARISH","PARLIAMENT","PARTLY","PARTNER","PARTY","PASSAGE","PATIENT","PATTERN","PEACE","PEOPLE","PERFORM","PERHAPS","PERIOD","PERMIT","PERSON","PERSONAL","PHONE","PHOTO","PHYSICAL","PICTURE","PIECE","PLACE","PLANNING","PLANT","PLASTIC","PLAYER","POCKET","POINT","POLICE","POLICY","POLITICAL","POLLUTION","POPULAR","POSITION","POSITIVE","POSSIBLE","POSTER","POWER","PRACTICE","PREFER","PREPARE","PRESENCE","PRESENT","PRESIDENT","PRESS","PRESSURE","PRETTY","PREVIOUS","PRICE","PRIMARY","PRINCIPLE","PRINT","PRIOR","PRIORITY","PRISON","PRIVATE","PROBABLY","PROBLEM","PROCEDURE","PROCESS","PRODUCE","PRODUCT","PROFESSION","PROFILE","PROFIT","PROGRAM","PROGRESS","PROJECT","PROMISE","PROMOTE","PROPER","PROPERTY","PROPOSE","PROTECT","PROVIDE","PUBLIC","PUBLISH","PURPOSE","PUSH","QUALITY","QUARTER","QUESTION","QUICKLY","QUITE","RAISE","RANGE","RAPIDLY","RATELY","RATHER","REACH","REACTION","READER","READING","READY","REALISE","REALLY","REASON","RECALL","RECEIVE","RECENT","RECENTLY","RECOGNISE","RECORD","RECOVER","REDUCE","REFER","REFLECT","REFORM","REFUSE","REGARD","REGION","REGIONAL","REGULAR","RELATE","RELATION","RELATIVE","RELEASE","RELEVANT","RELIEF","RELIGION","REMAIN","REMEMBER","REMOVE","REPEAT","REPLACE","REPLY","REPORT","REPRESENT","REQUEST","REQUIRE","RESEARCH","RESOURCE","RESPECT","RESPOND","RESPONSE","RESULT","RETAIN","RETURN","REVEAL","REVENUE","REVIEW","REVOLUTION","RIGHT","RING","RISE","ROAD","ROLE","ROOM","ROUND","ROUTE","ROYAL","RULE","SAFETY","SALE","SAME","SAMPLE","SAVE","SCALE","SCENE","SCHEME","SCHOOL","SCIENCE","SCORE","SCREEN","SEARCH","SEASON","SECOND","SECRETARY","SECTION","SECTOR","SECURE","SEEM","SELECT","SENIOR","SENSE","SENSITIVE","SENTENCE","SEPARATE","SEQUENCE","SERIES","SERIOUS","SERVANT","SERVICE","SESSION","SETTLE","SEVEN","SEVERAL","SEVERE","SHARE","SHEET","SHOOT","SHORT","SHOT","SHOULD","SHOULDER","SHOUT","SHOW","SIDE","SIGHT","SIGN","SIGNAL","SILENCE","SIMPLE","SIMPLY","SINCE","SINGLE","SISTER","SITE","SITUATION","SIZE","SKILL","SKIN","SLEEP","SLIGHTLY","SLOWly","SOCIAL","SOCIETY","SOLDIER","SOLUTION","SOME","SOMEHOW","SOMEONE","SOMETHING","SOMETIMES","SOMEWHAT","SOON","SORRY","SORT","SOUND","SOURCE","SOUTHERN","SPACE","SPEAK","SPECIAL","SPECIFIC","SPEECH","SPEED","SPEND","SPIRIT","SPORT","SPOT","SPREAD","SPRING","SQUARE","STAFF","STAGE","STAND","STANDARD","START","STATE","STATEMENT","STATION","STATUS","STAY","STEP","STILL","STOCK","STONE","STOP","STORE","STORY","STRAIGHT","STRANGE","STRATEGY","STREET","STRENGTH","STRESS","STRIKE","STRONG","STRUCTURE","STUDENT","STUDIO","STUDY","STYLE","SUBJECT","SUBMIT","SUCCEED","SUCCESS","SUCH","SUDDENLY","SUFFER","SUGGEST","SUMMER","SUPPORT","SUPPOSE","SURELY","SURFACE","SURVEY","SURVIVE","SWITCH","SYSTEM","TABLE","TAKE","TALK","TARGET","TASK","TEACH","TEACHER","TEAM","TECHNOLOGY","TELEPHONE","TELEVISION","TEMPERATURE","TERM","TERRIBLE","TEST","THANKS","THEATRE","THEIR","THEME","THEMSELVES","THEN","THEORY","THERE","THESE","THEY","THING","THINK","THIRD","THIRTY","THIS","THOSE","THOUGH","THOUSAND","THREAT","THREATEN","THREE","THROUGH","THROW","TICKET","TIME","TITLE","TODAY","TOGETHER","TOMORROW","TONE","TONIGHT","TOTAL","TOTALLY","TOUCH","TOUR","TOWARDS","TOWN","TRADE","TRADITION","TRAFFIC","TRAIN","TRAINING","TRANSFER","TRANSPORT","TRAVEL","TREAT","TREATMENT","TREATY","TREE","TREND","TRIAL","TRIP","TROOP","TROUBLE","TRUE","TRUST","TRUTH","TWENTY","TWICE","TYPE","UNDER","UNDERSTAND","UNION","UNIQUE","UNIT","UNITED","UNIVERSITY","UNLESS","UNLIKE","UNTIL","UPON","UPPER","URBAN","USER","USUAL","USUALLY","VALLEY","VALUE","VARIETY","VARIOUS","VEHICLE","VERSION","VERY","VIDEO","VIEW","VILLAGE","VIOLENCE","VISION","VISIT","VISITOR","VOICE","VOLUME","VOTE","WAIT","WALK","WALL","WANT","WAR","WATCH","WATER","WAY","WEALTH","WEAPON","WEAR","WEATHER","WEEK","WEEKEND","WEIGHT","WELCOME","WELL","WESTERN","WHAT","WHATEVER","WHEN","WHERE","WHETHER","WHICH","WHILE","WHITE","WHOLE","WHOM","WHOSE","WIDE","WIDELY","WIFE","WILD","WILL","WINDOW","WINE","WINTER","WISH","WITHIN","WITHOUT","WOMAN","WONDER","WOOD","WORD","WORK","WORKER","WORLD","WORRY","WORTH","WOULD","WRITE","WRITER","WRONG","YARD","YEAR","YOUNG","YOURSELF","YOUTH"];
-
-        // --- Prize Emojis and their properties ---
-        const prizeEmojis = [
-            { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: '💣', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: '💰', value: 1000000, type: 'cash_money' }
-        ];
+        // --- Word Bank & Prize Data ---
+        const wordBank = ["ABROAD","ACCEPT","ACCESS","ACROSS","ACTION","ACTIVE","ADMIRE","ADVICE","AFFAIR","AFFECT","AFFORD","AGENCY","AGENDA","ALMOST","ALWAYS","AMOUNT","ANIMAL","ANNUAL","ANSWER","ANYONE","ANYWAY","APART","APPEAL","APPEAR","APPLY","APPROVE","AROUND","ARRIVE","ARTIST","ASLEEP","ASPECT","ASSESS","ASSIST","ASSUME","ATTACK","ATTEND","ATTRACT","AUTHOR","AWARD","BALANCE","BECOME","BEHAVE","BELIEF","BELONG","BENEATH","BENEFIT","BESIDE","BEYOND","BISHOP","BORDER","BOTTLE","BOTTOM","BRANCH","BREATH","BRIDGE","BRIEFLY","BRIGHT","BROKEN","BUDGET","BURDEN","CAMERA","CANCEL","CANCER","CANDLE","CAPITAL","CAREER","CAREFUL","CENTRAL","CENTURY","CERTAIN","CHAIR","CHALLENGE","CHANCE","CHANGE","CHARGE","CHOICE","CHOOSE","CHURCH","CIRCLE","CLIENT","CLIMB","CLOSELY","CLOSER","COFFEE","COLLECT","COLLEGE","COLUMN","COMBINE","COMFORT","COMMAND","COMMENT","COMMIT","COMMON","COMPARE","COMPETE","COMPLEX","CONCEPT","CONCERN","CONFIRM","CONFLICT","CONNECT","CONSENT","CONSIST","CONTACT","CONTAIN","CONTENT","CONTEST","CONTEXT","CONTROL","CONVERT","CORNER","COUNCIL","COUNTY","COUPLE","COVER","CREATE","CREDIT","CRISIS","CRITERION","CRITIC","CROWD","CULTURE","CURRENT","CUSTOM","DAMAGE","DANGER","DEALER","DEBATE","DECADE","DECIDE","DECLARE","DECREASE","DEEPLY","DEFAULT","DEFENCE","DEFEND","DEFINE","DEGREE","DELAY","DELIVER","DEMAND","DEPEND","DEPICT","DEPOSIT","DEPUTY","DERIVE","DESIGN","DESIRE","DESPITE","DESTROY","DETAIL","DETECT","DEVELOP","DEVICE","DEVOTE","DIFFER","DIFFICULT","DINNER","DIRECT","DISCUSS","DISEASE","DISMISS","DISPLAY","DISTANT","DIVIDE","DIVISION","DOCTOR","DOCUMENT","DOUBLE","DOUBT","DOZEN","DREAM","DRINK","DRIVE","EAGER","EARLY","EARTH","EASTERN","ECONOMIC","ECONOMY","EDITOR","EDUCATE","EFFECT","EFFORT","EIGHT","EITHER","ELDERLY","ELECT","ELEMENT","ELSE","EMERGE","EMPHASIS","EMPLOY","ENABLE","ENCOURAGE","ENGINE","ENJOY","ENOUGH","ENSURE","ENTER","ENTIRE","ENTITLE","EQUALLY","EQUIP","ESCAPE","ESSAY","ESSENTIAL","ESTATE","ETHNIC","EVENT","EVERY","EXACTLY","EXAMINE","EXAMPLE","EXCEED","EXCEPT","EXCHANGE","EXCITE","EXCLUDE","EXCUSE","EXERCISE","EXIST","EXPECT","EXPENSE","EXPERIENCE","EXPERT","EXPLAIN","EXPLORE","EXPOSE","EXPRESS","EXTEND","EXTENT","EXTERNAL","EXTRA","EXTREME","FACTOR","FACULTY","FAILED","FAILURE","FAIRLY","FAITH","FAMLIAR","FAMOUS","FARMER","Fashion","FATHER","FAVOUR","FEELING","FEMALE","FIFTEEN","FIGHT","FIGURE","FINANCE","FINALLY","FINGER","FINISH","FLIGHT","FLOWER","FOLLOW","FOOTBALL","FORCE","FOREIGN","FOREST","FORGET","FORMAL","FORMER","FORWARD","FOUND","FOURTH","FRAME","FREEDOM","FRIEND","FUNCTION","FUTURE","GARDEN","GATHER","GENERAL","GENERATION","GENTLE","GLOBAL","GOLDEN","GROUND","GROWTH","GUARD","GUILTY","HANDLE","HAPPEN","HARDLY","HEALTH","HEAVILY","HEIGHT","HENCE","HOLIDAY","HORSE","HOSPITAL","HOUSE","HOWEVER","HUMAN","HUSBAND","IMPACT","IMPLY","IMPORT","IMPOSE","IMPROVE","INCLUDE","INCREASE","INDEED","INDICATE","INDIVIDUAL","INDUSTRY","INFORM","INITIAL","INJURY","INSIDE","INSIST","INSTANCE","INSTEAD","INSTITUTE","INTEND","INTEREST","INTERNAL","INVOLVE","ISLAND","ISSUE","ITSELF","JOINT","JUDGE","JUDGMENT","JUNIOR","JUSTICE","LABOUR","LANGUAGE","LARGELY","LATTER","LAUGH","LAWYER","LEADER","LEAGUE","LEARN","LEAVE","LEGAL","LENGTH","LESSON","LETTER","LEVEL","LIBERAL","LIBRARY","LICENCE","LIMIT","LIMITED","LITTLE","LOCAL","LONDON","LONGER","MACHINE","MAJOR","MANAGE","MANAGER","MANNER","MANY","MARKET","MARRIAGE","MATCH","MATERIAL","MATTER","MEASURE","MEDIA","MEDICAL","MEETING","MEMBER","MEMORY","MENTAL","MENTION","MERELY","METHOD","MIDDLE","MIGHT","MILE","MILITARY","MINISTER","MINOR","MINORITY","MINUTE","MISSION","MISTAKE","MODEL","MODERN","MODULE","MOMENT","MONEY","MONTH","MORAL","MORNING","MOTHER","MOTION","MOTOR","MOUNTAIN","MOUTH","MOVEMENT","MOVIE","MUCH","MUSIC","MYSELF","NARROW","NATION","NATIONAL","NATIVE","NATURAL","NATURE","NEARLY","NECESSary","NEEDLE","NEITHER","NERVE","NETWORK","NEVER","NEWLY","NIGHT","NOBODY","NORMAL","NORTHERN","NOTICE","NOTION","NOWHERE","NUMBER","OBJECT","OBSERVE","OBTAIN","OBVIOUS","OCCASION","OCCUR","OFFENCE","OFFER","OFFICE","OFFICER","OFFICIAL","OFTEN","ONCE","ONLINE","ONLY","ONTO","OPENing","OPERATE","OPPORTUNITY","OPPOSE","OPPOSITE","ORDER","ORDINARY","ORGANISE","ORIGIN","ORIGINAL","OTHER","OUGHT","OUTCOME","OUTSIDE","OVERALL","OWNER","PACKAGE","PAINT","PANEL","PARENT","PARISH","PARLIAMENT","PARTLY","PARTNER","PARTY","PASSAGE","PATIENT","PATTERN","PEACE","PEOPLE","PERFORM","PERHAPS","PERIOD","PERMIT","PERSON","PERSONAL","PHONE","PHOTO","PHYSICAL","PICTURE","PIECE","PLACE","PLANNING","PLANT","PLASTIC","PLAYER","POCKET","POINT","POLICE","POLICY","POLITICAL","POLLUTION","POPULAR","POSITION","POSITIVE","POSSIBLE","POSTER","POWER","PRACTICE","PREFER","PREPARE","PRESENCE","PRESENT","PRESIDENT","PRESS","PRESSURE","PRETTY","PREVIOUS","PRICE","PRIMARY","PRINCIPLE","PRINT","PRIOR","PRIORITY","PRISON","PRIVATE","PROBABLY","PROBLEM","PROCEDURE","PROCESS","PRODUCE","PRODUCT","PROFESSION","PROFILE","PROFIT","PROGRAM","PROGRESS","PROJECT","PROMISE","PROMOTE","PROPER","PROPERTY","PROPOSE","PROTECT","PROVIDE","PUBLIC","PUBLISH","PURPOSE","PUSH","QUALITY","QUARTER","QUESTION","QUICKLY","QUITE","RAISE","RANGE","RAPIDLY","RATELY","RATHER","REACH","REACTION","READER","READING","READY","REALISE","REALLY","REASON","RECALL","RECEIVE","RECENT","RECENTLY","RECOGNISE","RECORD","RECOVER","REDUCE","REFER","REFLECT","REFORM","REFUSE","REGARD","REGION","REGIONAL","REGULAR","RELATE","RELATION","RELATIVE","RELEASE","RELEVANT","RELIEF","RELIGION","REMAIN","REMEMBER","REMOVE","REPEAT","REPLACE","REPLY","REPORT","REPRESENT","REQUEST","REQUIRE","RESEARCH","RESOURCE","RESPECT","RESPOND","RESPONSE","RESULT","RETAIN","RETURN","REVEAL","REVENUE","REVIEW","REVOLUTION","RIGHT","RING","RISE","ROAD","ROLE","ROOM","ROUND","ROUTE","ROYAL","RULE","SAFETY","SALE","SAME","SAMPLE","SAVE","SCALE","SCENE","SCHEME","SCHOOL","SCIENCE","SCORE","SCREEN","SEARCH","SEASON","SECOND","SECRETARY","SECTION","SECTOR","SECURE","SEEM","SELECT","SENIOR","SENSE","SENSITIVE","SENTENCE","SEPARATE","SEQUENCE","SERIES","SERIOUS","SERVANT","SERVICE","SESSION","SETTLE","SEVEN","SEVERAL","SEVERE","SHARE","SHEET","SHOOT","SHORT","SHOT","SHOULD","SHOULDER","SHOUT","SHOW","SIDE","SIGHT","SIGN","SIGNAL","SILENCE","SIMPLE","SIMPLY","SINCE","SINGLE","SISTER","SITE","SITUATION","SIZE","SKILL","SKIN","SLEEP","SLIGHTLY","SLOWly","SOCIAL","SOCIETY","SOLDIER","SOLUTION","SOME","SOMEHOW","SOMEONE","SOMETHING","SOMETIMES","SOMEWHAT","SOON","SORRY","SORT","SOUND","SOURCE","SOUTHERN","SPACE","SPEAK","SPECIAL","SPECIFIC","SPEECH","SPEED","SPEND","SPIRIT","SPORT","SPOT","SPREAD","SPRING","SQUARE","STAFF","STAGE","STAND","STANDARD","START","STATE","STATEMENT","STATION","STATUS","STAY","STEP","STILL","STOCK","STONE","STOP","STORE","STORY","STRAIGHT","STRANGE","STRATEGY","STREET","STRENGTH","STRESS","STRIKE","STRONG","STRUCTURE","STUDENT","STUDIO","STUDY","STYLE","SUBJECT","SUBMIT","SUCCEED","SUCCESS","SUCH","SUDDENLY","SUFFER","SUGGEST","SUMMER","SUPPORT","SUPPOSE","SURELY","SURFACE","SURVEY","SURVIVE","SWITCH","SYSTEM","TABLE","TAKE","TALK","TARGET","TASK","TEACH","TEACHER","TEAM","TECHNOLOGY","TELEPHONE","TELEVISION","TEMPERATURE","TERM","TERRIBLE","TEST","THANKS","THEATRE","THEIR","THEME","THEMSELVES","THEN","THEORY","THERE","THESE","THEY","THING","THINK","THIRD","THIRTY","THIS","THOSE","THOUGH","THOUSAND","THREAT","THREATEN","THREE","THROUGH","THROW","TICKET","TIME","TITLE","TODAY","TOGETHER","TOMORROW","TONE","TONIGHT","TOTAL","TOTALLY","TOUCH","TOUR","TOWARDS","TOWN","TRADE","TRADITION","TRAFFIC","TRAIN","TRAINING","TRANSFER","TRANSPORT","TRAVEL","TREAT","TREATMENT","TREATY","TREE","TREND","TRIAL","TRIP","TROOP","TROUBLE","TRUE","TRUST","TRUTH","TWENTY","TWICE","TYPE","UNDER","UNDERSTAND","UNION","UNIQUE","UNIT","UNITED","UNIVERSITY","UNLESS","UNLIKE","UNTIL","UPON","UPPER","URBAN","USER","USUAL","USUALLY","VALLEY","VALUE","VARIETY","VARIOUS","VEHICLE","VERSION","VERY","VIDEO","VIEW","VILLAGE","VIOLENCE","VISION","VISIT","VISITOR","VOICE","VOLUME","VOTE","WAIT","WALK","WALL","WANT","WAR","WATCH","WATER","WAY","WEALTH","WEAPON","WEAR","WEATHER","WEEK","WEEKEND","WEIGHT","WELCOME","WELL","WESTERN","WHAT","WHATEVER","WHEN","WHERE","WHETHER","WHICH","WHILE","WHITE","WHOLE","WHOM","WHOSE","WIDE","WIDELY","WIFE","WILD","WILL","WINDOW","WINE","WINTER","WISH","WITHIN","WITHOUT","WOMAN","WONDER","WOOD","WORD","WORK","WORKER","WORLD","WORRY","WORTH","WOULD","WRITE","WRITER","WRONG","YARD","YEAR","YOUNG","YOURSELF","YOUTH"];
+        const prizeEmojis = [ { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: '💣', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: '💰', value: 1000000, type: 'cash_money' } ];
         const nonsenseFreebies = ['🍊','🌭','🥞','🍕','🍔','🧸','🍟','🍗','🥠','🍩'];
-
-        // --- Defines the layout of the word puzzles on the grid ---
-        const puzzleLayouts = [
-            { length: 5, indices: [11, 12, 13, 14, 15] }, { length: 7, indices: [28, 29, 30, 31, 32, 33, 34] }, { length: 7, indices: [46, 47, 48, 49, 50, 51, 52] }, { length: 5, indices: [65, 66, 67, 68, 69] }
-        ];
+        const puzzleLayouts = [ { length: 5, indices: [11, 12, 13, 14, 15] }, { length: 7, indices: [28, 29, 30, 31, 32, 33, 34] }, { length: 7, indices: [46, 47, 48, 49, 50, 51, 52] }, { length: 5, indices: [65, 66, 67, 68, 69] } ];
         
-        /**
-         * Generates a new set of puzzles for the current level.
-         */
+        // --- Game Logic Functions ---
         function generatePuzzlesForLevel() {
             puzzles = [];
             let availableWords = [...wordBank];
@@ -651,9 +602,6 @@
             });
         }
         
-        /**
-         * Sets up the game for a new level.
-         */
         function startLevel() {
             document.getElementById('level-display').textContent = currentLevel;
             trophyCollectedThisLevel = false;
@@ -668,9 +616,6 @@
             initializeGrid();
         }
 
-        /**
-         * Creates the game grid and places the puzzle tiles.
-         */
         function initializeGrid() {
             gridContainer.innerHTML = '';
             puzzles.forEach(p => p.scrambled = shuffleWord(p.word));
@@ -682,7 +627,6 @@
                 tile.id = `tile-${i}`;
 
                 if (allPuzzleIndices.includes(i)) {
-                    // This is a puzzle tile
                     for (const puzzle of puzzles) {
                         if (puzzle.indices.includes(i)) {
                             const letterIndex = puzzle.indices.indexOf(i);
@@ -695,24 +639,17 @@
                         }
                     }
                 } else if (i === 40) {
-                    // This is the central jackpot square
                     tile.id = 'jackpot-square';
                     tile.classList.add('bg-amber-500', 'border-2', 'border-amber-300', 'text-4xl');
                     tile.textContent = '💰';
                     tile.addEventListener('click', onJackpotClick);
                 } else {
-                    // This is an empty background tile
                     tile.classList.add('bg-slate-900/50', 'border', 'border-slate-800/50');
                 }
                 gridContainer.appendChild(tile);
             }
         }
 
-        /**
-         * Shuffles the letters of a word.
-         * @param {string} word The word to shuffle.
-         * @returns {string} The shuffled word.
-         */
         function shuffleWord(word) {
             let array = word.split('');
             for (let i = array.length - 1; i > 0; i--) {
@@ -720,14 +657,9 @@
                 [array[i], array[j]] = [array[j], array[i]];
             }
             let shuffled = array.join('');
-            // Ensure the shuffled word is not the same as the original
             return shuffled === word ? shuffleWord(word) : shuffled;
         }
 
-        /**
-         * Adds drag-and-drop event listeners to a tile.
-         * @param {HTMLElement} tile The tile element.
-         */
         function addDragListeners(tile) {
             tile.addEventListener('dragstart', handleDragStart);
             tile.addEventListener('dragover', handleDragOver);
@@ -739,7 +671,6 @@
             if (timeRemaining <= 0) return;
             draggedTile = e.target;
             setTimeout(() => e.target.classList.add('dragging'), 0);
-            // Special handling for dragging a green bomb
             if (draggedTile.dataset.prizeType === 'green_bomb') {
                 isDraggingBomb = true;
                 document.getElementById('bomb-drag-preview').style.display = 'block';
@@ -748,7 +679,6 @@
 
         function handleDragOver(e) { 
             e.preventDefault(); 
-            // Update the green bomb preview position
             if (isDraggingBomb) {
                 const targetTile = e.target.closest('#game-grid > div');
                 if (targetTile) {
@@ -770,7 +700,6 @@
             if (!dropTarget) return;
 
             if (isDraggingBomb && draggedTile) {
-                // Dropped a green bomb
                 startGreenBombSequence(dropTarget);
                 draggedTile.textContent = '';
                 draggedTile.classList.remove('prize-tile', 'green-bomb');
@@ -780,7 +709,6 @@
                 draggedTile && draggedTile.classList.contains('word-puzzle-tile') &&
                 dropTarget.dataset.puzzleIndex === draggedTile.dataset.puzzleIndex &&
                 draggedTile !== dropTarget && !dropTarget.classList.contains('solved')) {
-                // Swapping letters within the same puzzle
                 const tempText = draggedTile.textContent;
                 draggedTile.textContent = dropTarget.textContent;
                 dropTarget.textContent = tempText;
@@ -797,9 +725,6 @@
             draggedTile = null;
         }
 
-        /**
-         * Checks all puzzles on the board to see if they are solved.
-         */
         function checkAllPuzzles() {
             let allWordsOnBoardAreSolved = true;
             puzzles.forEach((puzzle) => {
@@ -829,7 +754,6 @@
             });
 
             if (allWordsOnBoardAreSolved && puzzles.length > 0) {
-                // All puzzles solved, level up
                 if (isFrozen) endFreeze();
                 coins += 100000;
                 updateScoreDisplay();
@@ -841,11 +765,6 @@
             }
         }
 
-        /**
-         * Formats large numbers into a more readable format (e.g., 1.23M).
-         * @param {number} num The number to format.
-         * @returns {string} The formatted number string.
-         */
         function formatScore(num) {
             if (num < 1000) return num.toString();
             const si = [
@@ -861,9 +780,6 @@
             return num.toLocaleString();
         }
 
-        /**
-         * Updates the score and money bags display.
-         */
         function updateScoreDisplay() {
             bagsOfMoney = Math.floor(coins * 0.01);
             document.getElementById('coins-display').textContent = coins.toLocaleString();
@@ -871,15 +787,11 @@
             document.getElementById('coins-display').classList.remove('score-decay');
         }
 
-        /**
-         * Flashes the score display to indicate a change.
-         * @param {string} type 'gain' or 'deduct'.
-         */
         function flashScore(type = 'gain') {
             const coinsDisplay = document.getElementById('coins-display');
             const flashClass = type === 'gain' ? 'gain-flash' : 'deduct-flash';
             coinsDisplay.classList.remove('gain-flash', 'deduct-flash');
-            void coinsDisplay.offsetWidth; // Trigger reflow
+            void coinsDisplay.offsetWidth;
             coinsDisplay.classList.add(flashClass);
             setTimeout(() => { coinsDisplay.classList.remove(flashClass); }, 800);
         }
@@ -896,9 +808,6 @@
             setTimeout(() => { levelDisplay.classList.remove('level-flash'); }, 1500);
         }
         
-        /**
-         * Main game timer loop.
-         */
         function updateTimer() {
             if (timeRemaining > 0 && !isGamePaused) {
                 timeRemaining--;
@@ -907,7 +816,6 @@
                 const seconds = (timeRemaining % 60).toString().padStart(2, '0');
                 document.getElementById('timer-display').textContent = `${minutes}:${seconds}`;
 
-                // Trigger timed events
                 if (timeRemaining === 580 && !specialCashEmojiSpawned) {
                     specialCashEmojiSpawned = true;
                     spawnSpecialCashEmoji();
@@ -929,9 +837,6 @@
             }
         }
         
-        /**
-         * Activates the special jackpot event on the center square.
-         */
         function activateSpecialJackpot() {
             const jackpotSquare = document.getElementById('jackpot-square');
             jackpotSquare.classList.add('wild-pulse');
@@ -953,11 +858,6 @@
             }, 15000);
         }
 
-        /**
-         * Triggers a visual animation of coins flying from a start to an end element.
-         * @param {HTMLElement} startElement The element to start from.
-         * @param {HTMLElement} endElement The element to fly to.
-         */
         function triggerCoinAnimation(startElement, endElement) {
             const startRect = startElement.getBoundingClientRect();
             const endRect = endElement.getBoundingClientRect();
@@ -1025,12 +925,9 @@
             }
         }
 
-        /**
-         * Handles the click event for the quick solve button.
-         */
         function onSolveButtonClick() {
             if (timeRemaining <= 0 || solveButtonCooldown > 0) return;
-            GJACKVARNUM = 0; // Reset jackpot click counter
+            GJACKVARNUM = 0;
 
             const unsolvedPuzzles = puzzles.filter(p => !p.solved);
             if (unsolvedPuzzles.length === 0) return;
@@ -1055,9 +952,6 @@
             }
         }
 
-        /**
-         * Starts the cooldown timer for the solve button.
-         */
         function startSolveButtonCooldown() {
             solveButtonCooldown = 60;
             const solveButton = document.getElementById('solve-button');
@@ -1080,12 +974,12 @@
             }, 1000);
         }
 
-        let GJACKVARNUM = 0; // Tracks clicks on the jackpot square for a small easter egg.
+        let GJACKVARNUM = 0;
         function onJackpotClick(event) {
             const jackpotSquare = event.currentTarget;
             if (jackpotSquare.classList.contains('cooldown') || jackpotSquare.classList.contains('wild-pulse')) return;
 
-            timeSinceLastSolve = 0; // Reset decay timer on any interaction
+            timeSinceLastSolve = 0;
             GJACKVARNUM++;
             coins += 50000;
             updateScoreDisplay();
@@ -1109,14 +1003,10 @@
             }
         }
 
-        /**
-         * Schedules the next prize emoji to spawn on the grid.
-         */
         function scheduleNextPrizeSpawn() {
             if (timeRemaining <= 0 || isGamePaused || isFrozen || isSpecialAnimationActive) return;
             const timeElapsed = totalGameTime - timeRemaining;
             const progress = timeElapsed / totalGameTime;
-            // Spawning becomes faster as the game progresses
             const maxDelay = 2500;
             const minDelay = 100;
             const currentDelay = minDelay + (maxDelay - minDelay) * Math.pow(1 - progress, 3);
@@ -1127,9 +1017,6 @@
             }, currentDelay);
         }
 
-        /**
-         * Spawns a random prize emoji on an empty tile.
-         */
         function spawnPrizeEmoji() {
             if (timeRemaining <= 0 || isGamePaused || isFrozen) return;
 
@@ -1147,7 +1034,6 @@
 
             const tile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
             
-            // Filter the prize pool based on game time
             let prizePool = prizeEmojis.filter(p => p.type !== 'cash_money');
             if (timeRemaining > 580) {
                 prizePool = prizePool.filter(p => p.type !== 'freeze' && p.type !== 'game_over' && p.type !== 'green_bomb');
@@ -1167,15 +1053,15 @@
             else if (prize.type === 'fire_column') tile.classList.add('fire-bomb');
             
             const clickHandler = () => {
-                GJACKVARNUM = 0; // Reset jackpot click counter
-                timeSinceLastSolve = 0; // Any interaction resets the decay timer
+                GJACKVARNUM = 0;
+                timeSinceLastSolve = 0;
                 if (tile.dataset.prizeType === 'game_over') { endGame(true); } 
                 else if (tile.dataset.prizeType === 'diamond') { startDiamondSequence(tile); } 
                 else if (tile.dataset.prizeType === 'green_bomb') { startGreenBombSequence(tile); }
                 else if (tile.dataset.prizeType === 'fire_column') { startFireColumnSequence(tile); }
                 else if (tile.dataset.prizeType === 'freeze') { startFreezeSequence(); }
                 else if (tile.dataset.prizeType === 'lightning') {
-                    coins = 0; // Reset session coins, which resets session bags
+                    coins = 0;
                     coins += parseInt(tile.dataset.prizeValue);
                     updateScoreDisplay();
                     flashBagsPanel();
@@ -1297,17 +1183,11 @@
             iconsContainer.appendChild(diamondElement);
         }
 
-        /**
-         * Displays a large, flashing text event in the center of the screen.
-         * @param {string} text The text to display.
-         * @param {boolean} greenGlow Whether to apply a green glow effect.
-         * @param {boolean} longFlash Whether the animation should last longer.
-         */
         function showEventText(text, greenGlow = false, longFlash = false) {
-            if (isGamePaused && !longFlash) return; // Prevent non-essential popups while paused
+            if (isGamePaused && !longFlash) return;
             const eventTextContainer = document.getElementById('event-text-container');
             const eventText = document.getElementById('event-text');
-            eventText.innerHTML = text; // Use innerHTML to support line breaks
+            eventText.innerHTML = text;
             eventText.classList.toggle('green-glow', greenGlow);
             eventText.classList.toggle('long-flash', longFlash);
             
@@ -1319,10 +1199,6 @@
             }, duration);
         }
 
-        /**
-         * Starts the special diamond collection animation sequence.
-         * @param {HTMLElement} clickedTile The diamond tile that was clicked.
-         */
         function startDiamondSequence(clickedTile) {
             isSpecialAnimationActive = true;
             coins += currentDiamondValue;
@@ -1332,7 +1208,6 @@
             currentDiamondValue = Math.floor(currentDiamondValue / 2);
             updateGreedPanelWithDiamond();
 
-            // Clear all other prize tiles
             document.querySelectorAll('.prize-tile').forEach(t => {
                 if (t !== clickedTile) { 
                     t.textContent = ''; 
@@ -1340,7 +1215,6 @@
                 }
             });
 
-            // Temporarily fill empty tiles with diamonds for the animation
             const allPuzzleIndices = puzzles.flatMap(p => p.indices);
             const diamondTiles = [];
             for(let i=0; i<81; i++) {
@@ -1359,10 +1233,6 @@
             }, 2000);
         }
 
-        /**
-         * Triggers the vortex animation where diamonds fly to the center.
-         * @param {Array<HTMLElement>} diamondTiles The tiles to animate.
-         */
         function triggerVortexAnimation(diamondTiles) {
             const vortexCenterEl = document.getElementById('jackpot-square');
             if (!vortexCenterEl) return;
@@ -1424,20 +1294,17 @@
             adjacentIndices.forEach(index => {
                 const adjTile = document.getElementById(`tile-${index}`);
                 if (adjTile && adjTile.classList.contains('prize-tile')) {
-                    // Collect adjacent prizes
                     const prizeValue = parseInt(adjTile.dataset.prizeValue) || 0;
                     coins += prizeValue;
                     triggerCoinAnimation(adjTile, document.getElementById('coins-display'));
                     adjTile.textContent = '';
                     adjTile.classList.remove('prize-tile', 'red-bomb', 'green-bomb');
                 } else if (adjTile && adjTile.classList.contains('word-puzzle-tile') && !adjTile.classList.contains('solved')) {
-                    // Help solve adjacent puzzles
                     const puzzleIndex = parseInt(adjTile.dataset.puzzleIndex);
                     const puzzle = puzzles[puzzleIndex];
                     const letterIndex = puzzle.indices.indexOf(index);
                     const correctLetter = puzzle.word[letterIndex];
                     
-                    // Find the correct letter elsewhere in the puzzle and swap it
                     for (const i of puzzle.indices) {
                         const sourceTile = document.getElementById(`tile-${i}`);
                         if (sourceTile && sourceTile.textContent === correctLetter) {
@@ -1503,10 +1370,6 @@
             checkAllPuzzles();
         }
 
-        /**
-         * Ends the game and shows the game over screen.
-         * @param {boolean} isBomb Whether the game ended due to a bomb.
-         */
         function endGame(isBomb = false) {
             isGameOver = true;
             saveGameResult();
@@ -1523,9 +1386,6 @@
             setTimeout(showGameOverModal, 1500);
         }
 
-        /**
-         * Triggers the animation for the game over screen, swirling all tiles to the center.
-         */
         function triggerSwirlAnimation() {
             const elementsToSwirl = document.querySelectorAll('#game-grid > div');
             const vortexCenterEl = document.getElementById('jackpot-square');
@@ -1583,9 +1443,6 @@
             }
         }
 
-        /**
-         * Gradually decays the player's score if they are inactive.
-         */
         function handleScoreDecay() {
             if (isGamePaused || isGameOver) return;
             if (timeSinceLastSolve > 20) {
@@ -1599,9 +1456,6 @@
             }
         }
 
-        /**
-         * Starts the freeze sequence, covering the board in ice.
-         */
         function startFreezeSequence() {
             isFrozen = true;
             clearTimeout(prizeSpawnerTimeout);
@@ -1651,13 +1505,7 @@
             }
         }
         
-        /**
-         * Starts the game from the initial modal.
-         */
         function startGame() {
-            // --- FIX: Start playing music on the first user interaction ---
-            // This is required by browser autoplay policies.
-            // We start it muted and then set the real volume later.
             musicPlayer.muted = true;
             playTrack(currentTrackIndex);
             musicPlayer.play().catch(e => console.error("Audio play failed on initial click:", e));
@@ -1671,7 +1519,6 @@
         }
 
         function actuallyStartGame() {
-            // --- FIX: Unmute the music and set the correct volume ---
             musicPlayer.muted = false;
             musicPlayer.volume = lastVolume;
             document.getElementById('volume-slider').value = lastVolume;
@@ -1694,18 +1541,14 @@
                     solveButton.classList.add('big-pulse');
                     setTimeout(() => {
                         solveButton.classList.remove('big-pulse');
-                    }, 10000); // Pulse for 10 seconds
-                    timeSinceLastSolve = 0; // Reset timer after starting pulse
+                    }, 10000);
+                    timeSinceLastSolve = 0;
                 }
             }, 1000);
         }
 
-        /**
-         * Restarts the game after a game over.
-         */
         function restartGame() {
             document.getElementById('game-over-modal').classList.add('hidden');
-            // Reset all game state variables
             coins = 0;
             bagsOfMoney = 0;
             currentLevel = 1;
@@ -1723,7 +1566,6 @@
             specialCashEmojiSpawned = false;
             timedEvents = { sixMin: true, threeMin: true };
             isSpecialAnimationActive = false;
-            // Clear all timers and intervals
             clearInterval(mainTimerInterval);
             clearTimeout(prizeSpawnerTimeout);
             clearTimeout(diamondSequenceTimeout);
@@ -1732,7 +1574,6 @@
             clearTimeout(impTimeout);
             clearTimeout(thawTimeout);
             clearInterval(solveButtonPulseManager);
-            // Reset UI elements
             document.getElementById('timer-display').textContent = "10:00";
             const solveButton = document.getElementById('solve-button');
             solveButton.textContent = '✅';
@@ -1740,7 +1581,6 @@
             solveButton.classList.add('text-3xl');
             solveButton.disabled = false;
             updateScoreDisplay();
-            // Start a new level and timers
             startLevel(); 
             mainTimerInterval = setInterval(updateTimer, 1000);
             scoreDecayInterval = setInterval(handleScoreDecay, 1000);
@@ -1754,34 +1594,24 @@
                     solveButton.classList.add('big-pulse');
                     setTimeout(() => {
                         solveButton.classList.remove('big-pulse');
-                    }, 10000); // Pulse for 10 seconds
-                    timeSinceLastSolve = 0; // Reset timer after starting pulse
+                    }, 10000);
+                    timeSinceLastSolve = 0;
                 }
             }, 1000);
         }
 
-        /**
-         * Plays the next track in the user's playlist.
-         */
         function playNextTrack() {
             if (userPlaylist.length === 0) return;
             const nextIndex = (currentTrackIndex + 1) % userPlaylist.length;
             playTrack(nextIndex);
         }
 
-        /**
-         * Plays the previous track in the user's playlist.
-         */
         function playPreviousTrack() {
             if (userPlaylist.length === 0) return;
             const prevIndex = (currentTrackIndex - 1 + userPlaylist.length) % userPlaylist.length;
             playTrack(prevIndex);
         }
 
-        /**
-         * Plays a specific track by its index in the userPlaylist.
-         * @param {number} index The index of the track to play.
-         */
         function playTrack(index) {
             if (userPlaylist.length === 0 || index < 0 || index >= userPlaylist.length) return;
             currentTrackIndex = index;
@@ -1847,7 +1677,7 @@
             musicPlayer.addEventListener('play', updatePlayPauseIcon);
             musicPlayer.addEventListener('pause', updatePlayPauseIcon);
 
-            updatePlayPauseIcon(); // Set initial icon state
+            updatePlayPauseIcon();
         }
 
         function updatePlayPauseIcon() {
@@ -1864,17 +1694,13 @@
             document.getElementById('playlist-shuffle').classList.toggle('shuffle-active', isShuffled);
             
             if (isShuffled) {
-                // Save the current track to find it after shuffling
                 const currentTrackFilename = userPlaylist[currentTrackIndex];
-                // Shuffle the userPlaylist array
                 for (let i = userPlaylist.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [userPlaylist[i], userPlaylist[j]] = [userPlaylist[j], userPlaylist[i]];
                 }
-                // Find the new index of the current track
                 currentTrackIndex = userPlaylist.findIndex(filename => filename === currentTrackFilename);
             } else {
-                // Restore the original order
                 const currentTrackFilename = userPlaylist[currentTrackIndex];
                 userPlaylist = [...originalUserPlaylist];
                 currentTrackIndex = userPlaylist.findIndex(filename => filename === currentTrackFilename);
@@ -1925,7 +1751,7 @@
                 `;
                 container.appendChild(item);
                 item.querySelector('.song-title').addEventListener('dblclick', (e) => {
-                    e.stopPropagation(); // Prevent the label from toggling the checkbox
+                    e.stopPropagation();
                     const trackFilename = item.querySelector('input').value;
                     const playIndex = userPlaylist.findIndex(filename => filename === trackFilename);
                     if (playIndex !== -1) {
@@ -1938,7 +1764,6 @@
                     } else {
                         userPlaylist = userPlaylist.filter(filename => filename !== e.target.value);
                     }
-                    // Keep the playlist sorted in its original order
                     originalUserPlaylist = verifiedPlaylist.map(t => t.filename).filter(f => userPlaylist.includes(f));
                     userPlaylist.sort((a, b) => {
                         const indexA = originalUserPlaylist.indexOf(a);
@@ -1950,9 +1775,6 @@
             updateNowPlayingIndicator();
         }
         
-        /**
-         * Checks which songs from the database are available on the server.
-         */
         async function buildVerifiedPlaylist() {
             const checkTrack = async (track) => {
                 try {
@@ -1967,160 +1789,9 @@
             const results = await Promise.all(checks);
             verifiedPlaylist = songDatabase.filter((_, index) => results[index]);
             userPlaylist = verifiedPlaylist.map(track => track.filename);
-            originalUserPlaylist = [...userPlaylist]; // Store the original order
+            originalUserPlaylist = [...userPlaylist];
         }
-
-        function showFirebaseDisabledWarning() {
-            const warning = document.getElementById('firebase-warning');
-            warning.classList.remove('hidden');
-            setTimeout(() => {
-                warning.classList.add('hidden');
-            }, 8000);
-        }
-
-        /**
-         * Initializes the entire game on page load.
-         */
-        async function initGame() {
-            await buildVerifiedPlaylist();
-            
-            if (firebaseFeaturesEnabled) {
-                onAuthStateChanged(auth, user => {
-                    if (user) {
-                        userId = user.uid;
-                        loadPlayerData();
-                    } else {
-                        signInAnonymously(auth).catch(error => {
-                            console.error("Anonymous sign-in failed:", error);
-                            if (error.code === 'auth/requests-from-referer-are-blocked') {
-                                showFirebaseDisabledWarning();
-                            }
-                            firebaseFeaturesEnabled = false;
-                            loadPlayerData(); // Load default data now
-                        });
-                    }
-                });
-            } else {
-                loadPlayerData(); // Load default data if Firebase isn't set up
-            }
-
-            startLevel();
-            updateScoreDisplay();
-            setupAudioControls();
-            populatePlaylistModal();
-            
-            // Start the falling coin animation on the start modal
-            const startModal = document.getElementById('start-modal');
-            startModalAnimationInterval = setInterval(() => {
-                const coin = document.createElement('div');
-                coin.classList.add('falling-coin');
-                coin.textContent = '🪙';
-                coin.style.left = `${Math.random() * 100}%`;
-                coin.style.animationDuration = `${Math.random() * 2 + 3}s`;
-                coin.style.fontSize = `${Math.random() * 1 + 0.5}rem`;
-                startModal.appendChild(coin);
-                setTimeout(() => coin.remove(), 5000);
-
-                if (Math.random() < 0.3) {
-                    const sparkle = document.createElement('div');
-                    sparkle.classList.add('sparkle');
-                    sparkle.style.left = `${Math.random() * 100}%`;
-                    sparkle.style.top = `${Math.random() * 100}%`;
-                    sparkle.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
-                    startModal.appendChild(sparkle);
-                    setTimeout(() => sparkle.remove(), 1500);
-                }
-            }, 300);
-
-            // --- Global Event Listeners ---
-            musicPlayer.addEventListener('ended', playNextTrack);
-            document.getElementById('start-game-button').addEventListener('click', startGame);
-            document.getElementById('play-again-button').addEventListener('click', () => { 
-                restartGame(); 
-            });
-            document.getElementById('help-button').addEventListener('click', () => {
-                pauseGame();
-                document.getElementById('help-modal').classList.remove('hidden');
-            });
-            document.getElementById('close-help-button').addEventListener('click', () => {
-                document.getElementById('help-modal').classList.add('hidden');
-                resumeGame();
-            });
-            document.getElementById('solve-button').addEventListener('click', onSolveButtonClick);
-            document.getElementById('about-button').addEventListener('click', () => {
-                document.getElementById('help-modal').classList.add('hidden');
-                document.getElementById('about-modal').classList.remove('hidden');
-            });
-            document.getElementById('close-about-button').addEventListener('click', () => {
-                document.getElementById('about-modal').classList.add('hidden');
-                document.getElementById('help-modal').classList.remove('hidden');
-            });
-            
-            document.getElementById('playlist-button').addEventListener('click', () => {
-                document.getElementById('help-modal').classList.add('hidden');
-                populatePlaylistModal(); // Refresh indicators when opening
-                document.getElementById('playlist-modal').classList.remove('hidden');
-            });
-            document.getElementById('close-playlist-button').addEventListener('click', () => {
-                document.getElementById('playlist-modal').classList.add('hidden');
-                document.getElementById('help-modal').classList.remove('hidden');
-            });
-            document.getElementById('setup-button').addEventListener('click', () => {
-                document.getElementById('help-modal').classList.add('hidden');
-                populateSetupModal();
-                document.getElementById('setup-modal').classList.remove('hidden');
-            });
-            document.getElementById('close-setup-button').addEventListener('click', () => {
-                document.getElementById('setup-modal').classList.add('hidden');
-                document.getElementById('help-modal').classList.remove('hidden');
-            });
-            document.getElementById('reset-progress-button').addEventListener('click', () => {
-                document.getElementById('confirm-reset-modal').classList.remove('hidden');
-            });
-            document.getElementById('cancel-reset-button').addEventListener('click', () => {
-                document.getElementById('confirm-reset-modal').classList.add('hidden');
-            });
-            document.getElementById('confirm-reset-button').addEventListener('click', () => {
-                playerData = getDefaultPlayerData();
-                savePlayerProfile(); // Overwrite cloud data with default data
-                populateSetupModal();
-                applyTheme('default');
-                document.getElementById('confirm-reset-modal').classList.add('hidden');
-            });
-            document.querySelectorAll('.difficulty-button').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    document.querySelectorAll('.difficulty-button').forEach(btn => btn.classList.remove('difficulty-active'));
-                    const clickedButton = e.currentTarget;
-                    clickedButton.classList.add('difficulty-active');
-                    if (clickedButton.id === 'difficulty-easy') maxSameEmoji = 8;
-                    else if (clickedButton.id === 'difficulty-medium') maxSameEmoji = 4;
-                    else if (clickedButton.id === 'difficulty-hard') maxSameEmoji = 2;
-                    else maxSameEmoji = 4;
-                });
-            });
-
-            // New Feature Listeners
-            document.getElementById('daily-rewards-button').addEventListener('click', () => {
-                document.getElementById('help-modal').classList.add('hidden');
-                populateCalendar();
-                document.getElementById('daily-rewards-modal').classList.remove('hidden');
-            });
-            document.getElementById('close-daily-rewards-button').addEventListener('click', () => {
-                document.getElementById('daily-rewards-modal').classList.add('hidden');
-                document.getElementById('help-modal').classList.remove('hidden');
-            });
-            document.getElementById('trade-goodies-button')?.addEventListener('click', () => {
-                showEventText("Coming Soon!");
-            });
-
-            // FIX: Use 'blur' event to save player name only when they exit the field
-            document.getElementById('player-name-input').addEventListener('blur', (e) => {
-                playerData.name = e.target.value;
-                e.target.classList.toggle('invalid-input', !e.target.value.trim());
-                savePlayerProfile();
-            });
-        }
-
+        
         // --- Player Data & Store Logic ---
         function getDefaultPlayerData() {
             return {
@@ -2137,7 +1808,7 @@
         }
 
         async function loadPlayerData() {
-            if (!userId || !firebaseFeaturesEnabled) {
+            if (!userId) {
                 playerData = getDefaultPlayerData();
                 applyTheme(playerData.activeSkin);
                 return;
@@ -2149,34 +1820,10 @@
                 playerData = { ...getDefaultPlayerData(), ...docSnap.data() };
             } else {
                 playerData = getDefaultPlayerData();
-                await setDoc(playerDocRef, playerData);
             }
             applyTheme(playerData.activeSkin);
         }
         
-        // FIX: Separated saving logic for better efficiency
-        async function savePlayerProfile() {
-            if (!userId || !firebaseFeaturesEnabled) {
-                console.warn("Firebase features disabled. Skipping profile save.");
-                return;
-            }
-            const playerDocRef = doc(db, "players", userId);
-            await setDoc(playerDocRef, playerData, { merge: true });
-        }
-
-        async function saveGameResult() {
-            if (!userId || !firebaseFeaturesEnabled) {
-                console.warn("Firebase features disabled. Skipping game result save.");
-                return;
-            }
-            // Update the main player profile with final bags and high score
-            playerData.moneyBags += bagsOfMoney;
-            if (coins > playerData.highScore) {
-                playerData.highScore = coins;
-            }
-            await savePlayerProfile(); // Save the updated profile
-        }
-
         function populateSetupModal() {
             const nameInput = document.getElementById('player-name-input');
             nameInput.value = playerData.name;
@@ -2239,7 +1886,7 @@
                         playerData.activeSkin = theme.id;
                         applyTheme(theme.id);
                         savePlayerProfile();
-                        populateThemeStore(); // Refresh to show active state
+                        populateThemeStore();
                     });
                 } else {
                     item.addEventListener('click', () => {
@@ -2249,7 +1896,7 @@
                             playerData.activeSkin = theme.id;
                             applyTheme(theme.id);
                             savePlayerProfile();
-                            populateSetupModal(); // Refresh whole modal
+                            populateSetupModal();
                         } else {
                             showEventText("Not Enough Bags!");
                         }
@@ -2259,7 +1906,6 @@
             });
         }
 
-        // --- Daily Bonus and Rewards Logic ---
         function showWelcomeBonus() {
             const bonusCoins = Math.floor(Math.random() * 49001) + 1000;
             const bonusBags = Math.floor(Math.random() * 11);
@@ -2276,7 +1922,6 @@
                 </div>
             `;
             
-            // Add two random freebies
             for (let i = 0; i < 2; i++) {
                 const randomFreebie = nonsenseFreebies[Math.floor(Math.random() * nonsenseFreebies.length)];
                 const randomQty = Math.floor(Math.random() * 4) + 1;
@@ -2295,7 +1940,7 @@
 
             document.getElementById('claim-bonus-button').onclick = () => {
                 playerData.moneyBags += bonusBags;
-                coins += bonusCoins; // Add to session coins
+                coins += bonusCoins;
                 updateScoreDisplay();
                 playerData.lastLoginDate = new Date().toISOString().split('T')[0];
                 savePlayerProfile();
@@ -2309,8 +1954,8 @@
             const coinReward = Math.floor(1000 * Math.pow(day, 2.5));
             const bagReward = Math.floor(5 * Math.pow(day, 1.5));
             let bonus = 1;
-            if (day === 7 || day === 21) bonus = 2; // Double bonus days
-            if (day === 10 || day === 20 || day === 30) bonus = 3; // Triple bonus days
+            if (day === 7 || day === 21) bonus = 2;
+            if (day === 10 || day === 20 || day === 30) bonus = 3;
             return { day, coins: coinReward, bags: bagReward, bonus: bonus };
         });
         dailyRewards[30] = { day: 31, coins: 100000000, bags: 5000, bonus: 3 };
@@ -2354,11 +1999,11 @@
                         dayEl.classList.add('past-day');
                     }
                     grid.appendChild(dayEl);
-                } else if (i === 32) { // Start the legend in the first empty spot
+                } else if (i === 32) {
                     const legendEl = document.createElement('div');
                     legendEl.id = 'calendar-legend';
                     legendEl.className = 'text-xs text-center greed-panel p-2 rounded-lg flex flex-col justify-center items-center';
-                    legendEl.style.gridColumn = 'span 4'; // Make it span the remaining 4 columns
+                    legendEl.style.gridColumn = 'span 4';
                     legendEl.innerHTML = `
                         <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full border-2 border-yellow-300"></div> 2x Bonus</div>
                         <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full border-2 border-red-500"></div> 3x Bonus</div>
@@ -2387,11 +2032,157 @@
             playerData.lastDailyClaim = todayStr;
             savePlayerProfile();
             
-            // Refresh calendar
             populateCalendar();
         }
+        
+        async function saveGameResult() {
+            if (!userId) return;
+            playerData.moneyBags += bagsOfMoney;
+            if (coins > playerData.highScore) {
+                playerData.highScore = coins;
+            }
+            await savePlayerProfile();
+        }
 
-        // Start the game initialization process when the window loads.
+        async function savePlayerProfile() {
+            if (!userId) return;
+            const playerDocRef = doc(db, "players", userId);
+            try {
+                await setDoc(playerDocRef, playerData, { merge: true });
+            } catch (error) {
+                console.error("Error saving player profile:", error);
+            }
+        }
+
+        async function initGame() {
+            await buildVerifiedPlaylist();
+            
+            if (auth) {
+                onAuthStateChanged(auth, user => {
+                    if (user) {
+                        userId = user.uid;
+                        playerNameInput.disabled = false;
+                        playerNameInput.placeholder = "Enter Name";
+                        loadPlayerData();
+                    } else {
+                        signInAnonymously(auth).catch(error => {
+                            console.error("Anonymous sign-in failed:", error);
+                        });
+                    }
+                });
+            } else {
+                // If firebase failed to init, load default data for an offline experience.
+                loadPlayerData();
+            }
+
+            startLevel();
+            updateScoreDisplay();
+            setupAudioControls();
+            populatePlaylistModal();
+            
+            startModalAnimationInterval = setInterval(() => { 
+                const startModal = document.getElementById('start-modal');
+                const coin = document.createElement('div');
+                coin.classList.add('falling-coin');
+                coin.textContent = '🪙';
+                coin.style.left = `${Math.random() * 100}%`;
+                coin.style.animationDuration = `${Math.random() * 2 + 3}s`;
+                coin.style.fontSize = `${Math.random() * 1 + 0.5}rem`;
+                startModal.appendChild(coin);
+                setTimeout(() => coin.remove(), 5000);
+
+                if (Math.random() < 0.3) {
+                    const sparkle = document.createElement('div');
+                    sparkle.classList.add('sparkle');
+                    sparkle.style.left = `${Math.random() * 100}%`;
+                    sparkle.style.top = `${Math.random() * 100}%`;
+                    sparkle.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
+                    startModal.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 1500);
+                }
+             }, 300);
+
+            // --- Global Event Listeners ---
+            document.getElementById('start-game-button').addEventListener('click', startGame);
+            document.getElementById('play-again-button').addEventListener('click', restartGame);
+            document.getElementById('help-button').addEventListener('click', () => {
+                pauseGame();
+                document.getElementById('help-modal').classList.remove('hidden');
+            });
+            document.getElementById('close-help-button').addEventListener('click', () => {
+                document.getElementById('help-modal').classList.add('hidden');
+                resumeGame();
+            });
+            document.getElementById('solve-button').addEventListener('click', onSolveButtonClick);
+            document.getElementById('about-button').addEventListener('click', () => {
+                document.getElementById('help-modal').classList.add('hidden');
+                document.getElementById('about-modal').classList.remove('hidden');
+            });
+            document.getElementById('close-about-button').addEventListener('click', () => {
+                document.getElementById('about-modal').classList.add('hidden');
+                document.getElementById('help-modal').classList.remove('hidden');
+            });
+            document.getElementById('playlist-button').addEventListener('click', () => {
+                document.getElementById('help-modal').classList.add('hidden');
+                populatePlaylistModal();
+                document.getElementById('playlist-modal').classList.remove('hidden');
+            });
+            document.getElementById('close-playlist-button').addEventListener('click', () => {
+                document.getElementById('playlist-modal').classList.add('hidden');
+                document.getElementById('help-modal').classList.remove('hidden');
+            });
+            document.getElementById('setup-button').addEventListener('click', () => {
+                document.getElementById('help-modal').classList.add('hidden');
+                populateSetupModal();
+                document.getElementById('setup-modal').classList.remove('hidden');
+            });
+            document.getElementById('close-setup-button').addEventListener('click', () => {
+                document.getElementById('setup-modal').classList.add('hidden');
+                document.getElementById('help-modal').classList.remove('hidden');
+            });
+            document.getElementById('reset-progress-button').addEventListener('click', () => {
+                document.getElementById('confirm-reset-modal').classList.remove('hidden');
+            });
+            document.getElementById('cancel-reset-button').addEventListener('click', () => {
+                document.getElementById('confirm-reset-modal').classList.add('hidden');
+            });
+            document.getElementById('confirm-reset-button').addEventListener('click', () => {
+                playerData = getDefaultPlayerData();
+                savePlayerProfile();
+                populateSetupModal();
+                applyTheme('default');
+                document.getElementById('confirm-reset-modal').classList.add('hidden');
+            });
+            document.querySelectorAll('.difficulty-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    document.querySelectorAll('.difficulty-button').forEach(btn => btn.classList.remove('difficulty-active'));
+                    const clickedButton = e.currentTarget;
+                    clickedButton.classList.add('difficulty-active');
+                    if (clickedButton.id === 'difficulty-easy') maxSameEmoji = 8;
+                    else if (clickedButton.id === 'difficulty-medium') maxSameEmoji = 4;
+                    else if (clickedButton.id === 'difficulty-hard') maxSameEmoji = 2;
+                    else maxSameEmoji = 4;
+                });
+            });
+            document.getElementById('daily-rewards-button').addEventListener('click', () => {
+                document.getElementById('help-modal').classList.add('hidden');
+                populateCalendar();
+                document.getElementById('daily-rewards-modal').classList.remove('hidden');
+            });
+            document.getElementById('close-daily-rewards-button').addEventListener('click', () => {
+                document.getElementById('daily-rewards-modal').classList.add('hidden');
+                document.getElementById('help-modal').classList.remove('hidden');
+            });
+            document.getElementById('trade-goodies-button')?.addEventListener('click', () => {
+                showEventText("Coming Soon!");
+            });
+            document.getElementById('player-name-input').addEventListener('blur', (e) => {
+                playerData.name = e.target.value;
+                e.target.classList.toggle('invalid-input', !e.target.value.trim());
+                savePlayerProfile();
+            });
+        }
+        
         window.onload = initGame;
     </script>
 </body>
