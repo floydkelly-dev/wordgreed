@@ -361,7 +361,7 @@
                 <span class="absolute" style="top: 0; left: 0;">Word</span>
                 <span class="absolute" style="top: 2.7rem; left: 2.5rem;">Greed</span>
             </h1>
-            <div id="leaderboard-container" class="w-full"></div>
+            <h3 class="text-2xl font-bold text-amber-300 mb-4">Game Over!</h3>
             <button id="play-again-button" class="glassy-button mt-2 text-white font-bold py-3 px-6 rounded-lg text-xl">Play Again</button>
         </div>
     </div>
@@ -533,7 +533,7 @@
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
         // --- Firebase Initialization ---
         let app, auth, db, userId = null;
@@ -1558,47 +1558,9 @@
         }
 
         function showGameOverModal() {
-            displayLeaderboard();
             document.getElementById('game-over-modal').classList.remove('hidden');
         }
         
-        /**
-         * Displays a fake leaderboard on the game over screen.
-         */
-        async function displayLeaderboard() {
-            const container = document.getElementById('leaderboard-container');
-            container.innerHTML = `<h3 class="text-2xl font-bold text-amber-300 mb-4">Top 5 Players</h3><div class="text-white">Loading...</div>`;
-
-            if (!firebaseFeaturesEnabled) {
-                container.innerHTML = `<h3 class="text-2xl font-bold text-amber-300 mb-4">Top 5 Players</h3><div class="text-yellow-400 text-sm">Leaderboard is offline.</div>`;
-                return;
-            }
-
-            try {
-                const q = query(collection(db, "leaderboard"), orderBy("score", "desc"), limit(5));
-                const querySnapshot = await getDocs(q);
-                const topScores = [];
-                querySnapshot.forEach((doc) => {
-                    topScores.push(doc.data());
-                });
-
-                container.innerHTML = `
-                    <h3 class="text-2xl font-bold text-amber-300 mb-4">Top 5 Players</h3>
-                    <ol class="text-left w-full space-y-2">
-                        ${topScores.map((entry, index) => `
-                            <li class="flex justify-between p-2 rounded-lg ${entry.userId === userId ? 'bg-purple-600' : 'bg-black/20'}">
-                                <span class="font-bold">${index + 1}. ${entry.name || 'Anonymous'} (Lvl ${entry.level})</span>
-                                <span class="font-semibold">${entry.score.toLocaleString()}</span>
-                            </li>
-                        `).join('')}
-                    </ol>
-                `;
-            } catch (error) {
-                console.error("Error getting leaderboard:", error);
-                container.innerHTML = `<h3 class="text-2xl font-bold text-amber-300 mb-4">Top 5 Players</h3><div class="text-red-400">Could not load leaderboard.</div>`;
-            }
-        }
-
         function pauseGame() {
             isGamePaused = true;
             clearInterval(mainTimerInterval);
@@ -2213,16 +2175,6 @@
                 playerData.highScore = coins;
             }
             await savePlayerProfile(); // Save the updated profile
-
-            // Add a new entry to the leaderboard collection
-            const leaderboardRef = collection(db, "leaderboard");
-            await addDoc(leaderboardRef, {
-                name: playerData.name || 'Anonymous',
-                score: coins,
-                level: currentLevel,
-                userId: userId,
-                timestamp: new Date()
-            });
         }
 
         function populateSetupModal() {
