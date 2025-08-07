@@ -766,7 +766,6 @@
 
         function handleDrop(e) {
             e.preventDefault();
-            GJACKVARNUM = 0; // Reset jackpot click counter
             const dropTarget = e.target.closest('#game-grid > div');
             if (!dropTarget) return;
 
@@ -1087,17 +1086,26 @@
             const jackpotSquare = event.currentTarget;
             if (jackpotSquare.classList.contains('cooldown') || jackpotSquare.classList.contains('wild-pulse')) return;
 
-            GJACKVARNUM++; 
-            coins += 50000; 
+            timeSinceLastSolve = 0; // Reset decay timer on any interaction
+            GJACKVARNUM++;
+            coins += 50000;
             updateScoreDisplay();
             flashScore('gain');
             triggerCoinAnimation(jackpotSquare, document.getElementById('coins-display'));
 
-            if (GJACKVARNUM >= 12) {
+            if (GJACKVARNUM === 4) {
+                showEventText("Yep! You're Greedy!");
+            } else if (GJACKVARNUM === 8) {
+                showEventText("Get outta here!");
+            } else if (GJACKVARNUM >= 12) {
+                coins = Math.floor(coins / 2);
+                updateScoreDisplay();
+                flashScore('deduct');
+                flashBagsPanel();
+                GJACKVARNUM = 0;
                 jackpotSquare.classList.add('cooldown');
                 setTimeout(() => {
                     jackpotSquare.classList.remove('cooldown');
-                    GJACKVARNUM = 0;
                 }, 15000);
             }
         }
@@ -1161,6 +1169,7 @@
             
             const clickHandler = () => {
                 GJACKVARNUM = 0; // Reset jackpot click counter
+                timeSinceLastSolve = 0; // Any interaction resets the decay timer
                 if (tile.dataset.prizeType === 'game_over') { endGame(true); } 
                 else if (tile.dataset.prizeType === 'diamond') { startDiamondSequence(tile); } 
                 else if (tile.dataset.prizeType === 'green_bomb') { startGreenBombSequence(tile); }
@@ -1501,7 +1510,7 @@
          */
         function endGame(isBomb = false) {
             isGameOver = true;
-            savePlayerData();
+            saveGameResult();
             clearInterval(mainTimerInterval);
             clearTimeout(prizeSpawnerTimeout);
             clearTimeout(diamondSequenceTimeout);
@@ -1559,14 +1568,14 @@
          */
         async function displayLeaderboard() {
             const container = document.getElementById('leaderboard-container');
-            // FIX: Removed the special message for the preview environment.
-            // The try/catch block will now handle any errors gracefully.
             container.innerHTML = `<h3 class="text-2xl font-bold text-amber-300 mb-4">Top 5 Players</h3><div class="text-white">Loading...</div>`;
 
+            if (!firebaseFeaturesEnabled) {
+                container.innerHTML = `<h3 class="text-2xl font-bold text-amber-300 mb-4">Top 5 Players</h3><div class="text-yellow-400 text-sm">Leaderboard is offline.</div>`;
+                return;
+            }
+
             try {
-                if (!firebaseFeaturesEnabled) {
-                    throw new Error("Firebase is not available.");
-                }
                 const q = query(collection(db, "leaderboard"), orderBy("score", "desc"), limit(5));
                 const querySnapshot = await getDocs(q);
                 const topScores = [];
@@ -2066,7 +2075,6 @@
             musicPlayer.addEventListener('ended', playNextTrack);
             document.getElementById('start-game-button').addEventListener('click', startGame);
             document.getElementById('play-again-button').addEventListener('click', () => { 
-                savePlayerData();
                 restartGame(); 
             });
             document.getElementById('help-button').addEventListener('click', () => {
@@ -2113,7 +2121,7 @@
             });
             document.getElementById('confirm-reset-button').addEventListener('click', () => {
                 playerData = getDefaultPlayerData();
-                savePlayerData(); // Overwrite cloud data with default data
+                savePlayerProfile(); // Overwrite cloud data with default data
                 populateSetupModal();
                 applyTheme('default');
                 document.getElementById('confirm-reset-modal').classList.add('hidden');
@@ -2148,7 +2156,7 @@
             document.getElementById('player-name-input').addEventListener('blur', (e) => {
                 playerData.name = e.target.value;
                 e.target.classList.toggle('invalid-input', !e.target.value.trim());
-                savePlayerData();
+                savePlayerProfile();
             });
         }
 
@@ -2184,19 +2192,30 @@
             }
             applyTheme(playerData.activeSkin);
         }
-
-        async function savePlayerData() {
+        
+        // FIX: Separated saving logic for better efficiency
+        async function savePlayerProfile() {
             if (!userId || !firebaseFeaturesEnabled) {
-                console.warn("Firebase features disabled. Skipping save.");
+                console.warn("Firebase features disabled. Skipping profile save.");
                 return;
             }
+            const playerDocRef = doc(db, "players", userId);
+            await setDoc(playerDocRef, playerData, { merge: true });
+        }
+
+        async function saveGameResult() {
+            if (!userId || !firebaseFeaturesEnabled) {
+                console.warn("Firebase features disabled. Skipping game result save.");
+                return;
+            }
+            // Update the main player profile with final bags and high score
             playerData.moneyBags += bagsOfMoney;
             if (coins > playerData.highScore) {
                 playerData.highScore = coins;
             }
-            const playerDocRef = doc(db, "players", userId);
-            await setDoc(playerDocRef, playerData, { merge: true });
+            await savePlayerProfile(); // Save the updated profile
 
+            // Add a new entry to the leaderboard collection
             const leaderboardRef = collection(db, "leaderboard");
             await addDoc(leaderboardRef, {
                 name: playerData.name || 'Anonymous',
@@ -2268,7 +2287,7 @@
                     item.addEventListener('click', () => {
                         playerData.activeSkin = theme.id;
                         applyTheme(theme.id);
-                        savePlayerData();
+                        savePlayerProfile();
                         populateThemeStore(); // Refresh to show active state
                     });
                 } else {
@@ -2278,7 +2297,7 @@
                             playerData.unlockedSkins.push(theme.id);
                             playerData.activeSkin = theme.id;
                             applyTheme(theme.id);
-                            savePlayerData();
+                            savePlayerProfile();
                             populateSetupModal(); // Refresh whole modal
                         } else {
                             showEventText("Not Enough Bags!");
@@ -2328,7 +2347,7 @@
                 coins += bonusCoins; // Add to session coins
                 updateScoreDisplay();
                 playerData.lastLoginDate = new Date().toISOString().split('T')[0];
-                savePlayerData();
+                savePlayerProfile();
                 document.getElementById('welcome-bonus-modal').classList.add('hidden');
                 actuallyStartGame();
             };
@@ -2415,7 +2434,7 @@
 
             playerData.claimedDays.push(reward.day);
             playerData.lastDailyClaim = todayStr;
-            savePlayerData();
+            savePlayerProfile();
             
             // Refresh calendar
             populateCalendar();
