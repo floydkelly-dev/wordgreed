@@ -171,7 +171,7 @@
             cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
             position: relative; overflow: hidden; flex-shrink: 0; width: 150px; height: 100px;
         }
-        .theme-item > span { position: relative; z-index: 1; }
+        .theme-item > div { position: relative; z-index: 1; }
         .theme-item.active { border-color: var(--primary-color-light); box-shadow: 0 0 10px var(--primary-color); }
         .theme-item.locked::before {
             content: '';
@@ -179,15 +179,16 @@
             inset: 0;
             background: rgba(0,0,0,0.5);
             border-radius: 0.5rem;
+            z-index: 2;
         }
         .theme-item.locked::after {
             content: '🔒';
             position: absolute;
-            bottom: 0.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 2.5rem;
-            z-index: 2;
+            bottom: 0.25rem;
+            right: 0.5rem;
+            font-size: 1.75rem;
+            z-index: 3;
+            transform: none;
         }
         /* Daily Rewards Calendar */
         #calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; }
@@ -213,13 +214,6 @@
             100% { transform: scale(1); opacity: 1; }
         }
         .bonus-item { animation: bonus-reveal 0.5s ease-out forwards; }
-        /* Awarded Goodies in Setup */
-        .goodies-container { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 0.75rem; 
-            align-items: center;
-        }
         #nonsense-freebies-container {
             display: flex;
             flex-wrap: wrap;
@@ -461,16 +455,21 @@
                     <div id="high-score-display" class="text-2xl font-bold text-white">0</div>
                 </div>
             </div>
-            <div class="goodies-container mt-2">
-                 <h3 class="text-lg font-bold text-amber-300 text-right self-center">Awarded Goodies</h3>
-                <div id="nonsense-freebies-container" class="col-span-1">
-                    <!-- Nonsense freebies will be injected here -->
-                </div>
-                <div class="flex items-center justify-center">
-                    <button id="trade-goodies-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg" style="background: linear-gradient(145deg, #f59e0b, #d97706); border-color: #fbbf24;">Trade</button>
+
+            <div class="greed-panel p-4 rounded-lg">
+                <h3 class="text-lg font-bold text-amber-300 text-left mb-3">Awarded Goodies</h3>
+                <div class="grid grid-cols-3 gap-4 items-center">
+                    <div id="nonsense-freebies-container" class="col-span-2">
+                        <!-- Nonsense freebies will be injected here -->
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <button id="trade-goodies-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg" style="background: linear-gradient(145deg, #f59e0b, #d97706); border-color: #fbbf24;">Trade</button>
+                    </div>
                 </div>
             </div>
+
             <hr class="border-violet-300/20 w-full my-2">
+            
             <div class="mt-2">
                 <h3 class="text-lg font-bold text-amber-300 text-left">Theme Store</h3>
                 <div id="theme-store-container" class="mt-2">
@@ -1811,13 +1810,13 @@
 
         const themes = [
             { id: 'default', name: 'Purple Haze', cost: 0, colors: ['#a78bfa', '#8b5cf6'] },
-            { id: 'blue', name: 'Ocean Blue', cost: 100000, colors: ['#60a5fa', '#3b82f6'] },
-            { id: 'green', name: 'Emerald City', cost: 250000, colors: ['#4ade80', '#22c55e'] },
-            { id: 'red', name: 'Ruby Rush', cost: 500000, colors: ['#f87171', '#ef4444'] },
-            { id: 'christmas', name: 'Christmas', cost: 1000000, colors: ['#dc2626', '#166534'] },
-            { id: 'halloween', name: 'Halloween', cost: 1000000, colors: ['#f97316', '#4a044e'] },
-            { id: 'winter', name: 'Winter', cost: 750000, colors: ['#67e8f9', '#0c4a6e'] },
-            { id: 'beach', name: 'Beach', cost: 750000, colors: ['#fde047', '#2dd4bf'] }
+            { id: 'blue', name: 'Ocean Blue', cost: 1000000, colors: ['#60a5fa', '#3b82f6'] },
+            { id: 'green', name: 'Emerald City', cost: 3000000, colors: ['#4ade80', '#22c55e'] },
+            { id: 'red', name: 'Ruby Rush', cost: 5000000, colors: ['#f87171', '#ef4444'] },
+            { id: 'christmas', name: 'Christmas', cost: 7000000, colors: ['#dc2626', '#166534'] },
+            { id: 'halloween', name: 'Halloween', cost: 9000000, colors: ['#f97316', '#4a044e'] },
+            { id: 'winter', name: 'Winter', cost: 11000000, colors: ['#67e8f9', '#0c4a6e'] },
+            { id: 'beach', name: 'Beach', cost: 13000000, colors: ['#fde047', '#2dd4bf'] }
         ];
 
         function populateThemeStore() {
@@ -1827,12 +1826,17 @@
                 const isUnlocked = playerData.unlockedSkins.includes(theme.id);
                 const isActive = playerData.activeSkin === theme.id;
                 const item = document.createElement('div');
-                item.className = `theme-item p-2 rounded-lg flex flex-col items-center justify-center ${isActive ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`;
+                item.className = `theme-item p-2 rounded-lg flex flex-col items-center justify-start ${isActive ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`;
                 item.style.background = `linear-gradient(145deg, ${theme.colors[0]}, ${theme.colors[1]})`;
                 item.dataset.themeId = theme.id;
                 
                 let costHTML = isUnlocked ? '<span class="text-xs text-green-300">Unlocked</span>' : `<span class="text-xs">💰 ${theme.cost.toLocaleString()}</span>`;
-                item.innerHTML = `<span class="font-bold text-sm">${theme.name}</span>${costHTML}`;
+                item.innerHTML = `
+                    <div class="w-full text-center pt-2">
+                        <span class="font-bold text-sm">${theme.name}</span>
+                        ${costHTML}
+                    </div>
+                `;
 
                 if (isUnlocked) {
                     item.addEventListener('click', () => {
