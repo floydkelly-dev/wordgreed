@@ -6,9 +6,6 @@
     <title>Word Greed</title>
     <link id="favicon" rel="icon" href="https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/WordGreedSiteIcon.png">
     
-    <!-- This script will hold your secret Firebase keys for local development -->
-    <script src="./config.js" onerror="window.firebaseConfig = {}"></script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -298,8 +295,6 @@
                 </div>
                 <!-- Score Container -->
                 <div id="score-container" class="greed-panel p-3 rounded-lg text-center flex flex-col gap-2">
-                    <!-- FIX: Reverted to the original, better-looking 2x2 grid layout. -->
-                    <!-- The `min-w-0` class is added to the score divs to prevent overflow with large numbers. -->
                     <div class="grid grid-cols-2 gap-2 text-center">
                         <div class="text-4xl coin-rotate" style="filter: drop-shadow(0 0 5px #fde047);">🪙</div>
                         <div class="text-4xl" style="filter: drop-shadow(0 0 5px #fde047);">💰</div>
@@ -349,8 +344,7 @@
             </h1>
             <p class="text-lg text-slate-300">Drag and drop letters to solve jumbled words. Grab Big Prizes and Get Greedy!</p>
             <button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl">Start Game</button>
-            <!-- FIX: Version updated to 2.0 -->
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.0</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.5</div>
         </div>
     </div>
 
@@ -400,8 +394,7 @@
                     <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Close</button>
                 </div>
             </div>
-            <!-- FIX: Version updated to 2.0 -->
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.0</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.5</div>
         </div>
     </div>
 
@@ -412,9 +405,8 @@
             <div class="text-slate-300 space-y-2">
                 <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
-                <!-- FIX: Version updated to 2.0 -->
-                <p>Version: <span class="font-bold text-white">2.0</span></p>
-                <p>Build Date: <span class="font-bold text-white">August 6, 2025</span></p>
+                <p>Version: <span class="font-bold text-white">2.5</span></p>
+                <p>Build Date: <span class="font-bold text-white">August 7, 2025</span></p>
                 <p><a href="https://floydkellycreates.wordpress.com/contact-me/" target="_blank" class="text-purple-300 hover:text-purple-200">Contact the Developer</a></p>
             </div>
             <p class="text-xs text-slate-500 mt-4">Copyright © 2025</p>
@@ -455,7 +447,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-center">
                 <div class="greed-panel p-2 rounded-lg">
                     <label for="player-name-input" class="text-sm font-bold text-slate-300">PLAYER NAME</label>
-                    <input type="text" id="player-name-input" class="w-full mt-1 p-1 rounded-md text-center text-lg font-bold" placeholder="Connecting..." disabled>
+                    <input type="text" id="player-name-input" class="w-full mt-1 p-1 rounded-md text-center text-lg font-bold" placeholder="Enter Name">
                 </div>
                 <div class="greed-panel p-2 rounded-lg">
                     <div class="text-sm font-bold text-slate-300">TOTAL MONEY BAGS</div>
@@ -524,29 +516,7 @@
         </div>
     </div>
 
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
-        // --- Firebase Initialization ---
-        let app, auth, db, userId = null;
-
-        const firebaseConfig = window.firebaseConfig;
-
-        if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
-            try {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-            } catch (error) {
-                console.error("Firebase initialization failed:", error);
-            }
-        } else {
-            console.warn("Firebase config not found or is empty. Running in offline mode.");
-        }
-
+    <script>
         // --- DOM Elements ---
         const gridContainer = document.getElementById('game-grid');
         const musicPlayer = document.getElementById('background-music');
@@ -1792,10 +1762,10 @@
             originalUserPlaylist = [...userPlaylist];
         }
         
-        // --- Player Data & Store Logic ---
+        // --- Player Data & Store Logic (Using Local Storage) ---
         function getDefaultPlayerData() {
             return {
-                name: '',
+                name: 'Player',
                 moneyBags: 0,
                 highScore: 0,
                 unlockedSkins: ['default'],
@@ -1807,21 +1777,22 @@
             };
         }
 
-        async function loadPlayerData() {
-            if (!userId) {
-                playerData = getDefaultPlayerData();
-                applyTheme(playerData.activeSkin);
-                return;
-            }
-            const playerDocRef = doc(db, "players", userId);
-            const docSnap = await getDoc(playerDocRef);
-
-            if (docSnap.exists()) {
-                playerData = { ...getDefaultPlayerData(), ...docSnap.data() };
+        function loadPlayerData() {
+            const savedData = localStorage.getItem('wordGreedPlayerData');
+            if (savedData) {
+                playerData = { ...getDefaultPlayerData(), ...JSON.parse(savedData) };
             } else {
                 playerData = getDefaultPlayerData();
             }
             applyTheme(playerData.activeSkin);
+        }
+
+        function savePlayerProfile() {
+            try {
+                localStorage.setItem('wordGreedPlayerData', JSON.stringify(playerData));
+            } catch (error) {
+                console.error("Error saving player profile to local storage:", error);
+            }
         }
         
         function populateSetupModal() {
@@ -2035,45 +2006,20 @@
             populateCalendar();
         }
         
-        async function saveGameResult() {
-            if (!userId) return;
+        function saveGameResult() {
             playerData.moneyBags += bagsOfMoney;
             if (coins > playerData.highScore) {
                 playerData.highScore = coins;
             }
-            await savePlayerProfile();
-        }
-
-        async function savePlayerProfile() {
-            if (!userId) return;
-            const playerDocRef = doc(db, "players", userId);
-            try {
-                await setDoc(playerDocRef, playerData, { merge: true });
-            } catch (error) {
-                console.error("Error saving player profile:", error);
-            }
+            savePlayerProfile();
         }
 
         async function initGame() {
             await buildVerifiedPlaylist();
             
-            if (auth) {
-                onAuthStateChanged(auth, user => {
-                    if (user) {
-                        userId = user.uid;
-                        playerNameInput.disabled = false;
-                        playerNameInput.placeholder = "Enter Name";
-                        loadPlayerData();
-                    } else {
-                        signInAnonymously(auth).catch(error => {
-                            console.error("Anonymous sign-in failed:", error);
-                        });
-                    }
-                });
-            } else {
-                // If firebase failed to init, load default data for an offline experience.
-                loadPlayerData();
-            }
+            loadPlayerData();
+            playerNameInput.disabled = false;
+            playerNameInput.placeholder = "Enter Name";
 
             startLevel();
             updateScoreDisplay();
@@ -2177,7 +2123,7 @@
                 showEventText("Coming Soon!");
             });
             document.getElementById('player-name-input').addEventListener('blur', (e) => {
-                playerData.name = e.target.value;
+                playerData.name = e.target.value.trim() || 'Player';
                 e.target.classList.toggle('invalid-input', !e.target.value.trim());
                 savePlayerProfile();
             });
