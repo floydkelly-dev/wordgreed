@@ -74,7 +74,7 @@
         
         .event-text {
             font-family: 'Lobster Two', cursive; font-size: 5rem; color: #FDD835;
-            text-shadow: -3px -3px 0 #4a2c0f, 3px -3px 0 #4a2c0f, -3px 3px 0 #4a2c0f, 3px 3px 0 #4a2c0f, 4px 4px 2px rgba(0,0,0,0.6);
+            text-shadow: -3px -3px 0 #4a2c0f, 3px -3px 0 #4a2c0f, -3px 2px 0 #4a2c0f, 3px 2px 0 #4a2c0f, 4px 4px 2px rgba(0,0,0,0.6);
             animation: event-flash 2s ease-out forwards;
         }
         .event-text.long-flash { animation-duration: 4s; }
@@ -153,17 +153,8 @@
         input[type=range].volume-slider::-moz-range-thumb { height: 20px; width: 20px; border-radius: 50%; background: #a78bfa; cursor: pointer; border: 2px solid #c4b5fd; box-shadow: 0 0 5px #8b5cf6; }
         /* Playlist & Setup Styles */
         #playlist-container { max-height: 220px; overflow-y: auto; background-color: rgba(0,0,0,0.2); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5); padding: 0.5rem; border-radius: 0.5rem;}
-        .playlist-item { display: flex; justify-content: space-between; align-items: center; padding: 0.25rem 0.75rem; background-color: rgba(0,0,0,0.2); border-radius: 0.5rem; transition: background-color 0.2s; user-select: none; }
+        .playlist-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background-color: rgba(0,0,0,0.2); border-radius: 0.5rem; transition: background-color 0.2s; user-select: none; cursor: pointer; }
         .playlist-item:hover { background-color: rgba(0,0,0,0.4); }
-        .playlist-item input[type="checkbox"] { display: none; }
-        .playlist-item .custom-checkbox {
-            width: 20px; height: 20px; border: 2px solid var(--primary-color-light); border-radius: 4px;
-            display: flex; align-items: center; justify-content: center; margin-right: 0.75rem;
-            cursor: pointer; background-color: rgba(0,0,0,0.3);
-        }
-        .playlist-item .custom-checkbox svg { display: none; }
-        .playlist-item input[type="checkbox"]:checked + .custom-checkbox { background-color: var(--primary-color); }
-        .playlist-item input[type="checkbox"]:checked + .custom-checkbox svg { display: block; }
         .now-playing-indicator { font-size: 0.75rem; color: var(--primary-color-light); font-style: italic; display: none; }
         .playlist-item.now-playing { background-color: rgba(139, 92, 246, 0.3); }
         .playlist-item.now-playing .now-playing-indicator { display: block; }
@@ -279,7 +270,7 @@
         </div>
 
         <!-- Score & Control Panel -->
-        <div id="score-panel" class="glass-panel p-4 rounded-xl w-full max-w-xs md:w-[17rem] flex flex-col justify-between gap-3 relative">
+        <div id="score-panel" class="glass-panel p-4 rounded-xl w-full max-w-xs md:w-[20rem] flex flex-col justify-between gap-3 relative">
             <div class="flex flex-col gap-2"> 
                 <!-- Game Title -->
                 <div class="relative w-full h-24 flex justify-center items-center">
@@ -298,8 +289,8 @@
                     <div class="grid grid-cols-2 gap-2 text-center">
                         <div class="text-4xl coin-rotate" style="filter: drop-shadow(0 0 5px #fde047);">🪙</div>
                         <div class="text-4xl" style="filter: drop-shadow(0 0 5px #fde047);">💰</div>
-                        <div id="coins-display" class="text-lg font-bold text-white min-w-0 break-words">0</div>
-                        <div id="bags-of-money-display" class="text-lg font-bold text-green-400 min-w-0 break-words">0</div>
+                        <div id="coins-display" class="text-lg font-bold text-white">0</div>
+                        <div id="bags-of-money-display" class="text-lg font-bold text-green-400">0</div>
                     </div>
                     <!-- Greed Score and Solve Button -->
                     <div id="greed-content" class="mx-auto flex flex-col items-center justify-center gap-1">
@@ -1694,9 +1685,9 @@
         function updateNowPlayingIndicator() {
             document.querySelectorAll('.playlist-item').forEach((item) => {
                 item.classList.remove('now-playing');
-                const trackFilename = item.querySelector('input').value;
-                const currentTrackFilename = userPlaylist[currentTrackIndex];
-                if (trackFilename === currentTrackFilename) {
+                const trackTitle = item.querySelector('.song-title').textContent;
+                const currentTrackTitle = songDatabase.find(t => t.filename === userPlaylist[currentTrackIndex])?.title;
+                if (trackTitle === currentTrackTitle) {
                     item.classList.add('now-playing');
                 }
             });
@@ -1706,40 +1697,19 @@
             const container = document.getElementById('playlist-container');
             container.innerHTML = '';
             verifiedPlaylist.forEach(track => {
-                const isChecked = userPlaylist.includes(track.filename);
                 const item = document.createElement('div');
                 item.className = 'playlist-item';
                 item.innerHTML = `
-                    <label class="flex items-center cursor-pointer">
-                        <input type="checkbox" value="${track.filename}" ${isChecked ? 'checked' : ''}>
-                        <span class="custom-checkbox">
-                            <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                        </span>
-                        <span class="song-title">${track.title}</span>
-                    </label>
+                    <span class="song-title">${track.title}</span>
                     <span class="now-playing-indicator">Now Playing...</span>
                 `;
                 container.appendChild(item);
-                item.querySelector('.song-title').addEventListener('dblclick', (e) => {
-                    e.stopPropagation();
-                    const trackFilename = item.querySelector('input').value;
+                item.addEventListener('click', () => {
+                    const trackFilename = track.filename;
                     const playIndex = userPlaylist.findIndex(filename => filename === trackFilename);
                     if (playIndex !== -1) {
                         playTrack(playIndex);
                     }
-                });
-                item.querySelector('input').addEventListener('change', (e) => {
-                    if (e.target.checked) {
-                        userPlaylist.push(e.target.value);
-                    } else {
-                        userPlaylist = userPlaylist.filter(filename => filename !== e.target.value);
-                    }
-                    originalUserPlaylist = verifiedPlaylist.map(t => t.filename).filter(f => userPlaylist.includes(f));
-                    userPlaylist.sort((a, b) => {
-                        const indexA = originalUserPlaylist.indexOf(a);
-                        const indexB = originalUserPlaylist.indexOf(b);
-                        return indexA - indexB;
-                    });
                 });
             });
             updateNowPlayingIndicator();
@@ -2017,6 +1987,11 @@
         async function initGame() {
             await buildVerifiedPlaylist();
             
+            if (userPlaylist.length > 0) {
+                currentTrackIndex = Math.floor(Math.random() * userPlaylist.length);
+            }
+            musicPlayer.addEventListener('ended', playNextTrack);
+
             loadPlayerData();
             playerNameInput.disabled = false;
             playerNameInput.placeholder = "Enter Name";
