@@ -578,6 +578,7 @@
         let startModalAnimationInterval = null, maxSameEmoji = 4, isDraggingBomb = false;
         let lastVolume = 0.5, solveButtonPulseManager = null;
         let freezeAnimationInterval = null, gameOverAnimationInterval = null;
+        let levelGoodies = [];
         
         // --- Playlist Data ---
         const songDatabase = [
@@ -1019,6 +1020,7 @@
 
         function scheduleNextPrizeSpawn() {
             if (timeRemaining <= 0 || isGamePaused || isFrozen || isSpecialAnimationActive) return;
+            
             const timeElapsed = totalGameTime - timeRemaining;
             const progress = timeElapsed / totalGameTime;
             const maxDelay = 2500;
@@ -1026,9 +1028,63 @@
             const currentDelay = minDelay + (maxDelay - minDelay) * Math.pow(1 - progress, 3);
 
             prizeSpawnerTimeout = setTimeout(() => {
-                spawnPrizeEmoji();
+                if (levelGoodies.length > 0 && Math.random() < 0.1) { // 10% chance for a goodie
+                    spawnSpecialGoodie();
+                } else {
+                    spawnPrizeEmoji();
+                }
                 scheduleNextPrizeSpawn();
             }, currentDelay);
+        }
+
+        function spawnSpecialGoodie() {
+            if (isGamePaused || isGameOver || levelGoodies.length === 0) return;
+
+            const allPuzzleIndices = puzzles.flatMap(p => p.indices);
+            const emptyTiles = [];
+            for(let i=0; i<81; i++) {
+                if (!allPuzzleIndices.includes(i) && i !== 40) {
+                    const tile = document.getElementById(`tile-${i}`);
+                    if (!tile.textContent) {
+                        emptyTiles.push(tile);
+                    }
+                }
+            }
+            if (emptyTiles.length === 0) return;
+            const tile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
+
+            const goodieIndex = Math.floor(Math.random() * levelGoodies.length);
+            const goodieEmoji = levelGoodies.splice(goodieIndex, 1)[0];
+
+            tile.textContent = goodieEmoji;
+            tile.classList.add('prize-tile', 'cash-money-prize');
+
+            const clickHandler = () => {
+                coins += 1000000;
+                updateScoreDisplay();
+                flashScore('gain');
+                triggerCoinAnimation(tile, document.getElementById('coins-display'));
+
+                if (!playerData.nonsenseFreebiesCollected[goodieEmoji]) {
+                    playerData.nonsenseFreebiesCollected[goodieEmoji] = 0;
+                }
+                playerData.nonsenseFreebiesCollected[goodieEmoji]++;
+                savePlayerProfile();
+
+                tile.textContent = '';
+                tile.classList.remove('prize-tile', 'cash-money-prize');
+                tile.removeEventListener('click', clickHandler);
+                clearTimeout(despawnTimer);
+            };
+
+            const despawnTimer = setTimeout(() => {
+                levelGoodies.push(goodieEmoji);
+                tile.textContent = '';
+                tile.classList.remove('prize-tile', 'cash-money-prize');
+                tile.removeEventListener('click', clickHandler);
+            }, 8000);
+
+            tile.addEventListener('click', clickHandler);
         }
 
         function spawnPrizeEmoji() {
@@ -1628,6 +1684,7 @@
             clearTimeout(impTimeout);
             clearTimeout(thawTimeout);
             clearInterval(solveButtonPulseManager);
+            levelGoodies = [...nonsenseFreebies];
             document.getElementById('timer-display').textContent = "10:00";
             const solveButton = document.getElementById('solve-button');
             solveButton.textContent = '✅';
@@ -2099,6 +2156,7 @@
             loadPlayerData();
             playerNameInput.disabled = false;
             playerNameInput.placeholder = "Enter Name";
+            levelGoodies = [...nonsenseFreebies];
 
             startLevel();
             updateScoreDisplay();
