@@ -1985,6 +1985,11 @@
         }
 
         async function initGame() {
+            // Ensure all words in the bank are uppercase
+            for (let i = 0; i < wordBank.length; i++) {
+                wordBank[i] = wordBank[i].toUpperCase();
+            }
+            
             await buildVerifiedPlaylist();
             
             if (userPlaylist.length > 0) {
