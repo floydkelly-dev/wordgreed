@@ -269,8 +269,8 @@
         }
 
         @keyframes pulse-glow-amber { 
-            0%, 100% { box-shadow: 0 0 8px #f59e0b, 0 0 15px #f59e0b; } 
-            50% { box-shadow: 0 0 12px #fbbf24, 0 0 25px #fbbf24; } 
+            0%, 100% { box-shadow: 0 0 15px #f59e0b, 0 0 30px #f59e0b; } 
+            50% { box-shadow: 0 0 25px #fbbf24, 0 0 50px #fbbf24; } 
         }
         .trade-button-pulse {
             animation: pulse-glow-amber 1.5s infinite ease-in-out;
@@ -555,6 +555,37 @@
                 <!-- Bonus items will be injected here -->
             </div>
             <button id="claim-bonus-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-xl">Claim!</button>
+        </div>
+    </div>
+
+    <!-- Trading Post Modal -->
+    <div id="trading-post-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
+        <div class="glass-panel p-8 rounded-2xl flex flex-col gap-4 w-full max-w-4xl relative">
+            <h2 class="text-2xl font-bold text-amber-300 text-center">Trading Post</h2>
+            <div class="flex gap-4 mt-4">
+                <div id="available-trades-container" class="w-1/2 grid grid-cols-2 gap-2">
+                    <!-- Available trades will be injected here -->
+                </div>
+                <div id="trade-preview-panel" class="w-1/2 greed-panel flex flex-col items-center justify-center p-4 rounded-lg">
+                    <div id="trade-preview-emoji" class="text-8xl">❔</div>
+                    <div id="trade-preview-name" class="text-xl font-bold mt-2">Select a Trade</div>
+                </div>
+            </div>
+            <div class="flex justify-center mt-4 gap-4">
+                 <button id="execute-trade-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg" style="background: linear-gradient(145deg, #22c55e, #15803d); border-color: #4ade80;" disabled>Trade</button>
+                <button id="close-trading-post-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Riches Modal -->
+    <div id="riches-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
+        <div class="glass-panel p-8 rounded-2xl flex flex-col gap-4 w-full max-w-2xl relative">
+             <h2 class="text-2xl font-bold text-amber-300 text-center">Your Riches</h2>
+             <div id="riches-inventory" class="grid grid-cols-4 gap-4 mt-4">
+                <!-- Inventory items will be injected here -->
+             </div>
+             <button id="close-riches-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg self-center">Close</button>
         </div>
     </div>
 
