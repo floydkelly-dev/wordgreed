@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -145,6 +146,21 @@
         .falling-coin { position: absolute; font-size: 1.5rem; animation: fall linear forwards; pointer-events: none; }
         .sparkle { position: absolute; width: 8px; height: 8px; background-color: #fde047; border-radius: 50%; box-shadow: 0 0 5px #fde047, 0 0 10px #facc15; animation: twinkle ease-in-out infinite; pointer-events: none; }
         
+        @keyframes fall-sway {
+            0% { transform: translateY(-100%) translateX(0vw) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            50% { transform: translateY(50vh) translateX(5vw) rotate(180deg); }
+            100% { transform: translateY(100vh) translateX(-5vw) rotate(360deg); opacity: 0; }
+        }
+        .falling-snowflake {
+            position: fixed;
+            top: 0;
+            font-size: 1.5rem;
+            animation: fall-sway linear forwards;
+            pointer-events: none;
+            z-index: 55;
+        }
+
         input[type=range].volume-slider { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range].volume-slider:focus { outline: none; }
         input[type=range].volume-slider::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: rgba(0, 0, 0, 0.5); border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); }
@@ -544,6 +560,7 @@
         let timedEvents = { sixMin: true, threeMin: true }, isSpecialAnimationActive = false;
         let startModalAnimationInterval = null, maxSameEmoji = 4, isDraggingBomb = false;
         let lastVolume = 0.5, solveButtonPulseManager = null;
+        let freezeAnimationInterval = null, gameOverAnimationInterval = null;
         
         // --- Playlist Data ---
         const songDatabase = [
@@ -1400,7 +1417,31 @@
         function showGameOverModal() {
             document.getElementById('final-coins-display').textContent = coins.toLocaleString();
             document.getElementById('final-bags-display').textContent = bagsOfMoney.toLocaleString();
-            document.getElementById('game-over-modal').classList.remove('hidden');
+            const gameOverModal = document.getElementById('game-over-modal');
+            gameOverModal.classList.remove('hidden');
+
+            const animationContainer = gameOverModal.querySelector('.glass-panel');
+
+            gameOverAnimationInterval = setInterval(() => { 
+                const coin = document.createElement('div');
+                coin.classList.add('falling-coin');
+                coin.textContent = '🪙';
+                coin.style.left = `${Math.random() * 100}%`;
+                coin.style.animationDuration = `${Math.random() * 2 + 3}s`;
+                coin.style.fontSize = `${Math.random() * 1 + 0.5}rem`;
+                animationContainer.appendChild(coin);
+                setTimeout(() => coin.remove(), 5000);
+
+                if (Math.random() < 0.3) {
+                    const sparkle = document.createElement('div');
+                    sparkle.classList.add('sparkle');
+                    sparkle.style.left = `${Math.random() * 100}%`;
+                    sparkle.style.top = `${Math.random() * 100}%`;
+                    sparkle.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
+                    animationContainer.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 1500);
+                }
+            }, 300);
         }
         
         function pauseGame() {
@@ -1442,6 +1483,18 @@
             isFrozen = true;
             clearTimeout(prizeSpawnerTimeout);
             clearTimeout(impTimeout);
+            
+            freezeAnimationInterval = setInterval(() => {
+                const snowflake = document.createElement('div');
+                snowflake.classList.add('falling-snowflake');
+                snowflake.textContent = '❄️';
+                snowflake.style.left = `${Math.random() * 100}%`;
+                snowflake.style.animationDuration = `${Math.random() * 3 + 4}s`;
+                snowflake.style.fontSize = `${Math.random() * 1 + 0.75}rem`;
+                document.body.appendChild(snowflake);
+                setTimeout(() => snowflake.remove(), 7000);
+            }, 200);
+
             const frozenTiles = [];
             document.querySelectorAll('#game-grid > div:not(.word-puzzle-tile)').forEach(tile => {
                 const rect = tile.getBoundingClientRect();
@@ -1479,6 +1532,7 @@
         }
 
         function endFreeze() {
+            clearInterval(freezeAnimationInterval);
             clearTimeout(thawTimeout);
             isFrozen = false;
             document.querySelectorAll('.ice-block').forEach(block => block.remove());
@@ -1530,6 +1584,7 @@
         }
 
         function restartGame() {
+            clearInterval(gameOverAnimationInterval);
             document.getElementById('game-over-modal').classList.add('hidden');
             coins = 0;
             bagsOfMoney = 0;
