@@ -102,7 +102,7 @@
         #start-game-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; animation: start-button-pulse 15s infinite; }
         #claim-bonus-button { background: linear-gradient(145deg, #16a34a, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
         #play-again-button { background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af; border-bottom: 4px solid #1f2937; }
-        #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button, #close-daily-rewards-button, #close-trading-post-button, #close-riches-button, #close-tips-button, #close-privacy-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
+        #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button, #close-daily-rewards-button, #close-trading-post-button, #close-riches-button, #close-tips-button, #close-privacy-button, #close-giving-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
         #about-button, #privacy-policy-button { background: linear-gradient(145deg, #8b5cf6, #7c3aed); border-color: #a78bfa; border-bottom: 4px solid #5b21b6; }
         #setup-button { background: linear-gradient(145deg, #22c55e, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
         #daily-rewards-button { background: linear-gradient(145deg, #f59e0b, #d97706); border-color: #fbbf24; border-bottom: 4px solid #92400e; }
@@ -239,6 +239,10 @@
         }
         .freebie-item { text-align: center; font-size: 1.25rem; }
         .freebie-count { font-size: 0.75rem; font-weight: bold; color: var(--primary-color-light); }
+        .freebie-item.tradable {
+            animation: pulse-glow-amber 1.5s infinite ease-in-out;
+            border-radius: 0.5rem;
+        }
         /* Help Modal Footer Layout */
         #help-modal-footer {
             display: flex; flex-direction: column; align-items: center; width: 100%; gap: 0.75rem;
@@ -663,9 +667,6 @@
                     <div id="nonsense-freebies-container" class="flex-grow">
                         <!-- Nonsense freebies will be injected here -->
                     </div>
-                    <div class="greed-panel w-40 h-28 ml-4 flex items-center justify-center rounded-lg" style="box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);">
-                        <span class="text-5xl">🧧</span>
-                    </div>
                     <button id="trade-goodies-button" class="glassy-button text-white font-bold rounded-lg text-lg ml-4" style="background: linear-gradient(145deg, #f59e0b, #d97706); border-color: #fbbf24; width: 160px; height: 55px;">Trade</button>
                 </div>
             </div>
@@ -739,11 +740,28 @@
                 </div>
             </div>
             <div class="flex justify-center mt-4 gap-4">
+                 <button id="give-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg" style="background: linear-gradient(145deg, #a78bfa, #8b5cf6); border-color: #c4b5fd;">Give</button>
                  <button id="execute-trade-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg" style="background: linear-gradient(145deg, #22c55e, #15803d); border-color: #4ade80;" disabled>Trade</button>
                 <button id="close-trading-post-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
             </div>
         </div>
     </div>
+
+    <!-- Giving Modal -->
+    <div id="giving-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[70] p-4">
+        <div class="glass-panel p-8 rounded-2xl flex flex-col gap-4 w-full max-w-2xl relative">
+            <h2 class="text-2xl font-bold text-amber-300 text-center">Give to Charity</h2>
+            <p class="text-slate-300 text-center text-sm">Select an item from your riches to donate and earn a badge!</p>
+            <div id="giving-inventory" class="grid grid-cols-4 gap-4 mt-4">
+                <!-- Inventory items for giving will be injected here -->
+            </div>
+            <div class="flex justify-center mt-4 gap-4">
+                <button id="execute-give-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg" style="background: linear-gradient(145deg, #a78bfa, #8b5cf6); border-color: #c4b5fd;" disabled>Give Selected Item</button>
+                <button id="close-giving-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Riches Modal -->
     <div id="riches-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
@@ -787,6 +805,7 @@
         let freezeAnimationInterval = null, gameOverAnimationInterval = null;
         let levelGoodies = [];
         let selectedTrade = null;
+        let selectedDonation = null;
         
         // --- Playlist Data ---
         const songDatabase = [
@@ -1731,7 +1750,7 @@
             const gameOverModal = document.getElementById('game-over-modal');
             gameOverModal.classList.remove('hidden');
 
-            const animationContainer = gameOverModal.querySelector('.glass-panel');
+            const animationContainer = document.body; // Change container to body
 
             gameOverAnimationInterval = setInterval(() => { 
                 const coin = document.createElement('div');
@@ -1740,6 +1759,9 @@
                 coin.style.left = `${Math.random() * 100}%`;
                 coin.style.animationDuration = `${Math.random() * 2 + 3}s`;
                 coin.style.fontSize = `${Math.random() * 1 + 0.5}rem`;
+                coin.style.position = 'fixed'; // Use fixed to fall over everything
+                coin.style.top = '-5%';
+                coin.style.zIndex = '100';
                 animationContainer.appendChild(coin);
                 setTimeout(() => coin.remove(), 5000);
 
@@ -1749,6 +1771,8 @@
                     sparkle.style.left = `${Math.random() * 100}%`;
                     sparkle.style.top = `${Math.random() * 100}%`;
                     sparkle.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
+                    sparkle.style.position = 'fixed';
+                    sparkle.style.zIndex = '101';
                     animationContainer.appendChild(sparkle);
                     setTimeout(() => sparkle.remove(), 1500);
                 }
@@ -2349,6 +2373,18 @@
                 const count = playerData.nonsenseFreebiesCollected?.[freebie] || 0;
                 const item = document.createElement('div');
                 item.className = 'freebie-item';
+                
+                // Check if this goodie is part of an affordable trade
+                const isTradable = trades.some(trade => {
+                    const costItem = Object.keys(trade.cost)[0];
+                    const costAmount = trade.cost[costItem];
+                    return freebie === costItem && count >= costAmount;
+                });
+
+                if (isTradable) {
+                    item.classList.add('tradable');
+                }
+
                 item.innerHTML = `
                     <div>${freebie}</div>
                     <div class="freebie-count">${count}</div>
@@ -2596,13 +2632,14 @@
             { id: 'beginner', name: 'Beginner', emoji: '🤍', score: 1000000 }, // 1 Million
             { id: 'novice', name: 'Novice', emoji: '🧡', score: 100000000 }, // 100 Million
             { id: 'expert', name: 'Expert', emoji: '💙', score: 10000000000 }, // 10 Billion
-            { id: 'trillion', name: 'Trillionaire', emoji: '💜', score: 1000000000000 } // 1 Trillion
+            { id: 'trillion', name: 'Trillionaire', emoji: '💜', score: 1000000000000 }, // 1 Trillion
+            { id: 'charity', name: 'Philanthropist', emoji: '💖', score: -1 } // Special badge
         ];
 
         function checkAndAwardBadges(finalScore) {
             let newBadgeEarned = false;
             badges.forEach(badge => {
-                if (finalScore >= badge.score && !playerData.unlockedBadges.includes(badge.id)) {
+                if (badge.score > 0 && finalScore >= badge.score && !playerData.unlockedBadges.includes(badge.id)) {
                     playerData.unlockedBadges.push(badge.id);
                     newBadgeEarned = true;
                 }
