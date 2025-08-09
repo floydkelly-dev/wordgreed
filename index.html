@@ -100,8 +100,8 @@
         #start-game-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; animation: start-button-pulse 15s infinite; }
         #claim-bonus-button { background: linear-gradient(145deg, #16a34a, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
         #play-again-button { background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af; border-bottom: 4px solid #1f2937; }
-        #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button, #close-daily-rewards-button, #close-trading-post-button, #close-riches-button, #close-tips-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
-        #about-button { background: linear-gradient(145deg, #8b5cf6, #7c3aed); border-color: #a78bfa; border-bottom: 4px solid #5b21b6; }
+        #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button, #close-daily-rewards-button, #close-trading-post-button, #close-riches-button, #close-tips-button, #close-privacy-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
+        #about-button, #privacy-policy-button { background: linear-gradient(145deg, #8b5cf6, #7c3aed); border-color: #a78bfa; border-bottom: 4px solid #5b21b6; }
         #setup-button { background: linear-gradient(145deg, #22c55e, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
         #daily-rewards-button { background: linear-gradient(145deg, #f59e0b, #d97706); border-color: #fbbf24; border-bottom: 4px solid #92400e; }
         #tips-button { background: linear-gradient(145deg, #f97316, #ea580c); border-color: #fb923c; border-bottom: 4px solid #c2410c; }
@@ -359,6 +359,23 @@
         #copy-userid-button:hover {
             background-color: rgba(255,255,255,0.2);
         }
+        
+        /* Privacy Policy Modal */
+        #privacy-policy-content {
+            background-color: rgba(0,0,0,0.4);
+            border: 1px solid var(--panel-border);
+            box-shadow: inset 2px 2px 8px rgba(0,0,0,0.6);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            height: 300px;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 0.875rem;
+            color: #d1d5db;
+        }
+        #privacy-policy-content::-webkit-scrollbar { width: 8px; }
+        #privacy-policy-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        #privacy-policy-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
 
     </style>
 </head>
@@ -449,11 +466,8 @@
                 <span class="absolute" style="top: 4rem; left: 5rem;">Greed</span>
             </h1>
             <p class="text-lg text-slate-300">Drag and drop letters to solve jumbled words. Grab Big Prizes and Get Greedy!</p>
-            <div id="firebase-error-message" class="hidden my-2 p-3 rounded-lg bg-red-900/50 border border-red-500 text-red-300 text-sm">
-                <!-- Error message will be inserted here -->
-            </div>
             <button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl">Start Game</button>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.6</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.7</div>
         </div>
     </div>
 
@@ -512,7 +526,7 @@
                     <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Close</button>
                 </div>
             </div>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.6</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.7</div>
         </div>
     </div>
 
@@ -520,9 +534,9 @@
     <div id="tips-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-2xl relative">
             <h2 class="text-2xl font-bold text-amber-300">Game Tips</h2>
-            <div id="tips-carousel">
+            <div id="tips-carousel" class="w-full">
                 <div id="carousel-prev" class="carousel-arrow">⬅️</div>
-                <div id="tip-card-container">
+                <div id="tip-card-container" class="w-full h-full flex items-center justify-center">
                     <!-- Tip cards will be injected here -->
                 </div>
                 <div id="carousel-next" class="carousel-arrow">➡️</div>
@@ -538,12 +552,25 @@
             <div class="text-slate-300 space-y-2">
                 <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
-                <p>Version: <span class="font-bold text-white">2.6</span></p>
-                <p>Build Date: <span class="font-bold text-white">August 8, 2025</span></p>
+                <p>Version: <span class="font-bold text-white">2.7</span></p>
+                <p>Build Date: <span class="font-bold text-white">August 9, 2025</span></p>
                 <p><a href="https://floydkellycreates.wordpress.com/contact-me/" target="_blank" class="text-purple-300 hover:text-purple-200">Contact the Developer</a></p>
             </div>
-            <p class="text-xs text-slate-500 mt-4">Copyright © 2025</p>
-            <button id="close-about-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
+            <div class="flex justify-between w-full mt-4">
+                <button id="privacy-policy-button" class="glassy-button text-white font-bold py-2 px-4 rounded-lg text-sm">Privacy Policy</button>
+                <button id="close-about-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacy-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
+        <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-2xl relative">
+            <h2 class="text-2xl font-bold text-amber-300">Privacy Policy</h2>
+            <div id="privacy-policy-content">
+                Loading...
+            </div>
+            <button id="close-privacy-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
         </div>
     </div>
 
@@ -754,9 +781,9 @@
             { id: 'trade005', name: '100 🍋‍🟩 for 1 🧧', cost: { '🍋‍🟩': 100 }, reward: { type: 'inventory', item: '🧧', amount: 1 } }
         ];
         const tips = [
-            "Tip! The green bomb is your friend! Drag it anywhere and drop on a word to auto solve.",
-            "Another Tip! The green bomb has a range of 9 squares and will capture all freebies!",
-            "Tip! If you lose a big chunk of coins during game play, keep playing and in seconds be rich again!"
+            "💡 Tip! The green bomb is your friend! Drag it anywhere and drop on a word to auto solve.",
+            "💡 Another Tip! The green bomb has a range of 9 squares and will capture all freebies!",
+            "💡 Tip! If you lose a big chunk of coins during game play, keep playing and in seconds be rich again!"
         ];
         let currentTipIndex = 0;
         
@@ -2499,22 +2526,51 @@
             showTip(currentTipIndex);
         }
 
-        function showFirebaseError(message) {
-            const errorDiv = document.getElementById('firebase-error-message');
-            errorDiv.textContent = message;
-            errorDiv.classList.remove('hidden');
-        }
-
         async function initGame() {
-            // Always load from localStorage first for a fast, seamless start
+            // STEP 1: Immediately load from localStorage for a fast, playable start.
             loadPlayerFromLocalStorage();
 
-            // Ensure all words in the bank are uppercase
+            // STEP 2: Prepare game assets and UI elements that don't depend on Firebase.
             for (let i = 0; i < wordBank.length; i++) {
                 wordBank[i] = wordBank[i].toUpperCase();
             }
-            
-            // --- Firebase Initialization (Silent & Graceful) ---
+            await buildVerifiedPlaylist();
+            if (userPlaylist.length > 0) {
+                currentTrackIndex = Math.floor(Math.random() * userPlaylist.length);
+            }
+            musicPlayer.addEventListener('ended', playNextTrack);
+            playerNameInput.disabled = false;
+            playerNameInput.placeholder = "Enter Name";
+            levelGoodies = [...nonsenseFreebies];
+            startLevel();
+            updateScoreDisplay();
+            setupAudioControls();
+            populatePlaylistModal();
+            populateTipsCarousel();
+            startModalAnimationInterval = setInterval(() => { 
+                const startModal = document.getElementById('start-modal');
+                if (!startModal) return;
+                const coin = document.createElement('div');
+                coin.classList.add('falling-coin');
+                coin.textContent = '🪙';
+                coin.style.left = `${Math.random() * 100}%`;
+                coin.style.animationDuration = `${Math.random() * 2 + 3}s`;
+                coin.style.fontSize = `${Math.random() * 1 + 0.5}rem`;
+                startModal.appendChild(coin);
+                setTimeout(() => coin.remove(), 5000);
+
+                if (Math.random() < 0.3) {
+                    const sparkle = document.createElement('div');
+                    sparkle.classList.add('sparkle');
+                    sparkle.style.left = `${Math.random() * 100}%`;
+                    sparkle.style.top = `${Math.random() * 100}%`;
+                    sparkle.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
+                    startModal.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 1500);
+                }
+             }, 300);
+
+            // STEP 3: Attempt to connect to Firebase in the background.
             try {
                 let config;
                 if (typeof window.firebaseConfig !== 'undefined') {
@@ -2551,55 +2607,15 @@
                             isFirebaseConnected = true;
                             await syncWithFirebase();
                         } catch (error) {
-                            console.error("Anonymous sign-in failed:", error.message);
+                            console.warn("Anonymous sign-in failed. This is expected in unauthorized environments. Game will continue in offline mode.", error.message);
                             isFirebaseConnected = false;
                         }
                     }
                 });
-
             } catch (e) {
-                console.warn(e.message); // Log for dev, but don't show player
+                console.warn(e.message);
                 isFirebaseConnected = false;
             }
-
-            await buildVerifiedPlaylist();
-            
-            if (userPlaylist.length > 0) {
-                currentTrackIndex = Math.floor(Math.random() * userPlaylist.length);
-            }
-            musicPlayer.addEventListener('ended', playNextTrack);
-
-            playerNameInput.disabled = false;
-            playerNameInput.placeholder = "Enter Name";
-            levelGoodies = [...nonsenseFreebies];
-
-            startLevel();
-            updateScoreDisplay();
-            setupAudioControls();
-            populatePlaylistModal();
-            populateTipsCarousel();
-            
-            startModalAnimationInterval = setInterval(() => { 
-                const startModal = document.getElementById('start-modal');
-                const coin = document.createElement('div');
-                coin.classList.add('falling-coin');
-                coin.textContent = '🪙';
-                coin.style.left = `${Math.random() * 100}%`;
-                coin.style.animationDuration = `${Math.random() * 2 + 3}s`;
-                coin.style.fontSize = `${Math.random() * 1 + 0.5}rem`;
-                startModal.appendChild(coin);
-                setTimeout(() => coin.remove(), 5000);
-
-                if (Math.random() < 0.3) {
-                    const sparkle = document.createElement('div');
-                    sparkle.classList.add('sparkle');
-                    sparkle.style.left = `${Math.random() * 100}%`;
-                    sparkle.style.top = `${Math.random() * 100}%`;
-                    sparkle.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
-                    startModal.appendChild(sparkle);
-                    setTimeout(() => sparkle.remove(), 1500);
-                }
-             }, 300);
 
             // --- Global Event Listeners ---
             document.getElementById('start-game-button').addEventListener('click', startGame);
@@ -2703,6 +2719,27 @@
             });
             document.getElementById('carousel-next').addEventListener('click', nextTip);
             document.getElementById('carousel-prev').addEventListener('click', prevTip);
+
+            // Privacy Policy Listeners
+            document.getElementById('privacy-policy-button').addEventListener('click', async () => {
+                document.getElementById('about-modal').classList.add('hidden');
+                document.getElementById('privacy-modal').classList.remove('hidden');
+                const policyContainer = document.getElementById('privacy-policy-content');
+                try {
+                    // It's standard to place static assets like this in a 'public' folder.
+                    const response = await fetch('https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/PrivacyPolicy.html');
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const policyHTML = await response.text();
+                    policyContainer.innerHTML = policyHTML;
+                } catch (error) {
+                    console.error('Failed to fetch privacy policy:', error);
+                    policyContainer.textContent = 'Could not load the privacy policy. Please try again later.';
+                }
+            });
+            document.getElementById('close-privacy-button').addEventListener('click', () => {
+                document.getElementById('privacy-modal').classList.add('hidden');
+                document.getElementById('about-modal').classList.remove('hidden');
+            });
 
             // Copy User ID listener
             document.getElementById('copy-userid-button').addEventListener('click', () => {
