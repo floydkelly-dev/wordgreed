@@ -32,6 +32,8 @@
         body.theme-beach { --primary-color: #2dd4bf; --primary-color-dark: #0d9488; --primary-color-light: #5eead4; --primary-text-dark: #134e4a; --panel-bg: rgba(253, 230, 138, 0.4); --panel-border: rgba(6, 182, 212, 0.5); }
         body.theme-grove { --primary-color: #f59e0b; --primary-color-dark: #d97706; --primary-color-light: #fbbf24; --primary-text-dark: #1a2e05; --panel-bg: rgba(34, 197, 94, 0.4); --panel-border: rgba(134, 239, 172, 0.5); }
         body.theme-dark-purple { --primary-color: #5b21b6; --primary-color-dark: #4c1d95; --primary-color-light: #7c3aed; --primary-text-dark: #e0e7ff; --panel-bg: rgba(23, 2, 46, 0.5); --panel-border: rgba(109, 40, 217, 0.5); }
+        body.theme-grayscale { --primary-color: #9ca3af; --primary-color-dark: #6b7280; --primary-color-light: #d1d5db; --primary-text-dark: #111827; --panel-bg: rgba(107, 114, 128, 0.4); --panel-border: rgba(156, 163, 175, 0.5); }
+        body.theme-stage-lights { --primary-color: #ec4899; --primary-color-dark: #db2777; --primary-color-light: #f472b6; --primary-text-dark: #1e1b4b; --panel-bg: rgba(13, 13, 33, 0.6); --panel-border: rgba(236, 72, 153, 0.5); }
         
         @keyframes move-gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         body { font-family: 'Inter', sans-serif; background: linear-gradient(125deg, #000000, #0c1e42, #1e3a8a, #000000); background-size: 400% 400%; animation: move-gradient 20s ease infinite; overflow-x: hidden; }
@@ -154,7 +156,7 @@
             50% { transform: translateY(50vh) translateX(5vw) rotate(180deg); }
             100% { transform: translateY(100vh) translateX(-5vw) rotate(360deg); opacity: 0; }
         }
-        .falling-snowflake {
+        .falling-snowflake, .falling-heart {
             position: fixed;
             top: 0;
             font-size: 1.5rem;
@@ -289,11 +291,11 @@
             animation: pulse-glow-amber 1.5s infinite ease-in-out;
         }
 
-        .trade-item {
+        .trade-item, .giving-item {
             border: 2px solid var(--panel-border);
             transition: all 0.2s ease-in-out;
         }
-        .trade-item.selected {
+        .trade-item.selected, .giving-item.selected {
             border-color: var(--primary-color-light);
             background-color: var(--panel-bg);
             box-shadow: 0 0 10px var(--primary-color);
@@ -799,7 +801,8 @@
         let isGamePaused = true, isGameOver = false, timeSinceLastSolve = 0;
         let scoreDecayInterval = null, impTimeout = null, isFrozen = false, thawTimeout = null;
         let jackpotEventAvailable = true, specialJackpotTimeout = null, specialCashEmojiSpawned = false;
-        let timedEvents = { sixMin: true, threeMin: true }, isSpecialAnimationActive = false;
+        let timedEvents = { sixMin: true, threeMin: true, heartEvent1: true, heartEvent2: true };
+        let isSpecialAnimationActive = false;
         let startModalAnimationInterval = null, maxSameEmoji = 4, isDraggingBomb = false;
         let lastVolume = 0.5, solveButtonPulseManager = null;
         let freezeAnimationInterval = null, gameOverAnimationInterval = null;
@@ -1102,6 +1105,14 @@
                 if (timeRemaining === 300 && jackpotEventAvailable) {
                     jackpotEventAvailable = false;
                     activateSpecialJackpot();
+                }
+                if (timeRemaining === 480 && timedEvents.heartEvent1) {
+                    timedEvents.heartEvent1 = false;
+                    spawnHeartAnimation();
+                }
+                if (timeRemaining === 120 && timedEvents.heartEvent2) {
+                    timedEvents.heartEvent2 = false;
+                    spawnHeartAnimation();
                 }
             } else if (timeRemaining <= 0) {
                 endGame();
@@ -1936,7 +1947,7 @@
             isFrozen = false;
             jackpotEventAvailable = true;
             specialCashEmojiSpawned = false;
-            timedEvents = { sixMin: true, threeMin: true };
+            timedEvents = { sixMin: true, threeMin: true, heartEvent1: true, heartEvent2: true };
             isSpecialAnimationActive = false;
             clearInterval(mainTimerInterval);
             clearTimeout(prizeSpawnerTimeout);
@@ -2410,7 +2421,9 @@
             { id: 'winter', name: 'Winter', cost: 11000000, colors: ['#67e8f9', '#0c4a6e'] },
             { id: 'beach', name: 'Beach', cost: 13000000, colors: ['#fde047', '#2dd4bf'] },
             { id: 'grove', name: 'Grove Palms', cost: 15000000, colors: ['#22c55e', '#f59e0b'] },
-            { id: 'dark-purple', name: 'Dark Purples', cost: 20000000, colors: ['#5b21b6', '#4c1d95'] }
+            { id: 'dark-purple', name: 'Dark Purples', cost: 20000000, colors: ['#5b21b6', '#4c1d95'] },
+            { id: 'grayscale', name: 'Grayscale', cost: 25000000, colors: ['#6b7280', '#374151'] },
+            { id: 'stage-lights', name: 'Stage Lights', cost: 30000000, colors: ['#ec4899', '#8b5cf6'] }
         ];
 
         function populateThemeStore() {
