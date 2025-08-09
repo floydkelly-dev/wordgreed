@@ -30,6 +30,8 @@
         body.theme-halloween { --primary-color: #f97316; --primary-color-dark: #ea580c; --primary-color-light: #fb923c; --primary-text-dark: #4a044e; --panel-bg: rgba(28, 25, 23, 0.6); --panel-border: rgba(249, 115, 22, 0.5); }
         body.theme-winter { --primary-color: #67e8f9; --primary-color-dark: #0891b2; --primary-color-light: #a5f3fc; --primary-text-dark: #1e3a8a; --panel-bg: rgba(224, 242, 254, 0.4); --panel-border: rgba(56, 189, 248, 0.5); }
         body.theme-beach { --primary-color: #2dd4bf; --primary-color-dark: #0d9488; --primary-color-light: #5eead4; --primary-text-dark: #134e4a; --panel-bg: rgba(253, 230, 138, 0.4); --panel-border: rgba(6, 182, 212, 0.5); }
+        body.theme-grove { --primary-color: #f59e0b; --primary-color-dark: #d97706; --primary-color-light: #fbbf24; --primary-text-dark: #1a2e05; --panel-bg: rgba(34, 197, 94, 0.4); --panel-border: rgba(134, 239, 172, 0.5); }
+        body.theme-dark-purple { --primary-color: #5b21b6; --primary-color-dark: #4c1d95; --primary-color-light: #7c3aed; --primary-text-dark: #e0e7ff; --panel-bg: rgba(23, 2, 46, 0.5); --panel-border: rgba(109, 40, 217, 0.5); }
         
         @keyframes move-gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         body { font-family: 'Inter', sans-serif; background: linear-gradient(125deg, #000000, #0c1e42, #1e3a8a, #000000); background-size: 400% 400%; animation: move-gradient 20s ease infinite; overflow-x: hidden; }
@@ -773,12 +775,24 @@
         const prizeEmojis = [ { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: '💣', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: '💰', value: 1000000, type: 'cash_money' } ];
         const nonsenseFreebies = ['🌭','🥞','🍕','🍔','🍟','🍗','🥠','🍩', '🍰', '🍭', '🍋‍🟩', '🧋', '🍷', '🍫', '☕', '🍪'];
         const puzzleLayouts = [ { length: 5, indices: [11, 12, 13, 14, 15] }, { length: 7, indices: [28, 29, 30, 31, 32, 33, 34] }, { length: 7, indices: [46, 47, 48, 49, 50, 51, 52] }, { length: 5, indices: [65, 66, 67, 68, 69] } ];
+        // This is the new, exact trading table as requested.
         const trades = [
-            { id: 'trade001', name: '10 🌭 for 1 💰', cost: { '🌭': 10 }, reward: { type: 'bags', amount: 1 } },
-            { id: 'trade002', name: '10 🍕 for 2 💰', cost: { '🍕': 10 }, reward: { type: 'bags', amount: 2 } },
-            { id: 'trade003', name: '25 ☕ for 1 💎', cost: { '☕': 25 }, reward: { type: 'inventory', item: '💎', amount: 1 } },
-            { id: 'trade004', name: '50 🍪 for 1 🏆', cost: { '🍪': 50 }, reward: { type: 'inventory', item: '🏆', amount: 1 } },
-            { id: 'trade005', name: '100 🍋‍🟩 for 1 🧧', cost: { '🍋‍🟩': 100 }, reward: { type: 'inventory', item: '🧧', amount: 1 } }
+            { id: 'trade001', name: '10 🌭 for 1 Food Truck', cost: { '🌭': 10 }, reward: { type: 'inventory', item: '🚚', amount: 1 } },
+            { id: 'trade002', name: '15 🥞 for 1 Diner', cost: { '🥞': 15 }, reward: { type: 'inventory', item: '🏛️', amount: 1 } },
+            { id: 'trade003', name: '20 🍕 for 1 Pizzeria', cost: { '🍕': 20 }, reward: { type: 'inventory', item: '🍕', amount: 1 } },
+            { id: 'trade004', name: '25 🍔 for 1 Burger Chain', cost: { '🍔': 25 }, reward: { type: 'inventory', item: '🍔', amount: 1 } },
+            { id: 'trade005', name: '30 🍟 for 1 Potato Farm', cost: { '🍟': 30 }, reward: { type: 'inventory', item: '🥔', amount: 1 } },
+            { id: 'trade006', name: '25 🍗 for 1 Chicken Farm', cost: { '🍗': 25 }, reward: { type: 'inventory', item: '🐔', amount: 1 } },
+            { id: 'trade007', name: '20 🥠 for 1 Chip Plant', cost: { '🥠': 20 }, reward: { type: 'inventory', item: '💾', amount: 1 } },
+            { id: 'trade008', name: '15 🍩 for 1 Donut Shop', cost: { '🍩': 15 }, reward: { type: 'inventory', item: '🍩', amount: 1 } },
+            { id: 'trade009', name: '10 🍰 for 1 TV Show', cost: { '🍰': 10 }, reward: { type: 'inventory', item: '📺', amount: 1 } },
+            { id: 'trade010', name: '5 🍭 for 1 Candy Vendor', cost: { '🍭': 5 }, reward: { type: 'inventory', item: '🍬', amount: 1 } },
+            { id: 'trade011', name: '2 🍋‍🟩 for 2M Money Bags', cost: { '🍋‍🟩': 2 }, reward: { type: 'bags', amount: 2000000 } },
+            { id: 'trade012', name: '1 🧋 for 2K Coins', cost: { '🧋': 1 }, reward: { type: 'coins', amount: 2000 } },
+            { id: 'trade013', name: '1 🍷 for 1 Restaurant', cost: { '🍷': 1 }, reward: { type: 'inventory', item: '🍷', amount: 1 } },
+            { id: 'trade014', name: '10 🍫 for 1 Candy Factory', cost: { '🍫': 10 }, reward: { type: 'inventory', item: '🏭', amount: 1 } },
+            { id: 'trade015', name: '20 ☕ for 1 Headache', cost: { '☕': 20 }, reward: { type: 'inventory', item: '🤕', amount: 1 } },
+            { id: 'trade016', name: '25 🍪 for 2 Gold Mines', cost: { '🍪': 25 }, reward: { type: 'inventory', item: '⛏️', amount: 2 } }
         ];
         const tips = [
             "💡 Tip! The green bomb is your friend! Drag it anywhere and drop on a word to auto solve.",
@@ -2169,7 +2183,7 @@
                 const item = document.createElement('div');
                 item.className = 'trade-item p-4 rounded-lg text-center cursor-pointer';
                 const costItem = Object.keys(trade.cost)[0];
-                const rewardItem = trade.reward.type === 'bags' ? '💰' : trade.reward.item;
+                const rewardItem = trade.reward.item || (trade.reward.type === 'bags' ? '💰' : '🪙');
                 item.innerHTML = `
                     <div class="text-2xl">${costItem} ➜ ${rewardItem}</div>
                     <div class="text-sm font-bold">${trade.name}</div>
@@ -2197,10 +2211,10 @@
             const emojiEl = document.getElementById('trade-preview-emoji');
             const nameEl = document.getElementById('trade-preview-name');
             if (selectedTrade) {
-                const rewardItem = selectedTrade.reward.type === 'bags' ? '💰' : selectedTrade.reward.item;
-                const rewardName = selectedTrade.reward.item || 'Money Bag(s)';
+                const rewardItem = selectedTrade.reward.item || (selectedTrade.reward.type === 'bags' ? '💰' : '🪙');
+                const rewardName = selectedTrade.name.split(' for ')[1];
                 emojiEl.textContent = rewardItem;
-                nameEl.textContent = `Get: ${selectedTrade.reward.amount} ${rewardName}`;
+                nameEl.textContent = `Get: ${rewardName}`;
             } else {
                 emojiEl.textContent = '❔';
                 nameEl.textContent = 'Select a Trade';
@@ -2219,6 +2233,9 @@
 
                 if (selectedTrade.reward.type === 'bags') {
                     playerData.moneyBags += selectedTrade.reward.amount;
+                } else if (selectedTrade.reward.type === 'coins') {
+                    coins += selectedTrade.reward.amount;
+                    updateScoreDisplay();
                 } else if (selectedTrade.reward.type === 'inventory') {
                     const rewardItem = selectedTrade.reward.item;
                     playerData.inventory[rewardItem] = (playerData.inventory[rewardItem] || 0) + selectedTrade.reward.amount;
@@ -2309,7 +2326,9 @@
             { id: 'christmas', name: 'Christmas', cost: 7000000, colors: ['#dc2626', '#166534'] },
             { id: 'halloween', name: 'Halloween', cost: 9000000, colors: ['#f97316', '#4a044e'] },
             { id: 'winter', name: 'Winter', cost: 11000000, colors: ['#67e8f9', '#0c4a6e'] },
-            { id: 'beach', name: 'Beach', cost: 13000000, colors: ['#fde047', '#2dd4bf'] }
+            { id: 'beach', name: 'Beach', cost: 13000000, colors: ['#fde047', '#2dd4bf'] },
+            { id: 'grove', name: 'Grove Palms', cost: 15000000, colors: ['#22c55e', '#f59e0b'] },
+            { id: 'dark-purple', name: 'Dark Purples', cost: 20000000, colors: ['#5b21b6', '#4c1d95'] }
         ];
 
         function populateThemeStore() {
