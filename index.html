@@ -425,7 +425,7 @@
     </audio>
 
     <!-- Main Game Container -->
-    <div id="game-container" class="hidden flex-col md:flex-row gap-4 justify-center md:items-start">
+    <div id="game-container" class="hidden flex-col md:flex-row gap-4 justify-center md:items-stretch">
         <!-- Game Grid Section -->
         <div class="flex flex-col gap-1 items-center">
             <div class="relative">
@@ -834,7 +834,9 @@
         const tips = [
             "💡 Tip! The green bomb is your friend! Drag it anywhere and drop on a word to auto solve.",
             "💡 Another Tip! The green bomb has a range of 9 squares and will capture all freebies!",
-            "💡 Tip! If you lose a big chunk of coins during game play, keep playing and in seconds be rich again!"
+            "💡 Tip! If you lose a big chunk of coins during game play, keep playing and in seconds be rich again!",
+            "💡 Tip! The green checkmark is your friend to quick solve.",
+            "💡 Wow! Another tip for you. Use the green checkmark to break an ice level with ease!"
         ];
         let currentTipIndex = 0;
         
@@ -2226,21 +2228,19 @@
             document.getElementById('execute-trade-button').disabled = true;
 
             trades.forEach(trade => {
-                const item = document.createElement('div');
-                item.className = 'trade-item p-4 rounded-lg text-center cursor-pointer';
                 const costItem = Object.keys(trade.cost)[0];
-                const rewardItem = trade.reward.item || (trade.reward.type === 'bags' ? '💰' : '🪙');
-                item.innerHTML = `
-                    <div class="text-2xl">${costItem} ➜ ${rewardItem}</div>
-                    <div class="text-sm font-bold">${trade.name}</div>
-                `;
-
                 const costAmount = trade.cost[costItem];
                 const playerAmount = playerData.nonsenseFreebiesCollected[costItem] || 0;
 
-                if (playerAmount < costAmount) {
-                    item.classList.add('opacity-50', 'cursor-not-allowed');
-                } else {
+                // Only display trades the player can afford
+                if (playerAmount >= costAmount) {
+                    const item = document.createElement('div');
+                    item.className = 'trade-item p-4 rounded-lg text-center cursor-pointer';
+                    const rewardItem = trade.reward.item || (trade.reward.type === 'bags' ? '💰' : '🪙');
+                    item.innerHTML = `
+                        <div class="text-2xl">${costItem} ➜ ${rewardItem}</div>
+                        <div class="text-sm font-bold">${trade.name}</div>
+                    `;
                     item.addEventListener('click', () => {
                         document.querySelectorAll('.trade-item').forEach(el => el.classList.remove('selected'));
                         item.classList.add('selected');
@@ -2248,8 +2248,8 @@
                         updateTradePreview();
                         document.getElementById('execute-trade-button').disabled = false;
                     });
+                    container.appendChild(item);
                 }
-                container.appendChild(item);
             });
         }
 
