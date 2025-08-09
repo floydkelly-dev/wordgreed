@@ -100,10 +100,11 @@
         #start-game-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; animation: start-button-pulse 15s infinite; }
         #claim-bonus-button { background: linear-gradient(145deg, #16a34a, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
         #play-again-button { background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af; border-bottom: 4px solid #1f2937; }
-        #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button, #close-daily-rewards-button, #close-trading-post-button, #close-riches-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
+        #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button, #close-daily-rewards-button, #close-trading-post-button, #close-riches-button, #close-tips-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
         #about-button { background: linear-gradient(145deg, #8b5cf6, #7c3aed); border-color: #a78bfa; border-bottom: 4px solid #5b21b6; }
         #setup-button { background: linear-gradient(145deg, #22c55e, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
         #daily-rewards-button { background: linear-gradient(145deg, #f59e0b, #d97706); border-color: #fbbf24; border-bottom: 4px solid #92400e; }
+        #tips-button { background: linear-gradient(145deg, #f97316, #ea580c); border-color: #fb923c; border-bottom: 4px solid #c2410c; }
         #confirm-reset-button { background: linear-gradient(145deg, #f87171, #ef4444); border-color: #fca5a5; border-bottom: 4px solid #7f1d1d; }
         .theme-button { width: 2.5rem; height: 2.5rem; border-radius: 50%; background-color: var(--panel-bg); border: 1px solid var(--panel-border); color: white; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; padding: 0; position: relative; }
         .theme-button:hover .tooltip { opacity: 1; visibility: visible; }
@@ -291,9 +292,78 @@
             background-color: var(--panel-bg);
             box-shadow: 0 0 10px var(--primary-color);
         }
+
+        /* Tips Modal & Carousel */
+        #tips-carousel {
+            position: relative;
+            width: 100%;
+            height: 200px; /* Adjust height as needed */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tip-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 80%;
+            text-align: center;
+            font-size: 1.25rem;
+            position: absolute;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            pointer-events: none;
+        }
+        .tip-card.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.3);
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 2rem;
+            z-index: 10;
+        }
+        .carousel-arrow:hover {
+            background: rgba(0,0,0,0.5);
+        }
+        #carousel-prev { left: 1rem; }
+        #carousel-next { right: 1rem; }
+
+        /* User ID Display */
+        #user-id-container {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        #copy-userid-button {
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+        #copy-userid-button:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
     </style>
 </head>
 <body class="text-white flex items-center justify-center min-h-screen p-4">
+    <script src="config.js" defer></script>
 
     <div id="clouds-day" class="clouds hidden"></div>
     <div id="clouds-night" class="clouds hidden"></div>
@@ -379,8 +449,11 @@
                 <span class="absolute" style="top: 4rem; left: 5rem;">Greed</span>
             </h1>
             <p class="text-lg text-slate-300">Drag and drop letters to solve jumbled words. Grab Big Prizes and Get Greedy!</p>
+            <div id="firebase-error-message" class="hidden my-2 p-3 rounded-lg bg-red-900/50 border border-red-500 text-red-300 text-sm">
+                <!-- Error message will be inserted here -->
+            </div>
             <button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl">Start Game</button>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.5</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.6</div>
         </div>
     </div>
 
@@ -433,12 +506,28 @@
                 <div class="flex justify-center w-full flex-wrap items-center gap-2">
                     <button id="playlist-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Playlist</button>
                     <button id="daily-rewards-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Daily</button>
+                    <button id="tips-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Tips</button>
                     <button id="setup-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Setup</button>
                     <button id="about-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">About</button>
                     <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Close</button>
                 </div>
             </div>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.5</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.6</div>
+        </div>
+    </div>
+
+    <!-- Tips Modal -->
+    <div id="tips-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
+        <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-2xl relative">
+            <h2 class="text-2xl font-bold text-amber-300">Game Tips</h2>
+            <div id="tips-carousel">
+                <div id="carousel-prev" class="carousel-arrow">⬅️</div>
+                <div id="tip-card-container">
+                    <!-- Tip cards will be injected here -->
+                </div>
+                <div id="carousel-next" class="carousel-arrow">➡️</div>
+            </div>
+            <button id="close-tips-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
         </div>
     </div>
 
@@ -449,8 +538,8 @@
             <div class="text-slate-300 space-y-2">
                 <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
-                <p>Version: <span class="font-bold text-white">2.5</span></p>
-                <p>Build Date: <span class="font-bold text-white">August 7, 2025</span></p>
+                <p>Version: <span class="font-bold text-white">2.6</span></p>
+                <p>Build Date: <span class="font-bold text-white">August 8, 2025</span></p>
                 <p><a href="https://floydkellycreates.wordpress.com/contact-me/" target="_blank" class="text-purple-300 hover:text-purple-200">Contact the Developer</a></p>
             </div>
             <p class="text-xs text-slate-500 mt-4">Copyright © 2025</p>
@@ -523,7 +612,13 @@
                 </div>
             </div>
             <div class="flex justify-between items-center mt-4">
-                <button id="riches-button" class="glassy-button text-white font-bold py-2 px-4 rounded-lg text-sm" style="background: linear-gradient(145deg, #a78bfa, #8b5cf6); border-color: #c4b5fd;">View Riches</button>
+                <div>
+                    <button id="riches-button" class="glassy-button text-white font-bold py-2 px-4 rounded-lg text-sm" style="background: linear-gradient(145deg, #a78bfa, #8b5cf6); border-color: #c4b5fd;">View Riches</button>
+                    <div id="user-id-container">
+                        <span id="user-id-display"></span>
+                        <button id="copy-userid-button">Copy</button>
+                    </div>
+                </div>
                 <button id="reset-progress-button" class="text-xs text-red-400 hover:text-red-300">Reset Progress</button>
                 <button id="close-setup-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
             </div>
@@ -595,12 +690,21 @@
              <button id="close-riches-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg self-center">Close</button>
         </div>
     </div>
+    
+    <script type="module">
+        // --- Firebase Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    <script>
         // --- DOM Elements ---
         const gridContainer = document.getElementById('game-grid');
         const musicPlayer = document.getElementById('background-music');
         const playerNameInput = document.getElementById('player-name-input');
+
+        // --- Firebase State ---
+        let auth, db, userId;
+        let isFirebaseConnected = false;
 
         // --- Game Data & State ---
         let coins = 0, bagsOfMoney = 0, draggedTile = null, playerData = {}, currentLevel = 1;
@@ -649,6 +753,12 @@
             { id: 'trade004', name: '50 🍪 for 1 🏆', cost: { '🍪': 50 }, reward: { type: 'inventory', item: '🏆', amount: 1 } },
             { id: 'trade005', name: '100 🍋‍🟩 for 1 🧧', cost: { '🍋‍🟩': 100 }, reward: { type: 'inventory', item: '🧧', amount: 1 } }
         ];
+        const tips = [
+            "Tip! The green bomb is your friend! Drag it anywhere and drop on a word to auto solve.",
+            "Another Tip! The green bomb has a range of 9 squares and will capture all freebies!",
+            "Tip! If you lose a big chunk of coins during game play, keep playing and in seconds be rich again!"
+        ];
+        let currentTipIndex = 0;
         
         // --- Game Logic Functions ---
         function generatePuzzlesForLevel() {
@@ -1929,9 +2039,10 @@
             originalUserPlaylist = [...userPlaylist];
         }
         
-        // --- Player Data & Store Logic (Using Local Storage) ---
+        // --- Player Data & Store Logic (LocalStorage with Firebase Sync) ---
         function getDefaultPlayerData() {
             return {
+                userId: userId || 'local', // Use 'local' if no userId yet
                 name: 'Player',
                 moneyBags: 0,
                 highScore: 0,
@@ -1945,22 +2056,51 @@
             };
         }
 
-        function loadPlayerData() {
+        function loadPlayerFromLocalStorage() {
             const savedData = localStorage.getItem('wordGreedPlayerData');
             if (savedData) {
                 playerData = { ...getDefaultPlayerData(), ...JSON.parse(savedData) };
-                 if (!playerData.inventory) playerData.inventory = {};
             } else {
                 playerData = getDefaultPlayerData();
             }
             applyTheme(playerData.activeSkin);
+            populateSetupModal();
+        }
+        
+        async function syncWithFirebase() {
+            if (!isFirebaseConnected || !userId) return;
+
+            const playerDocRef = doc(db, "players", userId);
+            try {
+                const docSnap = await getDoc(playerDocRef);
+                if (docSnap.exists()) {
+                    const cloudData = docSnap.data();
+                    // Simple merge: cloud data takes precedence for scores and bags
+                    playerData.highScore = Math.max(playerData.highScore || 0, cloudData.highScore || 0);
+                    playerData.moneyBags = Math.max(playerData.moneyBags || 0, cloudData.moneyBags || 0);
+                    // More complex merges for other fields can be added here if needed
+                    console.log("Player data synced with Firebase.");
+                }
+                // Always save the latest (potentially merged) data back to Firebase
+                await savePlayerProfile();
+            } catch (error) {
+                console.error("Error syncing with Firestore:", error);
+            }
         }
 
-        function savePlayerProfile() {
-            try {
-                localStorage.setItem('wordGreedPlayerData', JSON.stringify(playerData));
-            } catch (error) {
-                console.error("Error saving player profile to local storage:", error);
+        async function savePlayerProfile() {
+            // Always save to localStorage first for immediate persistence
+            localStorage.setItem('wordGreedPlayerData', JSON.stringify(playerData));
+
+            // If Firebase is connected, also save to the cloud
+            if (isFirebaseConnected && userId) {
+                const playerDocRef = doc(db, "players", userId);
+                try {
+                    const dataToSave = JSON.parse(JSON.stringify(playerData));
+                    await setDoc(playerDocRef, dataToSave, { merge: true });
+                } catch (error) {
+                    console.error("Error saving player profile to Firestore:", error);
+                }
             }
         }
 
@@ -2094,10 +2234,19 @@
         
         function populateSetupModal() {
             const nameInput = document.getElementById('player-name-input');
-            nameInput.value = playerData.name;
-            nameInput.classList.toggle('invalid-input', !playerData.name.trim());
-            document.getElementById('total-bags-display').textContent = playerData.moneyBags.toLocaleString();
-            document.getElementById('high-score-display').textContent = playerData.highScore.toLocaleString();
+            nameInput.value = playerData.name || 'Player';
+            nameInput.classList.toggle('invalid-input', !playerData.name?.trim());
+            document.getElementById('total-bags-display').textContent = (playerData.moneyBags || 0).toLocaleString();
+            document.getElementById('high-score-display').textContent = (playerData.highScore || 0).toLocaleString();
+            
+            // Display User ID
+            const userIdDisplay = document.getElementById('user-id-display');
+            if (userId && isFirebaseConnected) {
+                userIdDisplay.textContent = `userId: ${userId}`;
+            } else {
+                userIdDisplay.textContent = 'Offline Mode';
+            }
+
             populateThemeStore();
             populateNonsenseFreebies();
             updateTradeButtonPulse();
@@ -2107,7 +2256,7 @@
             const container = document.getElementById('nonsense-freebies-container');
             container.innerHTML = '';
             nonsenseFreebies.forEach(freebie => {
-                const count = playerData.nonsenseFreebiesCollected[freebie] || 0;
+                const count = playerData.nonsenseFreebiesCollected?.[freebie] || 0;
                 const item = document.createElement('div');
                 item.className = 'freebie-item';
                 item.innerHTML = `
@@ -2140,7 +2289,7 @@
             const container = document.getElementById('theme-store-container');
             container.innerHTML = '';
             themes.forEach(theme => {
-                const isUnlocked = playerData.unlockedSkins.includes(theme.id);
+                const isUnlocked = playerData.unlockedSkins?.includes(theme.id);
                 const isActive = playerData.activeSkin === theme.id;
                 const item = document.createElement('div');
                 item.className = `theme-item p-2 rounded-lg flex flex-col items-center justify-start ${isActive ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`;
@@ -2247,7 +2396,7 @@
                     const reward = dailyRewards[i - 1];
                     const dayEl = document.createElement('div');
                     dayEl.classList.add('calendar-day');
-                    const isClaimed = playerData.claimedDays.includes(reward.day);
+                    const isClaimed = playerData.claimedDays?.includes(reward.day);
                     const isToday = reward.day === todayDay;
 
                     dayEl.innerHTML = `
@@ -2318,12 +2467,101 @@
             savePlayerProfile();
         }
 
+        // --- Tips Carousel Logic ---
+        function populateTipsCarousel() {
+            const container = document.getElementById('tip-card-container');
+            container.innerHTML = '';
+            tips.forEach((tip, index) => {
+                const card = document.createElement('div');
+                card.className = 'tip-card';
+                card.textContent = tip;
+                if (index === currentTipIndex) {
+                    card.classList.add('active');
+                }
+                container.appendChild(card);
+            });
+        }
+
+        function showTip(index) {
+            const cards = document.querySelectorAll('.tip-card');
+            cards.forEach((card, i) => {
+                card.classList.toggle('active', i === index);
+            });
+        }
+
+        function nextTip() {
+            currentTipIndex = (currentTipIndex + 1) % tips.length;
+            showTip(currentTipIndex);
+        }
+
+        function prevTip() {
+            currentTipIndex = (currentTipIndex - 1 + tips.length) % tips.length;
+            showTip(currentTipIndex);
+        }
+
+        function showFirebaseError(message) {
+            const errorDiv = document.getElementById('firebase-error-message');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+        }
+
         async function initGame() {
+            // Always load from localStorage first for a fast, seamless start
+            loadPlayerFromLocalStorage();
+
             // Ensure all words in the bank are uppercase
             for (let i = 0; i < wordBank.length; i++) {
                 wordBank[i] = wordBank[i].toUpperCase();
             }
             
+            // --- Firebase Initialization (Silent & Graceful) ---
+            try {
+                let config;
+                if (typeof window.firebaseConfig !== 'undefined') {
+                    config = window.firebaseConfig;
+                } else {
+                    config = {
+                        apiKey: "%FIREBASE_API_KEY%",
+                        authDomain: "%FIREBASE_AUTH_DOMAIN%",
+                        projectId: "%FIREBASE_PROJECT_ID%",
+                        storageBucket: "%FIREBASE_STORAGE_BUCKET%",
+                        messagingSenderId: "%FIREBASE_MESSAGING_SENDER_ID%",
+                        appId: "%FIREBASE_APP_ID%",
+                        measurementId: "%FIREBASE_MEASUREMENT_ID%"
+                    };
+                }
+
+                if (!config.apiKey || config.apiKey.startsWith('%')) {
+                    throw new Error("Firebase config not found. Running in offline mode.");
+                }
+
+                const app = initializeApp(config);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        isFirebaseConnected = true;
+                        await syncWithFirebase();
+                    } else {
+                        try {
+                            const userCredential = await signInAnonymously(auth);
+                            userId = userCredential.user.uid;
+                            isFirebaseConnected = true;
+                            await syncWithFirebase();
+                        } catch (error) {
+                            console.error("Anonymous sign-in failed:", error.message);
+                            isFirebaseConnected = false;
+                        }
+                    }
+                });
+
+            } catch (e) {
+                console.warn(e.message); // Log for dev, but don't show player
+                isFirebaseConnected = false;
+            }
+
             await buildVerifiedPlaylist();
             
             if (userPlaylist.length > 0) {
@@ -2331,7 +2569,6 @@
             }
             musicPlayer.addEventListener('ended', playNextTrack);
 
-            loadPlayerData();
             playerNameInput.disabled = false;
             playerNameInput.placeholder = "Enter Name";
             levelGoodies = [...nonsenseFreebies];
@@ -2340,6 +2577,7 @@
             updateScoreDisplay();
             setupAudioControls();
             populatePlaylistModal();
+            populateTipsCarousel();
             
             startModalAnimationInterval = setInterval(() => { 
                 const startModal = document.getElementById('start-modal');
@@ -2407,9 +2645,9 @@
             document.getElementById('cancel-reset-button').addEventListener('click', () => {
                 document.getElementById('confirm-reset-modal').classList.add('hidden');
             });
-            document.getElementById('confirm-reset-button').addEventListener('click', () => {
+            document.getElementById('confirm-reset-button').addEventListener('click', async () => {
                 playerData = getDefaultPlayerData();
-                savePlayerProfile();
+                await savePlayerProfile();
                 populateSetupModal();
                 applyTheme('default');
                 document.getElementById('confirm-reset-modal').classList.add('hidden');
@@ -2453,6 +2691,35 @@
                 playerData.name = e.target.value.trim() || 'Player';
                 e.target.classList.toggle('invalid-input', !e.target.value.trim());
                 savePlayerProfile();
+            });
+            // Tips Modal Listeners
+            document.getElementById('tips-button').addEventListener('click', () => {
+                document.getElementById('help-modal').classList.add('hidden');
+                document.getElementById('tips-modal').classList.remove('hidden');
+            });
+            document.getElementById('close-tips-button').addEventListener('click', () => {
+                document.getElementById('tips-modal').classList.add('hidden');
+                document.getElementById('help-modal').classList.remove('hidden');
+            });
+            document.getElementById('carousel-next').addEventListener('click', nextTip);
+            document.getElementById('carousel-prev').addEventListener('click', prevTip);
+
+            // Copy User ID listener
+            document.getElementById('copy-userid-button').addEventListener('click', () => {
+                const textToCopy = userId;
+                if (textToCopy) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        showEventText("User ID Copied!");
+                    } catch (err) {
+                        console.error('Failed to copy text: ', err);
+                    }
+                    document.body.removeChild(textArea);
+                }
             });
         }
         
