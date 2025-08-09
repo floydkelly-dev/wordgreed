@@ -269,8 +269,14 @@
         }
 
         @keyframes pulse-glow-amber { 
-            0%, 100% { box-shadow: 0 0 15px #f59e0b, 0 0 30px #f59e0b; } 
-            50% { box-shadow: 0 0 25px #fbbf24, 0 0 50px #fbbf24; } 
+            0%, 100% { 
+                box-shadow: 0 0 15px #f59e0b, 0 0 30px #f59e0b, inset 0 2px 4px rgba(255, 255, 255, 0.4);
+                transform: scale(1);
+            } 
+            50% { 
+                box-shadow: 0 0 30px #fbbf24, 0 0 60px #fbbf24, inset 0 2px 4px rgba(255, 255, 255, 0.4);
+                transform: scale(1.05);
+            } 
         }
         .trade-button-pulse {
             animation: pulse-glow-amber 1.5s infinite ease-in-out;
@@ -517,6 +523,7 @@
                 </div>
             </div>
             <div class="flex justify-between items-center mt-4">
+                <button id="riches-button" class="glassy-button text-white font-bold py-2 px-4 rounded-lg text-sm" style="background: linear-gradient(145deg, #a78bfa, #8b5cf6); border-color: #c4b5fd;">View Riches</button>
                 <button id="reset-progress-button" class="text-xs text-red-400 hover:text-red-300">Reset Progress</button>
                 <button id="close-setup-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
             </div>
@@ -610,6 +617,7 @@
         let lastVolume = 0.5, solveButtonPulseManager = null;
         let freezeAnimationInterval = null, gameOverAnimationInterval = null;
         let levelGoodies = [];
+        let selectedTrade = null;
         
         // --- Playlist Data ---
         const songDatabase = [
@@ -619,7 +627,8 @@
             { id: '004', title: 'Smooth Vibes', filename: 'wordgreed004.mp3' },
             { id: '005', title: 'Cash Flow', filename: 'wordgreed005.mp3' },
             { id: '006', title: 'Golden Glow', filename: 'wordgreed006.mp3' },
-            { id: '007', title: 'Rich Shadows', filename: 'wordgreed007.mp3' }
+            { id: '007', title: 'Rich Shadows', filename: 'wordgreed007.mp3' },
+            { id: '008', title: 'Reversal of Fortune', filename: 'wordgreed008.mp3' }
         ];
         let verifiedPlaylist = [], userPlaylist = [], originalUserPlaylist = [];
         let currentTrackIndex = 0, isShuffled = false;
@@ -633,6 +642,13 @@
         const prizeEmojis = [ { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: '💣', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: '💰', value: 1000000, type: 'cash_money' } ];
         const nonsenseFreebies = ['🌭','🥞','🍕','🍔','🍟','🍗','🥠','🍩', '🍰', '🍭', '🍋‍🟩', '🧋', '🍷', '🍫', '☕', '🍪'];
         const puzzleLayouts = [ { length: 5, indices: [11, 12, 13, 14, 15] }, { length: 7, indices: [28, 29, 30, 31, 32, 33, 34] }, { length: 7, indices: [46, 47, 48, 49, 50, 51, 52] }, { length: 5, indices: [65, 66, 67, 68, 69] } ];
+        const trades = [
+            { id: 'trade001', name: '10 🌭 for 1 💰', cost: { '🌭': 10 }, reward: { type: 'bags', amount: 1 } },
+            { id: 'trade002', name: '10 🍕 for 2 💰', cost: { '🍕': 10 }, reward: { type: 'bags', amount: 2 } },
+            { id: 'trade003', name: '25 ☕ for 1 💎', cost: { '☕': 25 }, reward: { type: 'inventory', item: '💎', amount: 1 } },
+            { id: 'trade004', name: '50 🍪 for 1 🏆', cost: { '🍪': 50 }, reward: { type: 'inventory', item: '🏆', amount: 1 } },
+            { id: 'trade005', name: '100 🍋‍🟩 for 1 🧧', cost: { '🍋‍🟩': 100 }, reward: { type: 'inventory', item: '🧧', amount: 1 } }
+        ];
         
         // --- Game Logic Functions ---
         function generatePuzzlesForLevel() {
@@ -1924,7 +1940,8 @@
                 lastLoginDate: null,
                 lastDailyClaim: null,
                 claimedDays: [],
-                nonsenseFreebiesCollected: {}
+                nonsenseFreebiesCollected: {},
+                inventory: {}
             };
         }
 
@@ -1932,6 +1949,7 @@
             const savedData = localStorage.getItem('wordGreedPlayerData');
             if (savedData) {
                 playerData = { ...getDefaultPlayerData(), ...JSON.parse(savedData) };
+                 if (!playerData.inventory) playerData.inventory = {};
             } else {
                 playerData = getDefaultPlayerData();
             }
@@ -1945,6 +1963,134 @@
                 console.error("Error saving player profile to local storage:", error);
             }
         }
+
+        // --- Trading Post & Riches Logic ---
+        function canAffordAnyTrade() {
+            return trades.some(trade => {
+                const costItem = Object.keys(trade.cost)[0];
+                const costAmount = trade.cost[costItem];
+                const playerAmount = playerData.nonsenseFreebiesCollected[costItem] || 0;
+                return playerAmount >= costAmount;
+            });
+        }
+
+        function updateTradeButtonPulse() {
+            const tradeButton = document.getElementById('trade-goodies-button');
+            if (tradeButton) {
+                if (canAffordAnyTrade()) {
+                    tradeButton.classList.add('trade-button-pulse');
+                } else {
+                    tradeButton.classList.remove('trade-button-pulse');
+                }
+            }
+        }
+
+        function openTradingPost() {
+            document.getElementById('setup-modal').classList.add('hidden');
+            populateTradingPost();
+            document.getElementById('trading-post-modal').classList.remove('hidden');
+        }
+
+        function populateTradingPost() {
+            const container = document.getElementById('available-trades-container');
+            container.innerHTML = '';
+            selectedTrade = null;
+            updateTradePreview();
+            document.getElementById('execute-trade-button').disabled = true;
+
+            trades.forEach(trade => {
+                const item = document.createElement('div');
+                item.className = 'trade-item p-4 rounded-lg text-center cursor-pointer';
+                const costItem = Object.keys(trade.cost)[0];
+                const rewardItem = trade.reward.type === 'bags' ? '💰' : trade.reward.item;
+                item.innerHTML = `
+                    <div class="text-2xl">${costItem} ➜ ${rewardItem}</div>
+                    <div class="text-sm font-bold">${trade.name}</div>
+                `;
+
+                const costAmount = trade.cost[costItem];
+                const playerAmount = playerData.nonsenseFreebiesCollected[costItem] || 0;
+
+                if (playerAmount < costAmount) {
+                    item.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    item.addEventListener('click', () => {
+                        document.querySelectorAll('.trade-item').forEach(el => el.classList.remove('selected'));
+                        item.classList.add('selected');
+                        selectedTrade = trade;
+                        updateTradePreview();
+                        document.getElementById('execute-trade-button').disabled = false;
+                    });
+                }
+                container.appendChild(item);
+            });
+        }
+
+        function updateTradePreview() {
+            const emojiEl = document.getElementById('trade-preview-emoji');
+            const nameEl = document.getElementById('trade-preview-name');
+            if (selectedTrade) {
+                const rewardItem = selectedTrade.reward.type === 'bags' ? '💰' : selectedTrade.reward.item;
+                const rewardName = selectedTrade.reward.item || 'Money Bag(s)';
+                emojiEl.textContent = rewardItem;
+                nameEl.textContent = `Get: ${selectedTrade.reward.amount} ${rewardName}`;
+            } else {
+                emojiEl.textContent = '❔';
+                nameEl.textContent = 'Select a Trade';
+            }
+        }
+
+        function executeTrade() {
+            if (!selectedTrade) return;
+
+            const costItem = Object.keys(selectedTrade.cost)[0];
+            const costAmount = selectedTrade.cost[costItem];
+            const playerAmount = playerData.nonsenseFreebiesCollected[costItem] || 0;
+
+            if (playerAmount >= costAmount) {
+                playerData.nonsenseFreebiesCollected[costItem] -= costAmount;
+
+                if (selectedTrade.reward.type === 'bags') {
+                    playerData.moneyBags += selectedTrade.reward.amount;
+                } else if (selectedTrade.reward.type === 'inventory') {
+                    const rewardItem = selectedTrade.reward.item;
+                    playerData.inventory[rewardItem] = (playerData.inventory[rewardItem] || 0) + selectedTrade.reward.amount;
+                }
+
+                showEventText("Trade Successful!", true);
+                savePlayerProfile();
+                populateTradingPost();
+                populateSetupModal();
+                selectedTrade = null;
+                updateTradePreview();
+                document.getElementById('execute-trade-button').disabled = true;
+            } else {
+                showEventText("Not enough items!", false);
+            }
+        }
+        
+        function populateRichesModal() {
+            const container = document.getElementById('riches-inventory');
+            container.innerHTML = '';
+            const inventory = playerData.inventory || {};
+            const items = Object.keys(inventory);
+
+            if (items.length === 0) {
+                container.innerHTML = `<p class="col-span-4 text-center text-slate-400">You have no special riches yet. Trade for them at the Trading Post!</p>`;
+                return;
+            }
+
+            items.forEach(item => {
+                const count = inventory[item];
+                const itemEl = document.createElement('div');
+                itemEl.className = 'flex flex-col items-center justify-center p-4 rounded-lg greed-panel';
+                itemEl.innerHTML = `
+                    <div class="text-6xl">${item}</div>
+                    <div class="text-lg font-bold mt-2">x${count}</div>
+                `;
+                container.appendChild(itemEl);
+            });
+        }
         
         function populateSetupModal() {
             const nameInput = document.getElementById('player-name-input');
@@ -1954,6 +2100,7 @@
             document.getElementById('high-score-display').textContent = playerData.highScore.toLocaleString();
             populateThemeStore();
             populateNonsenseFreebies();
+            updateTradeButtonPulse();
         }
 
         function populateNonsenseFreebies() {
@@ -2287,8 +2434,20 @@
                 document.getElementById('daily-rewards-modal').classList.add('hidden');
                 document.getElementById('help-modal').classList.remove('hidden');
             });
-            document.getElementById('trade-goodies-button')?.addEventListener('click', () => {
-                showEventText("Coming Soon!");
+            document.getElementById('trade-goodies-button')?.addEventListener('click', openTradingPost);
+            document.getElementById('execute-trade-button').addEventListener('click', executeTrade);
+            document.getElementById('close-trading-post-button').addEventListener('click', () => {
+                document.getElementById('trading-post-modal').classList.add('hidden');
+                document.getElementById('setup-modal').classList.remove('hidden');
+            });
+            document.getElementById('riches-button').addEventListener('click', () => {
+                document.getElementById('setup-modal').classList.add('hidden');
+                populateRichesModal();
+                document.getElementById('riches-modal').classList.remove('hidden');
+            });
+            document.getElementById('close-riches-button').addEventListener('click', () => {
+                document.getElementById('riches-modal').classList.add('hidden');
+                document.getElementById('setup-modal').classList.remove('hidden');
             });
             document.getElementById('player-name-input').addEventListener('blur', (e) => {
                 playerData.name = e.target.value.trim() || 'Player';
