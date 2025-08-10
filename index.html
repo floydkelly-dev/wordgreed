@@ -60,6 +60,8 @@
         @keyframes wild-pulse-animation { 0%, 100% { transform: scale(1); box-shadow: 0 0 15px #F59E0B, 0 0 30px #F59E0B; } 50% { transform: scale(1.2) rotate(10deg); box-shadow: 0 0 25px #facc15, 0 0 50px #facc15; } }
         @keyframes big-pulse-animation { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.25); } }
         #jackpot-square.wild-pulse { animation: wild-pulse-animation 0.5s infinite ease-in-out !important; }
+        @keyframes endgame-jackpot-pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 20px #fde047, 0 0 40px #fde047; } 50% { transform: scale(2); box-shadow: 0 0 40px #fbbf24, 0 0 80px #fbbf24; } }
+        #jackpot-square.endgame-pulse { animation: endgame-jackpot-pulse 0.5s infinite ease-in-out !important; z-index: 210; }
         #jackpot-square.cooldown { background-color: #4b5563 !important; border-color: #6b7280 !important; cursor: not-allowed; }
         #solve-button.big-pulse { animation: big-pulse-animation 1.5s ease-in-out infinite; }
         .prize-tile { animation: pulse-glow-blue 1.5s infinite; cursor: pointer; font-size: 2rem; }
@@ -677,6 +679,7 @@
             <div class="text-slate-300 space-y-2">
                 <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
+                <p><span class="font-bold text-white">Concept:</span> Floyd Kelly, <span class="font-bold text-white">Code:</span> Google Gemini</p>
                 <p>Version: <span class="font-bold text-white">3.3</span></p>
                 <p>Build Date: <span class="font-bold text-white">August 10, 2025</span></p>
                 <p><a href="https://floydkellycreates.wordpress.com/contact-me/" target="_blank" class="text-purple-300 hover:text-purple-200">Contact the Developer</a></p>
@@ -891,6 +894,7 @@
         let lastVolume = 0.5, solveButtonPulseManager = null;
         let freezeAnimationInterval = null, heartAnimationInterval = null, gameOverAnimationInterval = null;
         let badgesModalAnimationInterval = null;
+        let endgameJackpotActive = false;
         let levelGoodies = [];
         let selectedTrade = null;
         let selectedDonation = null;
@@ -1196,6 +1200,9 @@
                     jackpotEventAvailable = false;
                     activateSpecialJackpot();
                 }
+                if (timeRemaining <= 5 && timeRemaining > 0 && !isGameOver) {
+                    activateEndgameJackpot();
+                }
                 if (timeRemaining === 480 && timedEvents.heartEvent1) {
                     timedEvents.heartEvent1 = false;
                     spawnHeartAnimation();
@@ -1228,6 +1235,24 @@
                 jackpotSquare.classList.remove('wild-pulse');
                 jackpotSquare.removeEventListener('click', specialJackpotHandler);
             }, 15000);
+        }
+
+        function activateEndgameJackpot() {
+            if (endgameJackpotActive || isGameOver) return;
+            endgameJackpotActive = true;
+
+            const jackpotSquare = document.getElementById('jackpot-square');
+            jackpotSquare.classList.add('endgame-pulse');
+
+            const endgameJackpotHandler = () => {
+                if (isGameOver) return; 
+                coins += 1000000000;
+                updateScoreDisplay();
+                showEventText("Jackpot!", true, true);
+                jackpotSquare.classList.remove('endgame-pulse');
+            };
+
+            jackpotSquare.addEventListener('click', endgameJackpotHandler, { once: true });
         }
 
         function triggerCoinAnimation(startElement, endElement) {
@@ -1349,7 +1374,7 @@
         let GJACKVARNUM = 0;
         function onJackpotClick(event) {
             const jackpotSquare = event.currentTarget;
-            if (jackpotSquare.classList.contains('cooldown') || jackpotSquare.classList.contains('wild-pulse')) return;
+            if (jackpotSquare.classList.contains('cooldown') || jackpotSquare.classList.contains('wild-pulse') || jackpotSquare.classList.contains('endgame-pulse')) return;
 
             timeSinceLastSolve = 0;
             GJACKVARNUM++;
@@ -1842,6 +1867,10 @@
 
         function endGame(isBomb = false) {
             isGameOver = true;
+            const jackpotSquare = document.getElementById('jackpot-square');
+            if (jackpotSquare) {
+                jackpotSquare.classList.remove('endgame-pulse');
+            }
             saveGameResult(); // This now increments gamesPlayed
             checkAndAwardBadges(coins); // Check for new badges at the end of the game
             clearInterval(mainTimerInterval);
@@ -2104,6 +2133,7 @@
             specialCashEmojiSpawned = false;
             timedEvents = { sixMin: true, threeMin: true, heartEvent1: true, heartEvent2: true };
             isSpecialAnimationActive = false; // BUG FIX: Reset this state on restart
+            endgameJackpotActive = false;
             
             clearInterval(mainTimerInterval);
             clearTimeout(prizeSpawnerTimeout);
