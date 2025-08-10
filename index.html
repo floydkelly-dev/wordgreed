@@ -1479,9 +1479,7 @@
             tile.parentNode.replaceChild(newTile, tile);
             
             let prizePool = prizeEmojis.filter(p => p.type !== 'cash_money');
-            if (timeRemaining > 580) {
-                prizePool = prizePool.filter(p => p.type !== 'freeze' && p.type !== 'game_over' && p.type !== 'green_bomb');
-            }
+            
             const prize = prizePool[Math.floor(Math.random() * prizePool.length)];
 
             newTile.textContent = prize.emoji;
