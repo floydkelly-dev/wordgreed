@@ -386,6 +386,16 @@
         #privacy-policy-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
 
         /* Badges Panel */
+        @keyframes badge-pulse-glow {
+            0%, 100% {
+                opacity: 0.8;
+                box-shadow: inset 0 3px 5px rgba(255,255,255,0.2), 0 4px 6px rgba(0,0,0,0.4);
+            }
+            50% {
+                opacity: 1;
+                box-shadow: inset 0 3px 5px rgba(255,255,255,0.3), 0 4px 6px rgba(0,0,0,0.4), 0 0 10px rgba(255,255,255,0.2);
+            }
+        }
         #badges-panel {
             background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
             backdrop-filter: blur(10px);
@@ -405,16 +415,8 @@
             position: relative;
             background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), rgba(255,255,255,0) 70.71%),
                         radial-gradient(circle at 70% 70%, rgba(0,0,0,0.2), rgba(0,0,0,0) 70.71%);
-            box-shadow: inset 0 3px 5px rgba(255,255,255,0.2), 0 4px 6px rgba(0,0,0,0.4);
             border: 1px solid rgba(255,255,255,0.1);
-        }
-        .badge-item::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 50%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            animation: button-shimmer 5s infinite linear;
+            animation: badge-pulse-glow 3s infinite ease-in-out;
         }
         
         /* Riches Modal */
@@ -539,7 +541,7 @@
             </h1>
             <p class="text-lg text-slate-300">Drag and drop letters to solve jumbled words. Grab Big Prizes and Get Greedy!</p>
             <button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl">Start Game</button>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.9</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.0</div>
         </div>
     </div>
 
@@ -598,7 +600,7 @@
                     <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Close</button>
                 </div>
             </div>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v2.9</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.0</div>
         </div>
     </div>
 
@@ -624,7 +626,7 @@
             <div class="text-slate-300 space-y-2">
                 <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
-                <p>Version: <span class="font-bold text-white">2.9</span></p>
+                <p>Version: <span class="font-bold text-white">3.0</span></p>
                 <p>Build Date: <span class="font-bold text-white">August 9, 2025</span></p>
                 <p><a href="https://floydkellycreates.wordpress.com/contact-me/" target="_blank" class="text-purple-300 hover:text-purple-200">Contact the Developer</a></p>
             </div>
@@ -861,11 +863,10 @@
         const speakerIconHref = `data:image/svg+xml,${encodeURIComponent(speakerSVG)}`;
 
         // --- Word Bank & Prize Data ---
-        const wordBank = ["ABROAD","ACCEPT","ACCESS","ACROSS","ACTION","ACTIVE","ADMIRE","ADVICE","AFFAIR","AFFECT","AFFORD","AGENCY","AGENDA","ALMOST","ALWAYS","AMOUNT","ANIMAL","ANNUAL","ANSWER","ANYONE","ANYWAY","APART","APPEAL","APPEAR","APPLY","APPROVE","AROUND","ARRIVE","ARTIST","ASLEEP","ASPECT","ASSESS","ASSIST","ASSUME","ATTACK","ATTEND","ATTRACT","AUTHOR","AWARD","BALANCE","BECOME","BEHAVE","BELIEF","BELONG","BENEATH","BENEFIT","BESIDE","BEYOND","BISHOP","BORDER","BOTTLE","BOTTOM","BRANCH","BREATH","BRIDGE","BRIEFLY","BRIGHT","BROKEN","BUDGET","BURDEN","CAMERA","CANCEL","CANCER","CANDLE","CAPITAL","CAREER","CAREFUL","CENTRAL","CENTURY","CERTAIN","CHAIR","CHALLENGE","CHANCE","CHANGE","CHARGE","CHOICE","CHOOSE","CHURCH","CIRCLE","CLIENT","CLIMB","CLOSELY","CLOSER","COFFEE","COLLECT","COLLEGE","COLUMN","COMBINE","COMFORT","COMMAND","COMMENT","COMMIT","COMMON","COMPARE","COMPETE","COMPLEX","CONCEPT","CONCERN","CONFIRM","CONFLICT","CONNECT","CONSENT","CONSIST","CONTACT","CONTAIN","CONTENT","CONTEST","CONTEXT","CONTROL","CONVERT","CORNER","COUNCIL","COUNTY","COUPLE","COVER","CREATE","CREDIT","CRISIS","CRITERION","CRITIC","CROWD","CULTURE","CURRENT","CUSTOM","DAMAGE","DANGER","DEALER","DEBATE","DECADE","DECIDE","DECLARE","DECREASE","DEEPLY","DEFAULT","DEFENCE","DEFEND","DEFINE","DEGREE","DELAY","DELIVER","DEMAND","DEPEND","DEPICT","DEPOSIT","DEPUTY","DERIVE","DESIGN","DESIRE","DESPITE","DESTROY","DETAIL","DETECT","DEVELOP","DEVICE","DEVOTE","DIFFER","DIFFICULT","DINNER","DIRECT","DISCUSS","DISEASE","DISMISS","DISPLAY","DISTANT","DIVIDE","DIVISION","DOCTOR","DOCUMENT","DOUBLE","DOUBT","DOZEN","DREAM","DRINK","DRIVE","EAGER","EARLY","EARTH","EASTERN","ECONOMIC","ECONOMY","EDITOR","EDUCATE","EFFECT","EFFORT","EIGHT","EITHER","ELDERLY","ELECT","ELEMENT","ELSE","EMERGE","EMPHASIS","EMPLOY","ENABLE","ENCOURAGE","ENGINE","ENJOY","ENOUGH","ENSURE","ENTER","ENTIRE","ENTITLE","EQUALLY","EQUIP","ESCAPE","ESSAY","ESSENTIAL","ESTATE","ETHNIC","EVENT","EVERY","EXACTLY","EXAMINE","EXAMPLE","EXCEED","EXCEPT","EXCHANGE","EXCITE","EXCLUDE","EXCUSE","EXERCISE","EXIST","EXPECT","EXPENSE","EXPERIENCE","EXPERT","EXPLAIN","EXPLORE","EXPOSE","EXPRESS","EXTEND","EXTENT","EXTERNAL","EXTRA","EXTREME","FACTOR","FACULTY","FAILED","FAILURE","FAIRLY","FAITH","FAMLIAR","FAMOUS","FARMER","FASHION","FATHER","FAVOUR","FEELING","FEMALE","FIFTEEN","FIGHT","FIGURE","FINANCE","FINALLY","FINGER","FINISH","FLIGHT","FLOWER","FOLLOW","FOOTBALL","FORCE","FOREIGN","FOREST","FORGET","FORMAL","FORMER","FORWARD","FOUND","FOURTH","FRAME","FREEDOM","FRIEND","FUNCTION","FUTURE","GARDEN","GATHER","GENERAL","GENERATION","GENTLE","GLOBAL","GOLDEN","GROUND","GROWTH","GUARD","GUILTY","HANDLE","HAPPEN","HARDLY","HEALTH","HEAVILY","HEIGHT","HENCE","HOLIDAY","HORSE","HOSPITAL","HOUSE","HOWEVER","HUMAN","HUSBAND","IMPACT","IMPLY","IMPORT","IMPOSE","IMPROVE","INCLUDE","INCREASE","INDEED","INDICATE","INDIVIDUAL","INDUSTRY","INFORM","INITIAL","INJURY","INSIDE","INSIST","INSTANCE","INSTEAD","INSTITUTE","INTEND","INTEREST","INTERNAL","INVOLVE","ISLAND","ISSUE","ITSELF","JOINT","JUDGE","JUDGMENT","JUNIOR","JUSTICE","LABOUR","LANGUAGE","LARGELY","LATTER","LAUGH","LAWYER","LEADER","LEAGUE","LEARN","LEAVE","LEGAL","LENGTH","LESSON","LETTER","LEVEL","LIBERAL","LIBRARY","LICENCE","LIMIT","LIMITED","LITTLE","LOCAL","LONDON","LONGER","MACHINE","MAJOR","MANAGE","MANAGER","MANNER","MANY","MARKET","MARRIAGE","MATCH","MATERIAL","MATTER","MEASURE","MEDIA","MEDICAL","MEETING","MEMBER","MEMORY","MENTAL","MENTION","MERELY","METHOD","MIDDLE","MIGHT","MILE","MILITARY","MINISTER","MINOR","MINORITY","MINUTE","MISSION","MISTAKE","MODEL","MODERN","MODULE","MOMENT","MONEY","MONTH","MORAL","MORNING","MOTHER","MOTION","MOTOR","MOUNTAIN","MOUTH","MOVEMENT","MOVIE","MUCH","MUSIC","MYSELF","NARROW","NATION","NATIONAL","NATIVE","NATURAL","NATURE","NEARLY","NECESSary","NEEDLE","NEITHER","NERVE","NETWORK","NEVER","NEWLY","NIGHT","NOBODY","NORMAL","NORTHERN","NOTICE","NOTION","NOWHERE","NUMBER","OBJECT","OBSERVE","OBTAIN","OBVIOUS","OCCASION","OCCUR","OFFENCE","OFFER","OFFICE","OFFICER","OFFICIAL","OFTEN","ONCE","ONLINE","ONLY","ONTO","OPENING","OPERATE","OPPORTUNITY","OPPOSE","OPPOSITE","ORDER","ORDINARY","ORGANISE","ORIGIN","ORIGINAL","OTHER","OUGHT","OUTCOME","OUTSIDE","OVERALL","OWNER","PACKAGE","PAINT","PANEL","PARENT","PARISH","PARLIAMENT","PARTLY","PARTNER","PARTY","PASSAGE","PATIENT","PATTERN","PEACE","PEOPLE","PERFORM","PERHAPS","PERIOD","PERMIT","PERSON","PERSONAL","PHONE","PHOTO","PHYSICAL","PICTURE","PIECE","PLACE","PLANNING","PLANT","PLASTIC","PLAYER","POCKET","POINT","POLICE","POLICY","POLITICAL","POLLUTION","POPULAR","POSITION","POSITIVE","POSSIBLE","POSTER","POWER","PRACTICE","PREFER","PREPARE","PRESENCE","PRESENT","PRESIDENT","PRESS","PRESSURE","PRETTY","PREVIOUS","PRICE","PRIMARY","PRINCIPLE","PRINT","PRIOR","PRIORITY","PRISON","PRIVATE","PROBABLY","PROBLEM","PROCEDURE","PROCESS","PRODUCE","PRODUCT","PROFESSION","PROFILE","PROFIT","PROGRAM","PROGRESS","PROJECT","PROMISE","PROMOTE","PROPER","PROPERTY","PROPOSE","PROTECT","PROVIDE","PUBLIC","PUBLISH","PURPOSE","PUSH","QUALITY","QUARTER","QUESTION","QUICKLY","QUITE","RAISE","RANGE","RAPIDLY","RATELY","RATHER","REACH","REACTION","READER","READING","READY","REALISE","REALLY","REASON","RECALL","RECEIVE","RECENT","RECENTLY","RECOGNISE","RECORD","RECOVER","REDUCE","REFER","REFLECT","REFORM","REFUSE","REGARD","REGION","REGIONAL","REGULAR","RELATE","RELATION","RELATIVE","RELEASE","RELEVANT","RELIEF","RELIGION","REMAIN","REMEMBER","REMOVE","REPEAT","REPLACE","REPLY","REPORT","REPRESENT","REQUEST","REQUIRE","RESEARCH","RESOURCE","RESPECT","RESPOND","RESPONSE","RESULT","RETAIN","RETURN","REVEAL","REVENUE","REVIEW","REVOLUTION","RIGHT","RING","RISE","ROAD","ROLE","ROOM","ROUND","ROUTE","ROYAL","RULE","SAFETY","SALE","SAME","SAMPLE","SAVE","SCALE","SCENE","SCHEME","SCHOOL","SCIENCE","SCORE","SCREEN","SEARCH","SEASON","SECOND","SECRETARY","SECTION","SECTOR","SECURE","SEEM","SELECT","SENIOR","SENSE","SENSITIVE","SENTENCE","SEPARATE","SEQUENCE","SERIES","SERIOUS","SERVANT","SERVICE","SESSION","SETTLE","SEVEN","SEVERAL","SEVERE","SHARE","SHEET","SHOOT","SHORT","SHOT","SHOULD","SHOULDER","SHOUT","SHOW","SIDE","SIGHT","SIGN","SIGNAL","SILENCE","SIMPLE","SIMPLY","SINCE","SINGLE","SISTER","SITE","SITUATION","SIZE","SKILL","SKIN","SLEEP","SLIGHTLY","SLOWLY","SOCIAL","SOCIETY","SOLDIER","SOLUTION","SOME","SOMEHOW","SOMEONE","SOMETHING","SOMETIMES","SOMEWHAT","SOON","SORRY","SORT","SOUND","SOURCE","SOUTHERN","SPACE","SPEAK","SPECIAL","SPECIFIC","SPEECH","SPEED","SPEND","SPIRIT","SPORT","SPOT","SPREAD","SPRING","SQUARE","STAFF","STAGE","STAND","STANDARD","START","STATE","STATEMENT","STATION","STATUS","STAY","STEP","STILL","STOCK","STONE","STOP","STORE","STORY","STRAIGHT","STRANGE","STRATEGY","STREET","STRENGTH","STRESS","STRIKE","STRONG","STRUCTURE","STUDENT","STUDIO","STUDY","STYLE","SUBJECT","SUBMIT","SUCCEED","SUCCESS","SUCH","SUDDENLY","SUFFER","SUGGEST","SUMMER","SUPPORT","SUPPOSE","SURELY","SURFACE","SURVEY","SURVIVE","SWITCH","SYSTEM","TABLE","TAKE","TALK","TARGET","TASK","TEACH","TEACHER","TEAM","TECHNOLOGY","TELEPHONE","TELEVISION","TEMPERATURE","TERM","TERRIBLE","TEST","THANKS","THEATRE","THEIR","THEME","THEMSELVES","THEN","THEORY","THERE","THESE","THEY","THING","THINK","THIRD","THIRTY","THIS","THOSE","THOUGH","THOUSAND","THREAT","THREATEN","THREE","THROUGH","THROW","TICKET","TIME","TITLE","TODAY","TOGETHER","TOMORROW","TONE","TONIGHT","TOTAL","TOTALLY","TOUCH","TOUR","TOWARDS","TOWN","TRADE","TRADITION","TRAFFIC","TRAIN","TRAINING","TRANSFER","TRANSPORT","TRAVEL","TREAT","TREATMENT","TREATY","TREE","TREND","TRIAL","TRIP","TROOP","TROUBLE","TRUE","TRUST","TRUTH","TWENTY","TWICE","TYPE","UNDER","UNDERSTAND","UNION","UNIQUE","UNIT","UNITED","UNIVERSITY","UNLESS","UNLIKE","UNTIL","UPON","UPPER","URBAN","USER","USUAL","USUALLY","VALLEY","VALUE","VARIETY","VARIOUS","VEHICLE","VERSION","VERY","VIDEO","VIEW","VILLAGE","VIOLENCE","VISION","VISIT","VISITOR","VOICE","VOLUME","VOTE","WAIT","WALK","WALL","WANT","WAR","WATCH","WATER","WAY","WEALTH","WEAPON","WEAR","WEATHER","WEEK","WEEKEND","WEIGHT","WELCOME","WELL","WESTERN","WHAT","WHATEVER","WHEN","WHERE","WHETHER","WHICH","WHILE","WHITE","WHOLE","WHOM","WHOSE","WIDE","WIDELY","WIFE","WILD","WILL","WINDOW","WINE","WINTER","WISH","WITHIN","WITHOUT","WOMAN","WONDER","WOOD","WORD","WORK","WORKER","WORLD","WORRY","WORTH","WOULD","WRITE","WRITER","WRONG","YARD","YEAR","YOUNG","YOURSELF","YOUTH"];
+        const wordBank = ["ABROAD","ACCEPT","ACCESS","ACROSS","ACTION","ACTIVE","ADMIRE","ADVICE","AFFAIR","AFFECT","AFFORD","AGENCY","AGENDA","ALMOST","ALWAYS","AMOUNT","ANIMAL","ANNUAL","ANSWER","ANYONE","ANYWAY","APART","APPEAL","APPEAR","APPLY","APPROVE","AROUND","ARRIVE","ARTIST","ASLEEP","ASPECT","ASSESS","ASSIST","ASSUME","ATTACK","ATTEND","ATTRACT","AUTHOR","AWARD","BALANCE","BECOME","BEHAVE","BELIEF","BELONG","BENEATH","BENEFIT","BESIDE","BEYOND","BISHOP","BORDER","BOTTLE","BOTTOM","BRANCH","BREATH","BRIDGE","BRIEFLY","BRIGHT","BROKEN","BUDGET","BURDEN","CAMERA","CANCEL","CANCER","CANDLE","CAPITAL","CAREER","CAREFUL","CENTRAL","CENTURY","CERTAIN","CHAIR","CHALLENGE","CHANCE","CHANGE","CHARGE","CHOICE","CHOOSE","CHURCH","CIRCLE","CLIENT","CLIMB","CLOSELY","CLOSER","COFFEE","COLLECT","COLLEGE","COLUMN","COMBINE","COMFORT","COMMAND","COMMENT","COMMIT","COMMON","COMPARE","COMPETE","COMPLEX","CONCEPT","CONCERN","CONFIRM","CONFLICT","CONNECT","CONSENT","CONSIST","CONTACT","CONTAIN","CONTENT","CONTEST","CONTEXT","CONTROL","CONVERT","CORNER","COUNCIL","COUNTY","COUPLE","COVER","CREATE","CREDIT","CRISIS","CRITERION","CRITIC","CROWD","CULTURE","CURRENT","CUSTOM","DAMAGE","DANGER","DEALER","DEBATE","DECADE","DECIDE","DECLARE","DECREASE","DEEPLY","DEFAULT","DEFENCE","DEFEND","DEFINE","DEGREE","DELAY","DELIVER","DEMAND","DEPEND","DEPICT","DEPOSIT","DEPUTY","DERIVE","DESIGN","DESIRE","DESPITE","DESTROY","DETAIL","DETECT","DEVELOP","DEVICE","DEVOTE","DIFFER","DIFFICULT","DINNER","DIRECT","DISCUSS","DISEASE","DISMISS","DISPLAY","DISTANT","DIVIDE","DIVISION","DOCTOR","DOCUMENT","DOUBLE","DOUBT","DOZEN","DREAM","DRINK","DRIVE","EAGER","EARLY","EARTH","EASTERN","ECONOMIC","ECONOMY","EDITOR","EDUCATE","EFFECT","EFFORT","EIGHT","EITHER","ELDERLY","ELECT","ELEMENT","ELSE","EMERGE","EMPHASIS","EMPLOY","ENABLE","ENCOURAGE","ENGINE","ENJOY","ENOUGH","ENSURE","ENTER","ENTIRE","ENTITLE","EQUALLY","EQUIP","ESCAPE","ESSAY","ESSENTIAL","ESTATE","ETHNIC","EVENT","EVERY","EXACTLY","EXAMINE","EXAMPLE","EXCEED","EXCEPT","EXCHANGE","EXCITE","EXCLUDE","EXCUSE","EXERCISE","EXIST","EXPECT","EXPENSE","EXPERIENCE","EXPERT","EXPLAIN","EXPLORE","EXPOSE","EXPRESS","EXTEND","EXTENT","EXTERNAL","EXTRA","EXTREME","FACTOR","FACULTY","FAILED","FAILURE","FAIRLY","FAITH","FAMLIAR","FAMOUS","FARMER","FASHION","FATHER","FAVOUR","FEELING","FEMALE","FIFTEEN","FIGHT","FIGURE","FINANCE","FINALLY","FINGER","FINISH","FLIGHT","FLOWER","FOLLOW","FOOTBALL","FORCE","FOREIGN","FOREST","FORGET","FORMAL","FORMER","FORWARD","FOUND","FOURTH","FRAME","FREEDOM","FRIEND","FUNCTION","FUTURE","GARDEN","GATHER","GENERAL","GENERATION","GENTLE","GLOBAL","GOLDEN","GROUND","GROWTH","GUARD","GUILTY","HANDLE","HAPPEN","HARDLY","HEALTH","HEAVILY","HEIGHT","HENCE","HOLIDAY","HORSE","HOSPITAL","HOUSE","HOWEVER","HUMAN","HUSBAND","IMPACT","IMPLY","IMPORT","IMPOSE","IMPROVE","INCLUDE","INCREASE","INDEED","INDICATE","INDIVIDUAL","INDUSTRY","INFORM","INITIAL","INJURY","INSIDE","INSIST","INSTANCE","INSTEAD","INSTITUTE","INTEND","INTEREST","INTERNAL","INVOLVE","ISLAND","ISSUE","ITSELF","JOINT","JUDGE","JUDGMENT","JUNIOR","JUSTICE","LABOUR","LANGUAGE","LARGELY","LATTER","LAUGH","LAWYER","LEADER","LEAGUE","LEARN","LEAVE","LEGAL","LENGTH","LESSON","LETTER","LEVEL","LIBERAL","LIBRARY","LICENCE","LIMIT","LIMITED","LITTLE","LOCAL","LONDON","LONGER","MACHINE","MAJOR","MANAGE","MANAGER","MANNER","MANY","MARKET","MARRIAGE","MATCH","MATERIAL","MATTER","MEASURE","MEDIA","MEDICAL","MEETING","MEMBER","MEMORY","MENTAL","MENTION","MERELY","METHOD","MIDDLE","MIGHT","MILE","MILITARY","MINISTER","MINOR","MINORITY","MINUTE","MISSION","MISTAKE","MODEL","MODERN","MODULE","MOMENT","MONEY","MONTH","MORAL","MORNING","MOTHER","MOTION","MOTOR","MOUNTAIN","MOUTH","MOVEMENT","MOVIE","MUCH","MUSIC","MYSELF","NARROW","NATION","NATIONAL","NATIVE","NATURAL","NATURE","NEARLY","NECESSARY","NEEDLE","NEITHER","NERVE","NETWORK","NEVER","NEWLY","NIGHT","NOBODY","NORMAL","NORTHERN","NOTICE","NOTION","NOWHERE","NUMBER","OBJECT","OBSERVE","OBTAIN","OBVIOUS","OCCASION","OCCUR","OFFENCE","OFFER","OFFICE","OFFICER","OFFICIAL","OFTEN","ONCE","ONLINE","ONLY","ONTO","OPENING","OPERATE","OPPORTUNITY","OPPOSE","OPPOSITE","ORDER","ORDINARY","ORGANISE","ORIGIN","ORIGINAL","OTHER","OUGHT","OUTCOME","OUTSIDE","OVERALL","OWNER","PACKAGE","PAINT","PANEL","PARENT","PARISH","PARLIAMENT","PARTLY","PARTNER","PARTY","PASSAGE","PATIENT","PATTERN","PEACE","PEOPLE","PERFORM","PERHAPS","PERIOD","PERMIT","PERSON","PERSONAL","PHONE","PHOTO","PHYSICAL","PICTURE","PIECE","PLACE","PLANNING","PLANT","PLASTIC","PLAYER","POCKET","POINT","POLICE","POLICY","POLITICAL","POLLUTION","POPULAR","POSITION","POSITIVE","POSSIBLE","POSTER","POWER","PRACTICE","PREFER","PREPARE","PRESENCE","PRESENT","PRESIDENT","PRESS","PRESSURE","PRETTY","PREVIOUS","PRICE","PRIMARY","PRINCIPLE","PRINT","PRIOR","PRIORITY","PRISON","PRIVATE","PROBABLY","PROBLEM","PROCEDURE","PROCESS","PRODUCE","PRODUCT","PROFESSION","PROFILE","PROFIT","PROGRAM","PROGRESS","PROJECT","PROMISE","PROMOTE","PROPER","PROPERTY","PROPOSE","PROTECT","PROVIDE","PUBLIC","PUBLISH","PURPOSE","PUSH","QUALITY","QUARTER","QUESTION","QUICKLY","QUITE","RAISE","RANGE","RAPIDLY","RATELY","RATHER","REACH","REACTION","READER","READING","READY","REALISE","REALLY","REASON","RECALL","RECEIVE","RECENT","RECENTLY","RECOGNISE","RECORD","RECOVER","REDUCE","REFER","REFLECT","REFORM","REFUSE","REGARD","REGION","REGIONAL","REGULAR","RELATE","RELATION","RELATIVE","RELEASE","RELEVANT","RELIEF","RELIGION","REMAIN","REMEMBER","REMOVE","REPEAT","REPLACE","REPLY","REPORT","REPRESENT","REQUEST","REQUIRE","RESEARCH","RESOURCE","RESPECT","RESPOND","RESPONSE","RESULT","RETAIN","RETURN","REVEAL","REVENUE","REVIEW","REVOLUTION","RIGHT","RING","RISE","ROAD","ROLE","ROOM","ROUND","ROUTE","ROYAL","RULE","SAFETY","SALE","SAME","SAMPLE","SAVE","SCALE","SCENE","SCHEME","SCHOOL","SCIENCE","SCORE","SCREEN","SEARCH","SEASON","SECOND","SECRETARY","SECTION","SECTOR","SECURE","SEEM","SELECT","SENIOR","SENSE","SENSITIVE","SENTENCE","SEPARATE","SEQUENCE","SERIES","SERIOUS","SERVANT","SERVICE","SESSION","SETTLE","SEVEN","SEVERAL","SEVERE","SHARE","SHEET","SHOOT","SHORT","SHOT","SHOULD","SHOULDER","SHOUT","SHOW","SIDE","SIGHT","SIGN","SIGNAL","SILENCE","SIMPLE","SIMPLY","SINCE","SINGLE","SISTER","SITE","SITUATION","SIZE","SKILL","SKIN","SLEEP","SLIGHTLY","SLOWLY","SOCIAL","SOCIETY","SOLDIER","SOLUTION","SOME","SOMEHOW","SOMEONE","SOMETHING","SOMETIMES","SOMEWHAT","SOON","SORRY","SORT","SOUND","SOURCE","SOUTHERN","SPACE","SPEAK","SPECIAL","SPECIFIC","SPEECH","SPEED","SPEND","SPIRIT","SPORT","SPOT","SPREAD","SPRING","SQUARE","STAFF","STAGE","STAND","STANDARD","START","STATE","STATEMENT","STATION","STATUS","STAY","STEP","STILL","STOCK","STONE","STOP","STORE","STORY","STRAIGHT","STRANGE","STRATEGY","STREET","STRENGTH","STRESS","STRIKE","STRONG","STRUCTURE","STUDENT","STUDIO","STUDY","STYLE","SUBJECT","SUBMIT","SUCCEED","SUCCESS","SUCH","SUDDENLY","SUFFER","SUGGEST","SUMMER","SUPPORT","SUPPOSE","SURELY","SURFACE","SURVEY","SURVIVE","SWITCH","SYSTEM","TABLE","TAKE","TALK","TARGET","TASK","TEACH","TEACHER","TEAM","TECHNOLOGY","TELEPHONE","TELEVISION","TEMPERATURE","TERM","TERRIBLE","TEST","THANKS","THEATRE","THEIR","THEME","THEMSELVES","THEN","THEORY","THERE","THESE","THEY","THING","THINK","THIRD","THIRTY","THIS","THOSE","THOUGH","THOUSAND","THREAT","THREATEN","THREE","THROUGH","THROW","TICKET","TIME","TITLE","TODAY","TOGETHER","TOMORROW","TONE","TONIGHT","TOTAL","TOTALLY","TOUCH","TOUR","TOWARDS","TOWN","TRADE","TRADITION","TRAFFIC","TRAIN","TRAINING","TRANSFER","TRANSPORT","TRAVEL","TREAT","TREATMENT","TREATY","TREE","TREND","TRIAL","TRIP","TROOP","TROUBLE","TRUE","TRUST","TRUTH","TWENTY","TWICE","TYPE","UNDER","UNDERSTAND","UNION","UNIQUE","UNIT","UNITED","UNIVERSITY","UNLESS","UNLIKE","UNTIL","UPON","UPPER","URBAN","USER","USUAL","USUALLY","VALLEY","VALUE","VARIETY","VARIOUS","VEHICLE","VERSION","VERY","VIDEO","VIEW","VILLAGE","VIOLENCE","VISION","VISIT","VISITOR","VOICE","VOLUME","VOTE","WAIT","WALK","WALL","WANT","WAR","WATCH","WATER","WAY","WEALTH","WEAPON","WEAR","WEATHER","WEEK","WEEKEND","WEIGHT","WELCOME","WELL","WESTERN","WHAT","WHATEVER","WHEN","WHERE","WHETHER","WHICH","WHILE","WHITE","WHOLE","WHOM","WHOSE","WIDE","WIDELY","WIFE","WILD","WILL","WINDOW","WINE","WINTER","WISH","WITHIN","WITHOUT","WOMAN","WONDER","WOOD","WORD","WORK","WORKER","WORLD","WORRY","WORTH","WOULD","WRITE","WRITER","WRONG","YARD","YEAR","YOUNG","YOURSELF","YOUTH"];
         const prizeEmojis = [ { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: '💣', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: '💰', value: 1000000, type: 'cash_money' } ];
         const nonsenseFreebies = ['🌭','🥞','🍕','🍔','🍟','🍗','🥠','🍩', '🍰', '🍭', '🍋‍🟩', '🧋', '🍷', '🍫', '☕', '🍪'];
         const puzzleLayouts = [ { length: 5, indices: [11, 12, 13, 14, 15] }, { length: 7, indices: [28, 29, 30, 31, 32, 33, 34] }, { length: 7, indices: [46, 47, 48, 49, 50, 51, 52] }, { length: 5, indices: [65, 66, 67, 68, 69] } ];
-        // This is the new, exact trading table as requested.
         const trades = [
             { id: 'trade001', name: '10 🌭 for 1 Food Truck', cost: { '🌭': 10 }, reward: { type: 'inventory', item: '🚚', amount: 1 } },
             { id: 'trade002', name: '15 🥞 for 1 Diner', cost: { '🥞': 15 }, reward: { type: 'inventory', item: '🏛️', amount: 1 } },
@@ -2454,19 +2455,22 @@
 
         function calculateNetWorth() {
             const totalItems = Object.values(playerData.inventory || {}).reduce((a, b) => a + b, 0);
+            const uniqueItemTypes = Object.keys(playerData.inventory || {}).length;
             const totalBags = playerData.moneyBags || 0;
             let description = "";
 
             if (totalItems === 0 && totalBags < 100000) {
-                description = "Your portfolio is... let's call it 'minimalist'. Mostly lint and lost dreams.";
-            } else if (totalItems < 5 && totalBags < 1000000) {
-                description = "You're dabbling in high finance. Your primary asset is a half-eaten sandwich.";
-            } else if (totalItems < 20 && totalBags < 10000000) {
-                description = "You're a regional business magnate, primarily dealing in slightly-used paperclips.";
-            } else if (totalItems >= 20 && totalBags >= 10000000) {
-                description = "Congratulations, you now own several small countries. Your cash flow is 'ridiculous'.";
+                description = "Your financial portfolio consists mainly of pocket lint and a half-hearted IOU. Keep trading!";
+            } else if (uniqueItemTypes <= 2 && totalBags < 1000000) {
+                description = "You're a specialist! You've clearly cornered the market on... well, *something*. Your cash flow is a respectable trickle, but your focus is admirable.";
+            } else if (uniqueItemTypes > 2 && totalBags < 5000000) {
+                description = "A diversified portfolio! Your assets are spread wisely across various sectors of the emoji economy. You're officially 'financially intriguing'.";
+            } else if (totalItems > 10 && totalBags < 20000000) {
+                description = "You've built a small but powerful empire. Your name is whispered in the boardrooms of digital diners and virtual food trucks. Your cash flow is a mighty river.";
+            } else if (totalItems > 20 && totalBags >= 20000000) {
+                description = "Your net worth requires scientific notation to express. You don't have cash flow; you have a cash tsunami. Your financial advisor is a well-dressed parrot you taught to squawk 'Buy!'.";
             } else {
-                description = "Your financial advisor is a golden goose and your accountant weeps tears of joy.";
+                description = "Your financial situation is an enigma, wrapped in a riddle, and coated in chocolate. Keep up the good work, whatever it is you're doing!";
             }
 
             return `<h3 class="text-lg font-bold text-amber-300">Net Worth Analysis</h3><p class="text-slate-300 mt-2">${description}</p>`;
@@ -2756,14 +2760,12 @@
         
         // --- Badge Logic ---
         const badges = [
-            { id: 'beginner', name: 'Beginner', emoji: '🤍', score: 1000000 },
-            { id: 'novice', name: 'Novice', emoji: '🧡', score: 100000000 },
-            { id: 'expert', name: 'Expert', emoji: '💙', score: 10000000000 },
-            { id: 'trillion', name: 'Trillionaire', emoji: '💜', score: 1000000000000 },
-            { id: 'charity', name: 'Philanthropist', emoji: '💖', condition: (p) => p.unlockedBadges.includes('charity') },
-            { id: 'play5', name: 'Frequent Player', emoji: '🥉', condition: (p) => p.gamesPlayed >= 5 },
-            { id: 'play25', name: 'Veteran Player', emoji: '🥈', condition: (p) => p.gamesPlayed >= 25 },
-            { id: 'bomb1000', name: 'Demolitionist', emoji: '💥', condition: (p) => p.greenBombsUsed >= 1000 },
+            { id: 'first_play', name: 'First Play', emoji: '🩶', condition: (p) => p.gamesPlayed >= 1 },
+            { id: 'frequent_player', name: 'Frequent Player', emoji: '💛', condition: (p) => p.gamesPlayed >= 5 },
+            { id: 'veteran_player', name: 'Veteran Player', emoji: '💙', condition: (p) => p.gamesPlayed >= 25 },
+            { id: 'expert', name: 'Expert', emoji: '💜', score: 1000000000 },
+            { id: 'demolitionist', name: 'Demolitionist', emoji: '💚', condition: (p) => p.greenBombsUsed >= 1000 },
+            { id: 'philanthropist', name: 'Philanthropist', emoji: '💖', condition: (p) => p.unlockedBadges.includes('philanthropist') },
         ];
 
         function checkAndAwardBadges(finalScore) {
@@ -2792,8 +2794,12 @@
         function displayBadges() {
             const panel = document.getElementById('badges-panel');
             panel.innerHTML = ''; // Clear previous badges
-            if (playerData.unlockedBadges) {
-                playerData.unlockedBadges.forEach(badgeId => {
+            
+            const badgeOrder = ['first_play', 'frequent_player', 'veteran_player', 'expert', 'demolitionist', 'philanthropist'];
+            const unlockedBadgeSet = new Set(playerData.unlockedBadges || []);
+            
+            badgeOrder.forEach(badgeId => {
+                if (unlockedBadgeSet.has(badgeId)) {
                     const badgeData = badges.find(b => b.id === badgeId);
                     if (badgeData) {
                         const badgeEl = document.createElement('div');
@@ -2801,8 +2807,8 @@
                         badgeEl.textContent = badgeData.emoji;
                         panel.appendChild(badgeEl);
                     }
-                });
-            }
+                }
+            });
         }
         
         // --- Giving Modal Logic ---
@@ -2854,8 +2860,8 @@
             if (playerData.inventory[selectedDonation] > 0) {
                 playerData.inventory[selectedDonation]--;
 
-                if (!playerData.unlockedBadges.includes('charity')) {
-                    playerData.unlockedBadges.push('charity');
+                if (!playerData.unlockedBadges.includes('philanthropist')) {
+                    playerData.unlockedBadges.push('philanthropist');
                     showEventText("Badge Unlocked: Philanthropist!", true, true);
                     displayBadges();
                 } else {
