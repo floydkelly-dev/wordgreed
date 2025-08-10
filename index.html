@@ -34,6 +34,8 @@
         body.theme-dark-purple { --primary-color: #5b21b6; --primary-color-dark: #4c1d95; --primary-color-light: #7c3aed; --primary-text-dark: #e0e7ff; --panel-bg: rgba(23, 2, 46, 0.5); --panel-border: rgba(109, 40, 217, 0.5); }
         body.theme-grayscale { --primary-color: #9ca3af; --primary-color-dark: #6b7280; --primary-color-light: #d1d5db; --primary-text-dark: #111827; --panel-bg: rgba(107, 114, 128, 0.4); --panel-border: rgba(156, 163, 175, 0.5); }
         body.theme-stage-lights { --primary-color: #ec4899; --primary-color-dark: #db2777; --primary-color-light: #f472b6; --primary-text-dark: #1e1b4b; --panel-bg: rgba(13, 13, 33, 0.6); --panel-border: rgba(236, 72, 153, 0.5); }
+        body.theme-dark-aqua { --primary-color: #2dd4bf; --primary-color-dark: #14b8a6; --primary-color-light: #5eead4; --primary-text-dark: #0f766e; --panel-bg: rgba(15, 23, 42, 0.6); --panel-border: rgba(6, 182, 212, 0.5); }
+        body.theme-brownstone { --primary-color: #a16207; --primary-color-dark: #854d0e; --primary-color-light: #ca8a04; --primary-text-dark: #422006; --panel-bg: rgba(66, 32, 6, 0.6); --panel-border: rgba(161, 98, 7, 0.5); }
         
         @keyframes move-gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         body { font-family: 'Inter', sans-serif; background: linear-gradient(125deg, #000000, #0c1e42, #1e3a8a, #000000); background-size: 400% 400%; animation: move-gradient 20s ease infinite; overflow-x: hidden; }
@@ -104,11 +106,11 @@
         #start-game-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; animation: start-button-pulse 15s infinite; }
         #claim-bonus-button { background: linear-gradient(145deg, #16a34a, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
         #play-again-button { background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af; border-bottom: 4px solid #1f2937; }
-        #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button, #close-daily-rewards-button, #close-trading-post-button, #close-riches-button, #close-tips-button, #close-privacy-button, #close-giving-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
+        #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button, #close-daily-rewards-button, #close-trading-post-button, #close-riches-button, #close-tips-button, #close-privacy-button, #close-giving-button, #close-badges-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
         #about-button, #privacy-policy-button { background: linear-gradient(145deg, #8b5cf6, #7c3aed); border-color: #a78bfa; border-bottom: 4px solid #5b21b6; }
         #setup-button { background: linear-gradient(145deg, #22c55e, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
         #daily-rewards-button { background: linear-gradient(145deg, #f59e0b, #d97706); border-color: #fbbf24; border-bottom: 4px solid #92400e; }
-        #tips-button { background: linear-gradient(145deg, #f97316, #ea580c); border-color: #fb923c; border-bottom: 4px solid #c2410c; }
+        #tips-button, #badges-button { background: linear-gradient(145deg, #f97316, #ea580c); border-color: #fb923c; border-bottom: 4px solid #c2410c; }
         #confirm-reset-button { background: linear-gradient(145deg, #f87171, #ef4444); border-color: #fca5a5; border-bottom: 4px solid #7f1d1d; }
         .theme-button { width: 2.5rem; height: 2.5rem; border-radius: 50%; background-color: var(--panel-bg); border: 1px solid var(--panel-border); color: white; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; padding: 0; position: relative; }
         .theme-button:hover .tooltip { opacity: 1; visibility: visible; }
@@ -353,9 +355,9 @@
             font-size: 0.75rem;
             color: #9ca3af;
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
         }
         #copy-userid-button {
             background-color: rgba(255,255,255,0.1);
@@ -445,6 +447,33 @@
             padding: 1rem;
             margin-top: 1rem;
             text-align: center;
+        }
+        
+        /* Badges Info Modal */
+        #badges-info-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            width: 100%;
+            max-height: 50vh;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        .badge-info-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .badge-info-card.locked {
+            opacity: 0.6;
+        }
+        .badge-info-emoji {
+            font-size: 3rem;
+            flex-shrink: 0;
         }
 
     </style>
@@ -541,7 +570,7 @@
             </h1>
             <p class="text-lg text-slate-300">Drag and drop letters to solve jumbled words. Grab Big Prizes and Get Greedy!</p>
             <button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl">Start Game</button>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.0</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.2</div>
         </div>
     </div>
 
@@ -566,7 +595,7 @@
     </div>
     
     <!-- Floating Event Text (e.g., "Level Up!") -->
-    <div id="event-text-container" class="hidden fixed inset-0 flex items-center justify-center pointer-events-none z-[60]">
+    <div id="event-text-container" class="hidden fixed inset-0 flex items-center justify-center pointer-events-none z-[80]">
         <div id="event-text" class="event-text text-center"></div>
     </div>
 
@@ -595,12 +624,24 @@
                     <button id="playlist-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Playlist</button>
                     <button id="daily-rewards-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Daily</button>
                     <button id="tips-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Tips</button>
+                    <button id="badges-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Badges</button>
                     <button id="setup-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Setup</button>
                     <button id="about-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">About</button>
                     <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Close</button>
                 </div>
             </div>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.0</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.2</div>
+        </div>
+    </div>
+
+    <!-- Badges Info Modal -->
+    <div id="badges-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
+        <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-3xl relative">
+            <h2 class="text-2xl font-bold text-amber-300">Badges</h2>
+            <div id="badges-info-container">
+                <!-- Badge info cards will be injected here -->
+            </div>
+            <button id="close-badges-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
         </div>
     </div>
 
@@ -626,7 +667,7 @@
             <div class="text-slate-300 space-y-2">
                 <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
-                <p>Version: <span class="font-bold text-white">3.0</span></p>
+                <p>Version: <span class="font-bold text-white">3.2</span></p>
                 <p>Build Date: <span class="font-bold text-white">August 9, 2025</span></p>
                 <p><a href="https://floydkellycreates.wordpress.com/contact-me/" target="_blank" class="text-purple-300 hover:text-purple-200">Contact the Developer</a></p>
             </div>
@@ -710,7 +751,7 @@
                 </div>
             </div>
             <div class="flex justify-between items-center mt-4">
-                <div>
+                <div class="flex items-center gap-4">
                     <button id="riches-button" class="glassy-button text-white font-bold py-2 px-4 rounded-lg text-sm" style="background: linear-gradient(145deg, #a78bfa, #8b5cf6); border-color: #c4b5fd;">View Riches</button>
                     <div id="user-id-container">
                         <span id="user-id-display"></span>
@@ -1346,7 +1387,7 @@
             if (isGamePaused || isGameOver || levelGoodies.length === 0) return;
 
             const allPuzzleIndices = puzzles.flatMap(p => p.indices);
-            const emptyTiles = [];
+            let emptyTiles = [];
             for(let i=0; i<81; i++) {
                 if (!allPuzzleIndices.includes(i) && i !== 40) {
                     const tile = document.getElementById(`tile-${i}`);
@@ -1401,7 +1442,7 @@
             if (timeRemaining <= 0 || isGamePaused || isFrozen) return;
 
             const allPuzzleIndices = puzzles.flatMap(p => p.indices);
-            const emptyTiles = [];
+            let emptyTiles = [];
             for(let i=0; i<81; i++) {
                 if (!allPuzzleIndices.includes(i) && i !== 40) {
                     const tile = document.getElementById(`tile-${i}`);
@@ -1410,7 +1451,26 @@
                     }
                 }
             }
-            if (emptyTiles.length === 0) return;
+            // BUG FIX: If the board is full, clear a few random tiles to make space
+            if (emptyTiles.length === 0) {
+                const nonPuzzleTiles = [];
+                 for(let i=0; i<81; i++) {
+                    if (!allPuzzleIndices.includes(i) && i !== 40) {
+                        nonPuzzleTiles.push(document.getElementById(`tile-${i}`));
+                    }
+                }
+                for (let i = 0; i < 3; i++) {
+                    if (nonPuzzleTiles.length > 0) {
+                        const randomTile = nonPuzzleTiles.splice(Math.floor(Math.random() * nonPuzzleTiles.length), 1)[0];
+                        if (randomTile) {
+                             randomTile.textContent = '';
+                             randomTile.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
+                             emptyTiles.push(randomTile);
+                        }
+                    }
+                }
+                if (emptyTiles.length === 0) return; // Still no space, so we give up for this cycle
+            }
 
             const tile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
             
@@ -1566,7 +1626,7 @@
             diamondElement.classList.add('greed-icon');
             diamondElement.textContent = '💎';
             diamondElement.addEventListener('click', () => {
-                showEventText("You're so greedy!");
+                showEventText("Diamonds, oh yeah!");
             });
             iconsContainer.appendChild(diamondElement);
         }
@@ -1592,7 +1652,7 @@
             coins += currentDiamondValue;
             updateScoreDisplay();
             flashScore('gain');
-            showEventText("You're Greedy!");
+            showEventText("Diamonds, oh yeah!");
             currentDiamondValue = Math.floor(currentDiamondValue / 2);
             updateGreedPanelWithDiamond();
 
@@ -2034,7 +2094,7 @@
             jackpotEventAvailable = true;
             specialCashEmojiSpawned = false;
             timedEvents = { sixMin: true, threeMin: true, heartEvent1: true, heartEvent2: true };
-            isSpecialAnimationActive = false;
+            isSpecialAnimationActive = false; // BUG FIX: Reset this state on restart
             
             clearInterval(mainTimerInterval);
             clearTimeout(prizeSpawnerTimeout);
@@ -2540,7 +2600,9 @@
             { id: 'grove', name: 'Grove Palms', cost: 15000000, colors: ['#22c55e', '#f59e0b'] },
             { id: 'dark-purple', name: 'Dark Purples', cost: 20000000, colors: ['#5b21b6', '#4c1d95'] },
             { id: 'grayscale', name: 'Grayscale', cost: 25000000, colors: ['#6b7280', '#374151'] },
-            { id: 'stage-lights', name: 'Stage Lights', cost: 30000000, colors: ['#ec4899', '#8b5cf6'] }
+            { id: 'stage-lights', name: 'Stage Lights', cost: 30000000, colors: ['#ec4899', '#8b5cf6'] },
+            { id: 'dark-aqua', name: 'Dark Aqua', cost: 35000000, colors: ['#2dd4bf', '#0d9488'] },
+            { id: 'brownstone', name: 'Brownstone', cost: 40000000, colors: ['#a16207', '#854d0e'] }
         ];
 
         function populateThemeStore() {
@@ -2760,12 +2822,12 @@
         
         // --- Badge Logic ---
         const badges = [
-            { id: 'first_play', name: 'First Play', emoji: '🩶', condition: (p) => p.gamesPlayed >= 1 },
-            { id: 'frequent_player', name: 'Frequent Player', emoji: '💛', condition: (p) => p.gamesPlayed >= 5 },
-            { id: 'veteran_player', name: 'Veteran Player', emoji: '💙', condition: (p) => p.gamesPlayed >= 25 },
-            { id: 'expert', name: 'Expert', emoji: '💜', score: 1000000000 },
-            { id: 'demolitionist', name: 'Demolitionist', emoji: '💚', condition: (p) => p.greenBombsUsed >= 1000 },
-            { id: 'philanthropist', name: 'Philanthropist', emoji: '💖', condition: (p) => p.unlockedBadges.includes('philanthropist') },
+            { id: 'first_play', name: 'First Play', emoji: '🩶', condition: (p) => p.gamesPlayed >= 1, description: 'Play your first game.' },
+            { id: 'frequent_player', name: 'Frequent Player', emoji: '💛', condition: (p) => p.gamesPlayed >= 5, description: 'Play 5 total games.' },
+            { id: 'veteran_player', name: 'Veteran Player', emoji: '💙', condition: (p) => p.gamesPlayed >= 25, description: 'Play 25 total games.' },
+            { id: 'expert', name: 'Expert', emoji: '💜', score: 1000000000, description: 'Score 1 billion coins in a single game.' },
+            { id: 'demolitionist', name: 'Demolitionist', emoji: '💚', condition: (p) => p.greenBombsUsed >= 1000, description: 'Use 1,000 green bombs.' },
+            { id: 'philanthropist', name: 'Philanthropist', emoji: '💖', condition: (p) => p.unlockedBadges.includes('philanthropist'), description: 'Donate a rich to charity.' },
         ];
 
         function checkAndAwardBadges(finalScore) {
@@ -2811,6 +2873,29 @@
             });
         }
         
+        function populateBadgesModal() {
+            const container = document.getElementById('badges-info-container');
+            container.innerHTML = '';
+            const unlockedBadgeSet = new Set(playerData.unlockedBadges || []);
+
+            badges.forEach(badge => {
+                const isUnlocked = unlockedBadgeSet.has(badge.id);
+                const card = document.createElement('div');
+                card.className = 'badge-info-card';
+                if (!isUnlocked) {
+                    card.classList.add('locked');
+                }
+                card.innerHTML = `
+                    <div class="badge-info-emoji">${badge.emoji}</div>
+                    <div>
+                        <h4 class="font-bold text-lg">${isUnlocked ? badge.name : '???'}</h4>
+                        <p class="text-sm text-slate-300">${isUnlocked ? badge.description : 'Unlock this badge to see details.'}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
         // --- Giving Modal Logic ---
         function openGivingModal() {
             document.getElementById('trading-post-modal').classList.add('hidden');
@@ -3048,6 +3133,15 @@
             });
             document.getElementById('close-tips-button').addEventListener('click', () => {
                 document.getElementById('tips-modal').classList.add('hidden');
+                document.getElementById('help-modal').classList.remove('hidden');
+            });
+            document.getElementById('badges-button').addEventListener('click', () => {
+                document.getElementById('help-modal').classList.add('hidden');
+                populateBadgesModal();
+                document.getElementById('badges-modal').classList.remove('hidden');
+            });
+            document.getElementById('close-badges-button').addEventListener('click', () => {
+                document.getElementById('badges-modal').classList.add('hidden');
                 document.getElementById('help-modal').classList.remove('hidden');
             });
             document.getElementById('carousel-next').addEventListener('click', nextTip);
