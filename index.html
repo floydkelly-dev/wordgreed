@@ -158,8 +158,8 @@
             50% { transform: translateY(50vh) translateX(5vw) rotate(180deg); }
             100% { transform: translateY(100vh) translateX(-5vw) rotate(360deg); opacity: 0; }
         }
-        .falling-snowflake, .falling-heart {
-            position: fixed;
+        .falling-snowflake, .falling-heart, .falling-trophy {
+            position: absolute; /* Changed to absolute for modal containment */
             top: -10%;
             font-size: 1.5rem;
             animation: fall-sway linear forwards;
@@ -450,9 +450,19 @@
         }
         
         /* Badges Info Modal */
+        #badges-modal .glass-panel {
+            background: radial-gradient(ellipse at center, rgba(30, 30, 60, 0.7) 0%, rgba(10, 10, 20, 0.8) 100%);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            border-right: 1px solid rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(0,0,0,0.3);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
         #badges-info-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1rem;
             width: 100%;
             max-height: 50vh;
@@ -570,7 +580,7 @@
             </h1>
             <p class="text-lg text-slate-300">Drag and drop letters to solve jumbled words. Grab Big Prizes and Get Greedy!</p>
             <button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl">Start Game</button>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.2</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.3</div>
         </div>
     </div>
 
@@ -630,13 +640,13 @@
                     <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Close</button>
                 </div>
             </div>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.2</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.3</div>
         </div>
     </div>
 
     <!-- Badges Info Modal -->
     <div id="badges-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
-        <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-3xl relative">
+        <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-4xl relative">
             <h2 class="text-2xl font-bold text-amber-300">Badges</h2>
             <div id="badges-info-container">
                 <!-- Badge info cards will be injected here -->
@@ -667,8 +677,8 @@
             <div class="text-slate-300 space-y-2">
                 <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
-                <p>Version: <span class="font-bold text-white">3.2</span></p>
-                <p>Build Date: <span class="font-bold text-white">August 9, 2025</span></p>
+                <p>Version: <span class="font-bold text-white">3.3</span></p>
+                <p>Build Date: <span class="font-bold text-white">August 10, 2025</span></p>
                 <p><a href="https://floydkellycreates.wordpress.com/contact-me/" target="_blank" class="text-purple-300 hover:text-purple-200">Contact the Developer</a></p>
             </div>
             <div class="flex justify-between w-full mt-4">
@@ -824,7 +834,7 @@
     <div id="giving-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[70] p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col gap-4 w-full max-w-2xl relative">
             <h2 class="text-2xl font-bold text-amber-300 text-center">Give to Charity</h2>
-            <p class="text-slate-300 text-center text-sm">Select an item from your riches to donate and earn a badge!</p>
+            <p id="giving-confirmation-text" class="text-slate-300 text-center text-sm">Select an item from your riches to donate and earn a badge!</p>
             <div id="giving-inventory" class="grid grid-cols-4 gap-4 mt-4">
                 <!-- Inventory items for giving will be injected here -->
             </div>
@@ -880,6 +890,7 @@
         let startModalAnimationInterval = null, maxSameEmoji = 4, isDraggingBomb = false;
         let lastVolume = 0.5, solveButtonPulseManager = null;
         let freezeAnimationInterval = null, heartAnimationInterval = null, gameOverAnimationInterval = null;
+        let badgesModalAnimationInterval = null;
         let levelGoodies = [];
         let selectedTrade = null;
         let selectedDonation = null;
@@ -915,7 +926,7 @@
             { id: 'trade004', name: '25 🍔 for 1 Burger Chain', cost: { '🍔': 25 }, reward: { type: 'inventory', item: '🍔', amount: 1 } },
             { id: 'trade005', name: '30 🍟 for 1 Potato Farm', cost: { '🍟': 30 }, reward: { type: 'inventory', item: '🥔', amount: 1 } },
             { id: 'trade006', name: '25 🍗 for 1 Chicken Farm', cost: { '🍗': 25 }, reward: { type: 'inventory', item: '🐔', amount: 1 } },
-            { id: 'trade007', name: '20 🥠 for 1 Chip Plant', cost: { '🥠': 20 }, reward: { type: 'inventory', item: '💾', amount: 1 } },
+            { id: 'trade007', name: '20 🥠 for 1 Chip Plant', cost: { '🥠': 20 }, reward: { type: 'inventory', item: '💽', amount: 1 } },
             { id: 'trade008', name: '15 🍩 for 1 Donut Shop', cost: { '🍩': 15 }, reward: { type: 'inventory', item: '🍩', amount: 1 } },
             { id: 'trade009', name: '10 🍰 for 1 TV Show', cost: { '🍰': 10 }, reward: { type: 'inventory', item: '📺', amount: 1 } },
             { id: 'trade010', name: '5 🍭 for 1 Candy Vendor', cost: { '🍭': 5 }, reward: { type: 'inventory', item: '🍬', amount: 1 } },
@@ -928,7 +939,7 @@
         ];
         const inventoryItemNames = {
             '🚚': 'Food Truck', '🏛️': 'Diner', '🍕': 'Pizzeria', '🍔': 'Burger Chain',
-            '🥔': 'Potato Farm', '🐔': 'Chicken Farm', '💾': 'Chip Plant', '🍩': 'Donut Shop',
+            '🥔': 'Potato Farm', '🐔': 'Chicken Farm', '💽': 'Chip Plant', '🍩': 'Donut Shop',
             '📺': 'TV Show', '🍬': 'Candy Vendor', '🍷': 'Restaurant', '🏭': 'Candy Factory',
             '🤕': 'Headache', '⛏️': 'Gold Mine'
         };
@@ -1887,7 +1898,7 @@
             const animationContainer = document.body;
 
             gameOverAnimationInterval = setInterval(() => { 
-                const animations = ['🪙', '❄️', '💝'];
+                const animations = ['🪙', '❄️', '❤️'];
                 const animationChar = animations[Math.floor(Math.random() * animations.length)];
                 
                 const el = document.createElement('div');
@@ -1901,7 +1912,7 @@
 
                 if (animationChar === '🪙') el.classList.add('falling-coin');
                 else if (animationChar === '❄️') el.classList.add('falling-snowflake');
-                else if (animationChar === '💝') el.classList.add('falling-heart');
+                else if (animationChar === '❤️') el.classList.add('falling-heart');
 
                 animationContainer.appendChild(el);
                 setTimeout(() => el.remove(), 5000);
@@ -2015,7 +2026,7 @@
             heartAnimationInterval = setInterval(() => {
                 const heart = document.createElement('div');
                 heart.classList.add('falling-heart');
-                heart.textContent = '💝';
+                heart.textContent = '❤️';
                 heart.style.left = `${Math.random() * 100}%`;
                 heart.style.animationDuration = `${Math.random() * 4 + 5}s`;
                 heart.style.fontSize = `${Math.random() * 1 + 0.75}rem`;
@@ -2824,8 +2835,8 @@
             { id: 'frequent_player', name: 'Frequent Player', emoji: '💛', condition: (p) => p.gamesPlayed >= 5, description: 'Play 5 total games.' },
             { id: 'veteran_player', name: 'Veteran Player', emoji: '💙', condition: (p) => p.gamesPlayed >= 25, description: 'Play 25 total games.' },
             { id: 'expert', name: 'Expert', emoji: '💜', score: 1000000000, description: 'Score 1 billion coins in a single game.' },
-            { id: 'demolitionist', name: 'Demolitionist', emoji: '💚', condition: (p) => p.greenBombsUsed >= 1000, description: 'Use 1,000 green bombs.' },
-            { id: 'philanthropist', name: 'Philanthropist', emoji: '💖', condition: (p) => p.unlockedBadges.includes('philanthropist'), description: 'Donate a rich to charity.' },
+            { id: 'demolitionist', name: 'Drag-n-Drop', emoji: '💚', condition: (p) => p.greenBombsUsed >= 1000, description: 'Use 1,000 green bombs.' },
+            { id: 'philanthropist', name: 'Caring', emoji: '💖', condition: (p) => p.unlockedBadges.includes('philanthropist'), description: 'Donate a rich to charity.' },
         ];
 
         function checkAndAwardBadges(finalScore) {
@@ -2906,6 +2917,8 @@
             container.innerHTML = '';
             selectedDonation = null;
             document.getElementById('execute-give-button').disabled = true;
+            document.getElementById('giving-confirmation-text').textContent = 'Select an item from your riches to donate and earn a badge!';
+
 
             const inventory = playerData.inventory || {};
             const items = Object.keys(inventory);
@@ -2931,6 +2944,11 @@
                         itemEl.classList.add('selected');
                         selectedDonation = item;
                         document.getElementById('execute-give-button').disabled = false;
+                        if(count > 1) {
+                            document.getElementById('giving-confirmation-text').textContent = `You are donating one ${name}.`;
+                        } else {
+                            document.getElementById('giving-confirmation-text').textContent = 'Select an item from your riches to donate and earn a badge!';
+                        }
                     });
                     container.appendChild(itemEl);
                 }
@@ -2945,7 +2963,7 @@
 
                 if (!playerData.unlockedBadges.includes('philanthropist')) {
                     playerData.unlockedBadges.push('philanthropist');
-                    showEventText("Badge Unlocked: Philanthropist!", true, true);
+                    showEventText("Badge Unlocked: Caring!", true, true);
                     displayBadges();
                 } else {
                     showEventText("Thank you for your generosity!", true);
@@ -2953,7 +2971,6 @@
                 
                 savePlayerProfile();
                 populateGivingModal(); // Refresh the view
-                populateRichesModal(); // Also refresh riches view
             }
         }
 
@@ -3109,6 +3126,7 @@
             document.getElementById('execute-trade-button').addEventListener('click', executeTrade);
             document.getElementById('close-trading-post-button').addEventListener('click', () => {
                 document.getElementById('trading-post-modal').classList.add('hidden');
+                populateSetupModal(); // Refresh setup modal on close
                 document.getElementById('setup-modal').classList.remove('hidden');
             });
             document.getElementById('riches-button').addEventListener('click', () => {
@@ -3118,6 +3136,7 @@
             });
             document.getElementById('close-riches-button').addEventListener('click', () => {
                 document.getElementById('riches-modal').classList.add('hidden');
+                populateSetupModal(); // Refresh setup modal on close
                 document.getElementById('setup-modal').classList.remove('hidden');
             });
             document.getElementById('player-name-input').addEventListener('blur', (e) => {
@@ -3136,11 +3155,25 @@
             document.getElementById('badges-button').addEventListener('click', () => {
                 document.getElementById('help-modal').classList.add('hidden');
                 populateBadgesModal();
-                document.getElementById('badges-modal').classList.remove('hidden');
+                const badgesModal = document.getElementById('badges-modal');
+                badgesModal.classList.remove('hidden');
+                
+                clearInterval(badgesModalAnimationInterval);
+                badgesModalAnimationInterval = setInterval(() => { 
+                    const trophy = document.createElement('div');
+                    trophy.classList.add('falling-trophy');
+                    trophy.textContent = '🏆';
+                    trophy.style.left = `${Math.random() * 100}%`;
+                    trophy.style.animationDuration = `${Math.random() * 2 + 3}s`;
+                    trophy.style.fontSize = `${Math.random() * 1 + 0.5}rem`;
+                    badgesModal.querySelector('.glass-panel').appendChild(trophy);
+                    setTimeout(() => trophy.remove(), 5000);
+                }, 300);
             });
             document.getElementById('close-badges-button').addEventListener('click', () => {
                 document.getElementById('badges-modal').classList.add('hidden');
                 document.getElementById('help-modal').classList.remove('hidden');
+                clearInterval(badgesModalAnimationInterval);
             });
             document.getElementById('carousel-next').addEventListener('click', nextTip);
             document.getElementById('carousel-prev').addEventListener('click', prevTip);
@@ -3182,6 +3215,7 @@
             document.getElementById('give-button').addEventListener('click', openGivingModal);
             document.getElementById('close-giving-button').addEventListener('click', () => {
                 document.getElementById('giving-modal').classList.add('hidden');
+                populateTradingPost(); // Refresh trading post on close
                 document.getElementById('trading-post-modal').classList.remove('hidden');
             });
             document.getElementById('execute-give-button').addEventListener('click', executeGive);
