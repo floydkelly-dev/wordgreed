@@ -53,7 +53,7 @@ const speakerSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100
 const speakerIconHref = `data:image/svg+xml,${encodeURIComponent(speakerSVG)}`;
 
 // --- Prize Data ---
-const prizeEmojis = [ { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: ' ', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: '💰', value: 1000000, type: 'cash_money' } ];
+const prizeEmojis = [ { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: '💣', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: '💰', value: 1000000, type: 'cash_money' } ];
 const nonsenseFreebies = ['🌭','🥞','🍕','🍔','🍟','🍗','🥠','🍩', '🍰', '🍭', '🍋‍🟩', '🧋', '🍷', '🍫', '☕', '🍪'];
 const puzzleLayouts = [ { length: 5, indices: [11, 12, 13, 14, 15] }, { length: 7, indices: [28, 29, 30, 31, 32, 33, 34] }, { length: 7, indices: [46, 47, 48, 49, 50, 51, 52] }, { length: 5, indices: [65, 66, 67, 68, 69] } ];
 const trades = [
@@ -2040,4 +2040,345 @@ function displayBadges() {
                 badgeEl.className = 'badge-item';
                 badgeEl.textContent = badgeData.emoji;
                 panel.appendChild(badgeEl);
-           
+            }
+        }
+    });
+}
+
+function populateBadgesModal() {
+    const container = document.getElementById('badges-info-container');
+    container.innerHTML = '';
+    const unlockedBadgeSet = new Set(playerData.unlockedBadges || []);
+
+    badges.forEach(badge => {
+        const isUnlocked = unlockedBadgeSet.has(badge.id);
+        const card = document.createElement('div');
+        card.className = 'badge-info-card';
+        if (!isUnlocked) {
+            card.classList.add('locked');
+        }
+        card.innerHTML = `
+            <div class="badge-info-emoji">${badge.emoji}</div>
+            <div>
+                <h4 class="font-bold text-lg">${isUnlocked ? badge.name : '???'}</h4>
+                <p class="text-sm text-slate-300">${isUnlocked ? badge.description : 'Unlock this badge to see details.'}</p>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// --- Giving Modal Logic ---
+function openGivingModal() {
+    document.getElementById('trading-post-modal').classList.add('hidden');
+    populateGivingModal();
+    document.getElementById('giving-modal').classList.remove('hidden');
+}
+
+function populateGivingModal() {
+    const container = document.getElementById('giving-inventory');
+    container.innerHTML = '';
+    selectedDonation = null;
+    document.getElementById('execute-give-button').disabled = true;
+    document.getElementById('giving-confirmation-text').textContent = 'Select an item from your riches to donate and earn a badge!';
+
+
+    const inventory = playerData.inventory || {};
+    const items = Object.keys(inventory);
+
+    if (items.length === 0) {
+        container.innerHTML = `<p class="col-span-full text-center text-slate-400">You have nothing to give! Acquire some riches first.</p>`;
+        return;
+    }
+
+    items.forEach(item => {
+        const count = inventory[item];
+        if (count > 0) {
+            const name = inventoryItemNames[item] || 'Item';
+            const itemEl = document.createElement('div');
+            itemEl.className = 'giving-item p-2 rounded-lg text-center cursor-pointer';
+            itemEl.innerHTML = `
+                <div class="text-4xl">${item}</div>
+                <div class="text-xs font-bold">${name}</div>
+                <div class="text-xs text-slate-400">x${count}</div>
+            `;
+            itemEl.addEventListener('click', () => {
+                document.querySelectorAll('.giving-item').forEach(el => el.classList.remove('selected'));
+                itemEl.classList.add('selected');
+                selectedDonation = item;
+                document.getElementById('execute-give-button').disabled = false;
+                if(count > 1) {
+                    document.getElementById('giving-confirmation-text').textContent = `You are donating one ${name}.`;
+                } else {
+                    document.getElementById('giving-confirmation-text').textContent = 'Select an item from your riches to donate and earn a badge!';
+                }
+            });
+            container.appendChild(itemEl);
+        }
+    });
+}
+
+function executeGive() {
+    if (!selectedDonation) return;
+
+    if (playerData.inventory[selectedDonation] > 0) {
+        playerData.inventory[selectedDonation]--;
+
+        if (!playerData.unlockedBadges.includes('philanthropist')) {
+            playerData.unlockedBadges.push('philanthropist');
+            showEventText("Badge Unlocked: Caring!", true, true);
+            displayBadges();
+        } else {
+            showEventText("Thank you for your generosity!", true);
+        }
+        
+        savePlayerProfile();
+        populateGivingModal(); // Refresh the view
+    }
+}
+
+async function initGame() {
+    loadPlayerFromLocalStorage();
+    await buildVerifiedPlaylist();
+    if (userPlaylist.length > 0) {
+        currentTrackIndex = Math.floor(Math.random() * userPlaylist.length);
+    }
+    musicPlayer.addEventListener('ended', playNextTrack);
+    playerNameInput.disabled = false;
+    playerNameInput.placeholder = "Enter Name";
+    levelGoodies = [...nonsenseFreebies];
+    startLevel();
+    updateScoreDisplay();
+    setupAudioControls();
+    populatePlaylistModal();
+    populateTipsCarousel();
+    startModalAnimationInterval = setInterval(() => { 
+        const startModal = document.getElementById('start-modal');
+        if (!startModal || startModal.classList.contains('hidden')) {
+            clearInterval(startModalAnimationInterval);
+            return;
+        };
+        const coin = document.createElement('div');
+        coin.classList.add('falling-coin');
+        coin.textContent = '🪙';
+        coin.style.left = `${Math.random() * 100}%`;
+        coin.style.animationDuration = `${Math.random() * 2 + 3}s`;
+        coin.style.fontSize = `${Math.random() * 1 + 0.5}rem`;
+        startModal.appendChild(coin);
+        setTimeout(() => coin.remove(), 5000);
+     }, 300);
+
+    try {
+        let config;
+        if (typeof window.firebaseConfig !== 'undefined') {
+            config = window.firebaseConfig;
+        } else {
+            config = {
+                apiKey: "%FIREBASE_API_KEY%",
+                authDomain: "%FIREBASE_AUTH_DOMAIN%",
+                projectId: "%FIREBASE_PROJECT_ID%",
+                storageBucket: "%FIREBASE_STORAGE_BUCKET%",
+                messagingSenderId: "%FIREBASE_MESSAGING_SENDER_ID%",
+                appId: "%FIREBASE_APP_ID%",
+                measurementId: "%FIREBASE_MEASUREMENT_ID%"
+            };
+        }
+        if (!config.apiKey || config.apiKey.startsWith('%')) {
+            throw new Error("Firebase config not found. Running in offline mode.");
+        }
+        const app = initializeApp(config);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                isFirebaseConnected = true;
+                await syncWithFirebase();
+            } else {
+                try {
+                    const userCredential = await signInAnonymously(auth);
+                    userId = userCredential.user.uid;
+                    isFirebaseConnected = true;
+                    await syncWithFirebase();
+                } catch (error) {
+                    console.warn("Anonymous sign-in failed. Game will continue in offline mode.", error.message);
+                    isFirebaseConnected = false;
+                }
+            }
+        });
+    } catch (e) {
+        console.warn(e.message);
+        isFirebaseConnected = false;
+    }
+
+    // --- Global Event Listeners ---
+    document.getElementById('start-game-button').addEventListener('click', startGame);
+    document.getElementById('play-again-button').addEventListener('click', restartGame);
+    document.getElementById('help-button').addEventListener('click', () => {
+        pauseGame();
+        document.getElementById('help-modal').classList.remove('hidden');
+    });
+    document.getElementById('close-help-button').addEventListener('click', () => {
+        document.getElementById('help-modal').classList.add('hidden');
+        resumeGame();
+    });
+    document.getElementById('solve-button').addEventListener('click', onSolveButtonClick);
+    document.getElementById('about-button').addEventListener('click', () => {
+        document.getElementById('help-modal').classList.add('hidden');
+        document.getElementById('about-modal').classList.remove('hidden');
+    });
+    document.getElementById('close-about-button').addEventListener('click', () => {
+        document.getElementById('about-modal').classList.add('hidden');
+        document.getElementById('help-modal').classList.remove('hidden');
+    });
+    document.getElementById('playlist-button').addEventListener('click', () => {
+        document.getElementById('help-modal').classList.add('hidden');
+        populatePlaylistModal();
+        document.getElementById('playlist-modal').classList.remove('hidden');
+    });
+    document.getElementById('close-playlist-button').addEventListener('click', () => {
+        document.getElementById('playlist-modal').classList.add('hidden');
+        document.getElementById('help-modal').classList.remove('hidden');
+    });
+    document.getElementById('setup-button').addEventListener('click', () => {
+        document.getElementById('help-modal').classList.add('hidden');
+        populateSetupModal();
+        document.getElementById('setup-modal').classList.remove('hidden');
+    });
+    document.getElementById('close-setup-button').addEventListener('click', () => {
+        document.getElementById('setup-modal').classList.add('hidden');
+        document.getElementById('help-modal').classList.remove('hidden');
+    });
+    document.getElementById('reset-progress-button').addEventListener('click', () => {
+        document.getElementById('confirm-reset-modal').classList.remove('hidden');
+    });
+    document.getElementById('cancel-reset-button').addEventListener('click', () => {
+        document.getElementById('confirm-reset-modal').classList.add('hidden');
+    });
+    document.getElementById('confirm-reset-button').addEventListener('click', async () => {
+        playerData = getDefaultPlayerData();
+        await savePlayerProfile();
+        populateSetupModal();
+        applyTheme('default');
+        document.getElementById('confirm-reset-modal').classList.add('hidden');
+    });
+    document.querySelectorAll('.difficulty-button').forEach(button => {
+        button.addEventListener('click', (e) => {
+            document.querySelectorAll('.difficulty-button').forEach(btn => btn.classList.remove('difficulty-active'));
+            const clickedButton = e.currentTarget;
+            clickedButton.classList.add('difficulty-active');
+            if (clickedButton.id === 'difficulty-easy') maxSameEmoji = 8;
+            else if (clickedButton.id === 'difficulty-medium') maxSameEmoji = 4;
+            else if (clickedButton.id === 'difficulty-hard') maxSameEmoji = 2;
+            else maxSameEmoji = 4;
+        });
+    });
+    document.getElementById('daily-rewards-button').addEventListener('click', () => {
+        document.getElementById('help-modal').classList.add('hidden');
+        populateCalendar();
+        document.getElementById('daily-rewards-modal').classList.remove('hidden');
+    });
+    document.getElementById('close-daily-rewards-button').addEventListener('click', () => {
+        document.getElementById('daily-rewards-modal').classList.add('hidden');
+        document.getElementById('help-modal').classList.remove('hidden');
+    });
+    document.getElementById('trade-goodies-button')?.addEventListener('click', openTradingPost);
+    document.getElementById('execute-trade-button').addEventListener('click', executeTrade);
+    document.getElementById('close-trading-post-button').addEventListener('click', () => {
+        document.getElementById('trading-post-modal').classList.add('hidden');
+        populateSetupModal(); // Refresh setup modal on close
+        document.getElementById('setup-modal').classList.remove('hidden');
+    });
+    document.getElementById('riches-button').addEventListener('click', () => {
+        document.getElementById('setup-modal').classList.add('hidden');
+        populateRichesModal();
+        document.getElementById('riches-modal').classList.remove('hidden');
+    });
+    document.getElementById('close-riches-button').addEventListener('click', () => {
+        document.getElementById('riches-modal').classList.add('hidden');
+        populateSetupModal(); // Refresh setup modal on close
+        document.getElementById('setup-modal').classList.remove('hidden');
+    });
+    document.getElementById('player-name-input').addEventListener('blur', (e) => {
+        playerData.name = e.target.value.trim() || 'Player';
+        e.target.classList.toggle('invalid-input', !e.target.value.trim());
+        savePlayerProfile();
+    });
+    document.getElementById('tips-button').addEventListener('click', () => {
+        document.getElementById('help-modal').classList.add('hidden');
+        document.getElementById('tips-modal').classList.remove('hidden');
+    });
+    document.getElementById('close-tips-button').addEventListener('click', () => {
+        document.getElementById('tips-modal').classList.add('hidden');
+        document.getElementById('help-modal').classList.remove('hidden');
+    });
+    document.getElementById('badges-button').addEventListener('click', () => {
+        document.getElementById('help-modal').classList.add('hidden');
+        populateBadgesModal();
+        const badgesModal = document.getElementById('badges-modal');
+        badgesModal.classList.remove('hidden');
+        
+        clearInterval(badgesModalAnimationInterval);
+        badgesModalAnimationInterval = setInterval(() => { 
+            const trophy = document.createElement('div');
+            trophy.classList.add('falling-trophy');
+            trophy.textContent = '🏆';
+            trophy.style.left = `${Math.random() * 100}%`;
+            trophy.style.animationDuration = `${Math.random() * 2 + 3}s`;
+            trophy.style.fontSize = `${Math.random() * 1 + 0.5}rem`;
+            badgesModal.querySelector('.glass-panel').appendChild(trophy);
+            setTimeout(() => trophy.remove(), 5000);
+        }, 300);
+    });
+    document.getElementById('close-badges-button').addEventListener('click', () => {
+        document.getElementById('badges-modal').classList.add('hidden');
+        document.getElementById('help-modal').classList.remove('hidden');
+        clearInterval(badgesModalAnimationInterval);
+    });
+    document.getElementById('carousel-next').addEventListener('click', nextTip);
+    document.getElementById('carousel-prev').addEventListener('click', prevTip);
+    document.getElementById('privacy-policy-button').addEventListener('click', async () => {
+        document.getElementById('about-modal').classList.add('hidden');
+        document.getElementById('privacy-modal').classList.remove('hidden');
+        const policyContainer = document.getElementById('privacy-policy-content');
+        try {
+            const response = await fetch('https://raw.githubusercontent.com/floydkelly-dev/wordgreed/main/public/PrivacyPolicy.html');
+            if (!response.ok) throw new Error('Network response was not ok');
+            const policyHTML = await response.text();
+            policyContainer.innerHTML = policyHTML;
+        } catch (error) {
+            console.error('Failed to fetch privacy policy:', error);
+            policyContainer.textContent = 'Could not load the privacy policy. Please try again later.';
+        }
+    });
+    document.getElementById('close-privacy-button').addEventListener('click', () => {
+        document.getElementById('privacy-modal').classList.add('hidden');
+        document.getElementById('about-modal').classList.remove('hidden');
+    });
+    document.getElementById('copy-userid-button').addEventListener('click', () => {
+        const textToCopy = userId;
+        if (textToCopy) {
+            const textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showEventText("User ID Copied!");
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+            document.body.removeChild(textArea);
+        }
+    });
+    // Giving Modal Listeners
+    document.getElementById('give-button').addEventListener('click', openGivingModal);
+    document.getElementById('close-giving-button').addEventListener('click', () => {
+        document.getElementById('giving-modal').classList.add('hidden');
+        populateTradingPost(); // Refresh trading post on close
+        document.getElementById('trading-post-modal').classList.remove('hidden');
+    });
+    document.getElementById('execute-give-button').addEventListener('click', executeGive);
+}
+
+window.onload = initGame;
