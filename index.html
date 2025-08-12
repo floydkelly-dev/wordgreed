@@ -633,8 +633,7 @@
                 <span class="absolute" style="top: 4rem; left: 5rem;">Greed</span>
             </h1>
             <p class="text-lg text-slate-300">Drag and drop letters to solve jumbled words. Grab Big Prizes and Get Greedy!</p>
-            <button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl">Start Game</button>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.9</div>
+<button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl" disabled>Loading Game...</button>            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.9</div>
         </div>
     </div>
 
@@ -2546,6 +2545,12 @@ function updatePlayPauseIcon() {
             applyTheme(playerData.themes.active || 'default');
             updateSetupModalDisplays();
             updateBadgesPanel();
+
+            const startButton = document.getElementById('start-game-button');
+            if (startButton) {
+                startButton.disabled = false;
+                startButton.textContent = 'Start Game';
+            }
         }
 
         function saveGameResult() {
