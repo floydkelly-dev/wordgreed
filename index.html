@@ -37,7 +37,6 @@
         body.theme-stage-lights { --primary-color: #ec4899; --primary-color-dark: #db2777; --primary-color-light: #f472b6; --primary-text-dark: #1e1b4b; --panel-bg: rgba(13, 13, 33, 0.6); --panel-border: rgba(236, 72, 153, 0.5); }
         body.theme-dark-aqua { --primary-color: #2dd4bf; --primary-color-dark: #14b8a6; --primary-color-light: #5eead4; --primary-text-dark: #0f766e; --panel-bg: rgba(15, 23, 42, 0.6); --panel-border: rgba(6, 182, 212, 0.5); }
         body.theme-brownstone { --primary-color: #a16207; --primary-color-dark: #854d0e; --primary-color-light: #ca8a04; --primary-text-dark: #422006; --panel-bg: rgba(66, 32, 6, 0.6); --panel-border: rgba(161, 98, 7, 0.5); }
-        /* NEW THEMES */
         body.theme-burlap { --primary-color: #d2b48c; --primary-color-dark: #a0522d; --primary-color-light: #f5deb3; --primary-text-dark: #5a3825; --panel-bg: rgba(139, 69, 19, 0.4); --panel-border: rgba(210, 105, 30, 0.3); }
         body.theme-sapphire-ritz { --primary-color: #0f52ba; --primary-color-dark: #003366; --primary-color-light: #add8e6; --primary-text-dark: #ffffff; --panel-bg: rgba(0, 25, 80, 0.5); --panel-border: rgba(70, 130, 180, 0.4); }
         body.theme-vegan-dinner { --primary-color: #2e8b57; --primary-color-dark: #006400; --primary-color-light: #90ee90; --primary-text-dark: #f0fff0; --panel-bg: rgba(46, 139, 87, 0.4); --panel-border: rgba(60, 179, 113, 0.3); }
@@ -80,7 +79,7 @@
         @keyframes diamond-vortex { 0% { transform: translate(var(--start-x), var(--start-y)) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--end-x), var(--end-y)) scale(0) rotate(720deg); opacity: 0; } }
         @keyframes game-over-swirl { 0% { transform: translate(var(--start-x), var(--start-y)) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--end-x), var(--end-y)) scale(0) rotate(-360deg); opacity: 0; } }
         @keyframes big-coin-tumble { 0% { transform: scale(8) rotate(0deg); opacity: 1; } 50% { transform: scale(5) rotate(360deg); } 100% { transform: scale(1) rotate(720deg); opacity: 1; } }
-        /* NEW: Coin explosion animation */
+        /* UPDATED: Coin explosion animation with fade out */
         @keyframes coin-explosion {
             0% { transform: scale(0.5) translate(0, 0); opacity: 1; }
             100% { transform: scale(1.2) translate(var(--explode-x), var(--explode-y)); opacity: 0; }
@@ -138,7 +137,7 @@
         @keyframes start-button-pulse { 0%, 100% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 10px #60a5fa, 0 0 20px #60a5fa; } 5% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 20px #3b82f6, 0 0 40px #3b82f6; } 15% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 10px #60a5fa, 0 0 20px #60a5fa; } }
         #start-game-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; animation: start-button-pulse 15s infinite; }
         #claim-bonus-button { background: linear-gradient(145deg, #16a34a, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
-        #play-again-button, #close-leaderboard-button { background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af; border-bottom: 4px solid #1f2937; }
+        #play-again-button { background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af; border-bottom: 4px solid #1f2937; }
         #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button, #close-daily-rewards-button, #close-trading-post-button, #close-riches-button, #close-tips-button, #close-privacy-button, #close-giving-button, #close-badges-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
         #about-button, #privacy-policy-button { background: linear-gradient(145deg, #8b5cf6, #7c3aed); border-color: #a78bfa; border-bottom: 4px solid #5b21b6; }
         #setup-button { background: linear-gradient(145deg, #22c55e, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
@@ -153,7 +152,6 @@
         .tooltip::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: black transparent transparent transparent; }
         #help-button { font-size: 1.25rem; font-weight: bold; }
         #difficulty-default .orb { fill: #8B5CF6; } #difficulty-easy .orb { fill: #3B82F6; } #difficulty-medium .orb { fill: #F59E0B; } #difficulty-hard .orb { fill: #EF4444; }
-        /* NEW: Orb glowing animation */
         @keyframes orb-glow { 0%, 100% { box-shadow: 0 0 5px var(--glow-color), 0 0 10px var(--glow-color); } 50% { box-shadow: 0 0 15px var(--glow-color), 0 0 25px var(--glow-color); } }
         .glowing-orb { animation: orb-glow 1.5s infinite ease-in-out; }
         .score-decay { color: #ef4444 !important; }
@@ -183,7 +181,6 @@
         #bomb-drag-preview { position: absolute; border: 3px dashed #22c55e; background-color: rgba(34, 197, 94, 0.3); pointer-events: none; z-index: 200; display: none; }
         @keyframes cash-money-pulse { 0%, 100% { box-shadow: 0 0 15px #4ade80, 0 0 30px #4ade80; } 50% { box-shadow: 0 0 25px #22c55e, 0 0 50px #22c55e; } }
         .cash-money-prize { background-color: #16a34a !important; animation: cash-money-pulse 0.7s infinite ease-in-out; }
-        /* NEW: Special goodie pulse animation */
         @keyframes goodie-pulse { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px #fde047); } 50% { transform: scale(1.15); filter: drop-shadow(0 0 16px #fbbf24); } }
         .special-goodie-tile { animation: goodie-pulse 1s infinite ease-in-out; cursor: pointer; font-size: 2rem; }
         @keyframes fall { 0% { transform: translateY(-100%) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
@@ -198,7 +195,7 @@
             100% { transform: translateY(100vh) translateX(-5vw) rotate(360deg); opacity: 0; }
         }
         .falling-snowflake, .falling-heart, .falling-trophy {
-            position: absolute; /* Changed to absolute for modal containment */
+            position: absolute;
             top: -10%;
             font-size: 1.5rem;
             animation: fall-sway linear forwards;
@@ -212,7 +209,6 @@
         input[type=range].volume-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #a78bfa; cursor: pointer; margin-top: -7px; border: 2px solid #c4b5fd; box-shadow: 0 0 5px #8b5cf6; }
         input[type=range].volume-slider::-moz-range-track { width: 100%; height: 8px; cursor: pointer; background: rgba(0, 0, 0, 0.5); border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); }
         input[type=range].volume-slider::-moz-range-thumb { height: 20px; width: 20px; border-radius: 50%; background: #a78bfa; cursor: pointer; border: 2px solid #c4b5fd; box-shadow: 0 0 5px #8b5cf6; }
-        /* Playlist & Setup Styles */
         #playlist-container { max-height: 220px; overflow-y: auto; background-color: rgba(0,0,0,0.2); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5); padding: 0.5rem; border-radius: 0.5rem;}
         .playlist-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background-color: rgba(0,0,0,0.2); border-radius: 0.5rem; transition: background-color 0.2s; user-select: none; cursor: pointer; }
         .playlist-item:hover { background-color: rgba(0,0,0,0.4); }
@@ -251,7 +247,6 @@
             z-index: 3;
             transform: none;
         }
-        /* Daily Rewards Calendar */
         #calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; }
         .calendar-day {
             background-color: rgba(0,0,0,0.2); border: 2px solid var(--panel-border);
@@ -269,7 +264,6 @@
         .day-number { font-weight: bold; font-size: 0.9rem; position: absolute; top: 2px; right: 5px; }
         .reward-text { font-size: 0.65rem; line-height: 1; }
         #calendar-legend { grid-column: span 4; align-self: stretch; background-color: rgba(0,0,0,0.2); border-radius: 0.5rem; padding: 0.5rem 0.75rem; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.5rem;}
-        /* Welcome Bonus Animation */
         @keyframes bonus-reveal {
             0% { transform: scale(0.5); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
@@ -286,13 +280,9 @@
             animation: pulse-glow-amber 1.5s infinite ease-in-out;
             border-radius: 0.5rem;
         }
-        /* Help Modal Footer Layout */
         #help-modal-footer {
             display: flex; flex-direction: column; align-items: center; width: 100%; gap: 0.75rem;
         }
-        /* Setup Modal Scroll FIX */
-        #setup-modal > .glass-panel { /* max-height: 90vh; overflow-y: auto; */ }
-        /* Background Clouds */
         @keyframes slide {
             0% { transform: translateX(-25%); }
             100% { transform: translateX(25%); }
@@ -312,10 +302,10 @@
             opacity: 0.3;
         }
         #clouds-day {
-            background-image: url('https://placehold.co/2048x1024/87CEEB/FFFFFF?text=Day+Clouds+Here'); /* Replace with your day cloud PNG */
+            background-image: url('https://placehold.co/2048x1024/87CEEB/FFFFFF?text=Day+Clouds+Here');
         }
         #clouds-night {
-            background-image: url('https://placehold.co/2048x1024/000033/FFFFFF?text=Night+Clouds+Here'); /* Replace with your night cloud PNG */
+            background-image: url('https://placehold.co/2048x1024/000033/FFFFFF?text=Night+Clouds+Here');
         }
 
         @keyframes pulse-glow-amber { 
@@ -341,12 +331,10 @@
             background-color: var(--panel-bg);
             box-shadow: 0 0 10px var(--primary-color);
         }
-
-        /* Tips Modal & Carousel */
         #tips-carousel {
             position: relative;
             width: 100%;
-            height: 200px; /* Adjust height as needed */
+            height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -388,8 +376,6 @@
         }
         #carousel-prev { left: 1rem; }
         #carousel-next { right: 1rem; }
-
-        /* User ID Display */
         #user-id-container {
             font-size: 0.75rem;
             color: #9ca3af;
@@ -408,8 +394,6 @@
         #copy-userid-button:hover {
             background-color: rgba(255,255,255,0.2);
         }
-        
-        /* Privacy Policy Modal */
         #privacy-policy-content {
             background-color: rgba(0,0,0,0.4);
             border: 1px solid var(--panel-border);
@@ -425,8 +409,6 @@
         #privacy-policy-content::-webkit-scrollbar { width: 8px; }
         #privacy-policy-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
         #privacy-policy-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
-
-        /* Badges Panel */
         @keyframes badge-pulse-glow {
             0%, 100% {
                 opacity: 0.8;
@@ -459,8 +441,6 @@
             border: 1px solid rgba(255,255,255,0.1);
             animation: badge-pulse-glow 3s infinite ease-in-out;
         }
-        
-        /* Riches Modal */
         #riches-inventory {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -487,8 +467,6 @@
             margin-top: 1rem;
             text-align: center;
         }
-        
-        /* Badges Info Modal */
         #badges-modal .glass-panel {
             background: radial-gradient(ellipse at center, rgba(30, 30, 60, 0.7) 0%, rgba(10, 10, 20, 0.8) 100%);
             border-top: 1px solid rgba(255, 255, 255, 0.3);
@@ -524,6 +502,22 @@
             font-size: 3rem;
             flex-shrink: 0;
         }
+        /* NEW: Leaderboard styles */
+        #leaderboard-panel {
+            min-height: 180px; /* Ensure it has some height even when empty */
+        }
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+        .leaderboard-entry:nth-child(odd) {
+            background-color: rgba(0,0,0,0.1);
+        }
+        .leaderboard-rank { font-weight: bold; color: var(--primary-color-light); }
+        .leaderboard-name { color: #e5e7eb; }
+        .leaderboard-score { font-weight: bold; color: #facc15; }
 
     </style>
 </head>
@@ -533,42 +527,31 @@
     <div id="clouds-day" class="clouds hidden"></div>
     <div id="clouds-night" class="clouds hidden"></div>
 
-    <!-- Audio Player for background music -->
     <audio id="background-music">
-        <!-- Source will be set dynamically by JavaScript -->
     </audio>
 
-    <!-- Main Game Container -->
     <div id="game-container" class="hidden flex-col md:flex-row gap-4 justify-center md:items-stretch">
-        <!-- Game Grid Section -->
         <div class="flex flex-col gap-1 items-center">
             <div class="relative">
                 <div id="game-grid" class="grid grid-cols-9 gap-1 bg-slate-800/70 p-3 rounded-xl shadow-2xl border border-slate-700/50"></div>
-                <!-- This div is used to show a preview of the green bomb's effect area -->
                 <div id="bomb-drag-preview"></div>
             </div>
-            <!-- Badges Panel -->
             <div id="badges-panel" class="w-full mt-2 p-2 rounded-xl flex justify-center items-center gap-2 h-20">
-                <!-- Badges will be injected here -->
             </div>
         </div>
 
-        <!-- Score & Control Panel -->
         <div id="score-panel" class="glass-panel p-4 rounded-xl w-full max-w-xs md:w-[20rem] flex flex-col justify-between gap-3 relative">
             <div class="flex-grow flex flex-col gap-2"> 
-                <!-- Game Title -->
                 <div class="relative w-full h-24 flex justify-center items-center flex-shrink-0">
                     <h1 class="game-title-style text-6xl relative" style="width: 15rem; height: 7rem; left: 1rem;">
                         <span class="absolute" style="top: 0; left: 0;">Word</span>
                         <span class="absolute" style="top: 2.7rem; left: 2.5rem;">Greed</span>
                     </h1>
                 </div>
-                <!-- Level and Timer Display -->
                 <div class="p-2 flex justify-around text-center flex-shrink-0">
                     <div><span class="text-sm font-bold text-slate-300">LEVEL</span><div id="level-display" class="text-2xl font-bold text-white">1</div></div>
                     <div><span class="text-sm font-bold text-slate-300">TIME</span><div id="timer-display" class="text-2xl font-bold text-white">10:00</div></div>
                 </div>
-                <!-- Score Container -->
                 <div id="score-container" class="greed-panel p-3 rounded-lg text-center flex flex-col gap-2 flex-grow">
                     <div class="grid grid-cols-2 gap-2 text-center">
                         <div class="text-4xl coin-rotate" style="filter: drop-shadow(0 0 5px #fde047);">🪙</div>
@@ -576,7 +559,6 @@
                         <div id="coins-display" class="text-lg font-bold text-white">0</div>
                         <div id="bags-of-money-display" class="text-lg font-bold text-green-400">0</div>
                     </div>
-                    <!-- Greed Score and Solve Button -->
                     <div id="greed-content" class="mx-auto flex flex-col items-center justify-center gap-1 flex-grow">
                         <div class="flex items-center justify-center gap-2"><span class="text-sm font-bold text-violet-200">GREED SCORE</span></div>
                         <hr class="border-violet-300/20 w-full my-1">
@@ -587,7 +569,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Theme and Difficulty Buttons -->
             <div id="theme-buttons-container" class="flex justify-around items-center mt-auto flex-shrink-0">
                 <button id="help-button" class="theme-button">?</button>
                 <button id="difficulty-default" class="theme-button difficulty-button difficulty-active">
@@ -610,7 +591,6 @@
         </div>
     </div>
 
-    <!-- Start Modal -->
     <div id="start-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
         <div class="glass-panel p-8 pb-12 rounded-2xl text-center flex flex-col items-center gap-6 w-full max-w-md relative overflow-hidden">
             <h1 class="game-title-style text-8xl relative" style="width: 22rem; height: 10rem;">
@@ -619,50 +599,57 @@
             </h1>
             <p class="text-lg text-slate-300">Drag and drop letters to solve jumbled words. Grab Big Prizes and Get Greedy!</p>
             <button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl">Start Game</button>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.4</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.5</div>
         </div>
     </div>
 
-    <!-- Game Over Modal -->
+    <!-- UPDATED: Game Over Modal with Leaderboard -->
     <div id="game-over-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-        <div class="glass-panel p-8 rounded-2xl text-center flex flex-col items-center gap-4 w-full max-w-lg relative overflow-hidden">
-             <h1 class="game-title-style text-6xl relative" style="width: 15rem; height: 7rem;">
+        <div class="glass-panel p-8 rounded-2xl text-center flex flex-col items-center gap-4 w-full max-w-4xl relative overflow-hidden">
+             <h1 class="game-title-style text-6xl relative" style="width: 15rem; height: 7rem; margin-bottom: 1rem;">
                 <span class="absolute" style="top: 0; left: 0;">Word</span>
                 <span class="absolute" style="top: 2.7rem; left: 2.5rem;">Greed</span>
             </h1>
             <h3 class="text-3xl font-bold text-amber-300 mb-2">Game Over!</h3>
             
-            <!-- NEW: Game Summary / Leaderboard Section -->
-            <div id="game-summary-panel" class="greed-panel p-4 rounded-lg w-full max-w-md" style="box-shadow: inset 2px 2px 8px rgba(0,0,0,0.6), 0 1px 1px rgba(255,255,255,0.2);">
-                <h4 class="text-xl font-bold text-amber-200 mb-3">Game Summary</h4>
-                <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-left">
-                    <span class="font-semibold text-slate-300">Final Score:</span>
-                    <span id="summary-final-score" class="font-bold text-white text-right">0</span>
-                    
-                    <span class="font-semibold text-slate-300">Highest Score:</span>
-                    <span id="summary-high-score" class="font-bold text-amber-400 text-right">0</span>
+            <div class="flex flex-col md:flex-row gap-6 w-full">
+                <!-- Game Summary Panel -->
+                <div id="game-summary-panel" class="greed-panel p-4 rounded-lg w-full md:w-1/2" style="box-shadow: inset 2px 2px 8px rgba(0,0,0,0.6), 0 1px 1px rgba(255,255,255,0.2);">
+                    <h4 class="text-xl font-bold text-amber-200 mb-3">Game Summary</h4>
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-left">
+                        <span class="font-semibold text-slate-300">Final Score:</span>
+                        <span id="summary-final-score" class="font-bold text-white text-right">0</span>
+                        
+                        <span class="font-semibold text-slate-300">Highest Score:</span>
+                        <span id="summary-high-score" class="font-bold text-amber-400 text-right">0</span>
 
-                    <span class="font-semibold text-slate-300">Money Bags Earned:</span>
-                    <span id="summary-bags-earned" class="font-bold text-green-400 text-right">0</span>
+                        <span class="font-semibold text-slate-300">Money Bags Earned:</span>
+                        <span id="summary-bags-earned" class="font-bold text-green-400 text-right">0</span>
 
-                    <span class="font-semibold text-slate-300">Level Reached:</span>
-                    <span id="summary-level-reached" class="font-bold text-white text-right">1</span>
+                        <span class="font-semibold text-slate-300">Level Reached:</span>
+                        <span id="summary-level-reached" class="font-bold text-white text-right">1</span>
+                    </div>
+                </div>
+
+                <!-- Leaderboard Panel -->
+                <div id="leaderboard-panel" class="greed-panel p-4 rounded-lg w-full md:w-1/2" style="box-shadow: inset 2px 2px 8px rgba(0,0,0,0.6), 0 1px 1px rgba(255,255,255,0.2);">
+                    <h4 class="text-xl font-bold text-amber-200 mb-3">Top Players</h4>
+                    <div id="leaderboard-list" class="space-y-1 text-sm">
+                        <!-- Leaderboard entries will be injected here -->
+                    </div>
                 </div>
             </div>
 
             <div class="flex items-center gap-4 mt-4">
                 <button id="play-again-button" class="glassy-button text-white font-bold py-3 px-6 rounded-lg text-xl">Play Again</button>
-                <button id="close-leaderboard-button" class="glassy-button text-white font-bold py-3 px-6 rounded-lg text-xl">Close</button>
             </div>
         </div>
     </div>
     
-    <!-- Floating Event Text (e.g., "Level Up!") -->
     <div id="event-text-container" class="hidden fixed inset-0 flex items-center justify-center pointer-events-none z-[80]">
         <div id="event-text" class="event-text text-center"></div>
     </div>
 
-    <!-- Help Modal -->
     <div id="help-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-3 w-full max-w-4xl relative">
             <h2 class="text-2xl font-bold text-amber-300">How to Play</h2>
@@ -693,29 +680,25 @@
                     <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Close</button>
                 </div>
             </div>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.4</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.5</div>
         </div>
     </div>
 
-    <!-- Badges Info Modal -->
     <div id="badges-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-4xl relative">
             <h2 class="text-2xl font-bold text-amber-300">Badges</h2>
             <div id="badges-info-container">
-                <!-- Badge info cards will be injected here -->
             </div>
             <button id="close-badges-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
         </div>
     </div>
 
-    <!-- Tips Modal -->
     <div id="tips-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-2xl relative">
             <h2 class="text-2xl font-bold text-amber-300">Game Tips</h2>
             <div id="tips-carousel" class="w-full">
                 <div id="carousel-prev" class="carousel-arrow">⬅️</div>
                 <div id="tip-card-container" class="w-full h-full flex items-center justify-center">
-                    <!-- Tip cards will be injected here -->
                 </div>
                 <div id="carousel-next" class="carousel-arrow">➡️</div>
             </div>
@@ -723,7 +706,6 @@
         </div>
     </div>
 
-    <!-- About Modal -->
     <div id="about-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-md relative text-center">
             <h2 class="text-2xl font-bold text-amber-300">About Word Greed</h2>
@@ -731,7 +713,7 @@
                 <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
                 <p><span class="font-bold text-white">Concept:</span> Floyd Kelly, <span class="font-bold text-white">Code:</span> Google Gemini</p>
-                <p>Version: <span class="font-bold text-white">3.4</span></p>
+                <p>Version: <span class="font-bold text-white">3.5</span></p>
                 <p>Build Date: <span class="font-bold text-white">August 12, 2025</span></p>
                 <p><a href="https://floydkellycreates.wordpress.com/contact-me/" target="_blank" class="text-purple-300 hover:text-purple-200">Contact the Developer</a></p>
             </div>
@@ -742,7 +724,6 @@
         </div>
     </div>
 
-    <!-- Privacy Policy Modal -->
     <div id="privacy-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-2xl relative">
             <h2 class="text-2xl font-bold text-amber-300">Privacy Policy</h2>
@@ -753,19 +734,16 @@
         </div>
     </div>
 
-    <!-- Playlist Modal -->
     <div id="playlist-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-md relative">
             <h2 class="text-2xl font-bold text-amber-300">Soundtrack Playlist</h2>
             <div id="playlist-container" class="w-full space-y-1 my-2 text-left">
-                <!-- Playlist items will be injected here by JS -->
             </div>
             <div id="playlist-controls" class="flex items-center justify-center gap-4 my-4">
                 <button id="playlist-prev" class="glassy-button p-2 rounded-full" style="background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af;">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M8.445 14.832A1 1 0 0010 14.006V5.994a1 1 0 00-1.555-.832L4.16 9.168a1 1 0 000 1.664l4.286 4.001zM11 5h2v10h-2V5z"></path></svg>
                 </button>
                 <button id="playlist-play-pause" class="glassy-button p-3 rounded-full w-14 h-14" style="background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd;">
-                    <!-- Play/Pause SVG will be injected here -->
                 </button>
                 <button id="playlist-next" class="glassy-button p-2 rounded-full" style="background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af;">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M11.555 5.168A1 1 0 0010 5.994v8.012a1 1 0 001.555.832l4.286-4.001a1 1 0 000-1.664l-4.286-4.001zM7 5h2v10H7V5z"></path></svg>
@@ -778,7 +756,6 @@
         </div>
     </div>
 
-    <!-- Setup & Store Modal -->
     <div id="setup-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div class="glass-panel p-6 rounded-2xl flex flex-col gap-4 w-full max-w-4xl relative">
             <h2 class="text-2xl font-bold text-amber-300 text-center">Player Setup & Store</h2>
@@ -802,7 +779,6 @@
                 <h3 class="text-lg font-bold text-amber-300 text-left mb-3">Awarded Goodies</h3>
                 <div class="flex items-center justify-between">
                     <div id="nonsense-freebies-container" class="flex-grow">
-                        <!-- Nonsense freebies will be injected here -->
                     </div>
                     <button id="trade-goodies-button" class="glassy-button text-white font-bold rounded-lg text-lg ml-4" style="background: linear-gradient(145deg, #f59e0b, #d97706); border-color: #fbbf24; width: 160px; height: 55px;">Trade</button>
                 </div>
@@ -811,7 +787,6 @@
             <div class="mt-2">
                 <h3 class="text-lg font-bold text-amber-300 text-left">Theme Store</h3>
                 <div id="theme-store-container" class="mt-2">
-                    <!-- Themes will be injected here -->
                 </div>
             </div>
             <div class="flex justify-between items-center mt-4">
@@ -828,7 +803,6 @@
         </div>
     </div>
 
-    <!-- Confirm Reset Modal -->
     <div id="confirm-reset-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-sm relative text-center">
             <h2 class="text-xl font-bold text-red-400">Reset Progress?</h2>
@@ -840,36 +814,30 @@
         </div>
     </div>
 
-    <!-- Daily Rewards Modal -->
     <div id="daily-rewards-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-2xl relative">
             <h2 class="text-2xl font-bold text-amber-300">Daily Rewards</h2>
             <div id="calendar-grid" class="w-full">
-                <!-- Calendar will be populated by JS -->
             </div>
             <button id="close-daily-rewards-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
         </div>
     </div>
 
-    <!-- Welcome Bonus Modal -->
     <div id="welcome-bonus-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[70] p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4 w-full max-w-md relative text-center">
             <h2 class="text-2xl font-bold text-amber-300">Welcome Back!</h2>
             <p class="text-slate-300">Here's your daily bonus for playing!</p>
             <div id="bonus-rewards-container" class="flex items-center justify-center gap-4 my-4 flex-wrap">
-                <!-- Bonus items will be injected here -->
             </div>
             <button id="claim-bonus-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-xl">Claim!</button>
         </div>
     </div>
 
-    <!-- Trading Post Modal -->
     <div id="trading-post-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col gap-4 w-full max-w-4xl relative">
             <h2 class="text-2xl font-bold text-amber-300 text-center">Trading Post</h2>
             <div class="flex gap-4 mt-4">
                 <div id="available-trades-container" class="w-1/2 grid grid-cols-2 gap-2">
-                    <!-- Available trades will be injected here -->
                 </div>
                 <div id="trade-preview-panel" class="w-1/2 greed-panel flex flex-col items-center justify-center p-4 rounded-lg">
                     <div id="trade-preview-emoji" class="text-8xl">❔</div>
@@ -884,13 +852,11 @@
         </div>
     </div>
 
-    <!-- Giving Modal -->
     <div id="giving-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[70] p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col gap-4 w-full max-w-2xl relative">
             <h2 class="text-2xl font-bold text-amber-300 text-center">Give to Charity</h2>
             <p id="giving-confirmation-text" class="text-slate-300 text-center text-sm">Select an item from your riches to donate and earn a badge!</p>
             <div id="giving-inventory" class="grid grid-cols-4 gap-4 mt-4">
-                <!-- Inventory items for giving will be injected here -->
             </div>
             <div class="flex justify-center mt-4 gap-4">
                 <button id="execute-give-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg" style="background: linear-gradient(145deg, #a78bfa, #8b5cf6); border-color: #c4b5fd;" disabled>Give Selected Item</button>
@@ -899,16 +865,13 @@
         </div>
     </div>
 
-    <!-- Riches Modal -->
     <div id="riches-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
         <div class="glass-panel p-8 rounded-2xl flex flex-col gap-4 w-full max-w-3xl relative">
              <h2 class="text-2xl font-bold text-amber-300 text-center">Your Riches</h2>
              <div id="riches-inventory" class="min-h-[200px]">
-                <!-- Inventory items will be injected here -->
              </div>
              <hr class="w-full border-t border-slate-600 my-4">
              <div id="net-worth-panel">
-                <!-- Net worth description will be injected here -->
              </div>
              <button id="close-riches-button" class="glassy-button mt-4 text-white font-bold py-2 px-6 rounded-lg text-lg self-center">Close</button>
         </div>
@@ -918,7 +881,7 @@
         // --- Firebase Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DOM Elements ---
         const gridContainer = document.getElementById('game-grid');
@@ -931,7 +894,7 @@
 
         // --- Game Data & State ---
         let coins = 0, bagsOfMoney = 0, draggedTile = null, playerData = {}, currentLevel = 1;
-        const totalGameTime = 600; // 10 minutes
+        const totalGameTime = 600;
         let timeRemaining = totalGameTime, mainTimerInterval = null, prizeSpawnerTimeout = null;
         let diamondSequenceTimeout = null, puzzles = [], trophyCollectedThisLevel = false;
         let diamondCollectedThisLevel = false, currentDiamondValue = 20000000;
@@ -949,9 +912,9 @@
         let levelGoodies = [];
         let selectedTrade = null;
         let selectedDonation = null;
-        let jackpotConsecutiveClickCount = 0; // NEW: Counter for jackpot consecutive clicks
-        let goodieSpawnTimer = null; // NEW: Timer for the special goodie spawn
-        let orbGlowInterval = null; // NEW: Timer for orb glowing effect
+        let jackpotConsecutiveClickCount = 0;
+        let goodieSpawnTimer = null;
+        let orbGlowInterval = null;
 
         // --- Playlist Data ---
         const songDatabase = [
@@ -964,7 +927,7 @@
             { id: '007', title: 'Rich Shadows', filename: 'wordgreed007.mp3' },
             { id: '008', title: 'Reversal of Fortune', filename: 'wordgreed008.mp3' },
             { id: '009', title: 'Ascending Choices', filename: 'wordgreed009.mp3' },
-            { id: '010', title: 'Soul Beyond Desires', filename: 'wordgreed010.mp3' } // NEW: Added new song
+            { id: '010', title: 'Soul Beyond Desires', filename: 'wordgreed010.mp3' }
         ];
         let verifiedPlaylist = [], userPlaylist = [], originalUserPlaylist = [];
         let currentTrackIndex = 0, isShuffled = false;
@@ -974,14 +937,13 @@
         const speakerIconHref = `data:image/svg+xml,${encodeURIComponent(speakerSVG)}`;
 
         // --- Word Bank & Prize Data ---
-        // UPDATED: Word bank with additions and removals
         const wordBank = ["ABROAD","ACCEPT","ACCESS","ACROSS","ACTION","ACTIVE","ADMIRE","ADVICE","AFFAIR","AFFECT","AFFORD","AGENCY","AGENDA","ALMOST","ALWAYS","AMOUNT","ANIMAL","ANNUAL","ANSWER","ANYONE","ANYWAY","APART","APPEAL","APPEAR","APPLY","APPROVE","AROUND","ARRIVE","ARTIST","ASLEEP","ASPECT","ASSESS","ASSIST","ASSUME","ATTACK","ATTEND","ATTRACT","AUTHOR","AWARD","BALANCE","BECOME","BEHAVE","BELIEF","BELONG","BENEATH","BENEFIT","BESIDE","BEYOND","BISHOP","BORDER","BOTTLE","BOTTOM","BRANCH","BREATH","BRIDGE","BRIEFLY","BRIGHT","BROKEN","BUDGET","BURDEN","CAMERA","CANCEL","CANCER","CANDLE","CAPITAL","CAREER","CAREFUL","CENTRAL","CENTURY","CERTAIN","CHAIR","CHALLENGE","CHANCE","CHANGE","CHARGE","CHOICE","CHOOSE","CHURCH","CIRCLE","CLIENT","CLIMB","CLOSELY","CLOSER","COFFEE","COLLECT","COLLEGE","COLUMN","COMBINE","COMFORT","COMMAND","COMMENT","COMMIT","COMMON","COMPARE","COMPETE","COMPLEX","CONCEPT","CONCERN","CONFIRM","CONFLICT","CONNECT","CONSENT","CONSIST","CONTACT","CONTAIN","CONTENT","CONTEST","CONTEXT","CONTROL","CONVERT","CORNER","COUNCIL","COUNTY","COUPLE","COVER","CREATE","CREDIT","CRISIS","CRITERION","CRITIC","CROWD","CULTURE","CURRENT","CUSTOM","DAMAGE","DANGER","DEALER","DEBATE","DECADE","DECIDE","DECLARE","DECREASE","DEEPLY","DEFAULT","DEFENCE","DEFEND","DEFINE","DEGREE","DELAY","DELIVER","DEMAND","DEPEND","DEPICT","DEPOSIT","DEPUTY","DERIVE","DESIGN","DESIRE","DESPITE","DESTROY","DETAIL","DETECT","DEVELOP","DEVICE","DEVOTE","DIFFER","DIFFICULT","DINNER","DIRECT","DISCUSS","DISEASE","DISMISS","DISPLAY","DISTANT","DIVIDE","DIVISION","DOCTOR","DOCUMENT","DOUBLE","DOUBT","DOZEN","DREAM","DRINK","DRIVE","EAGER","EARLY","EARTH","EASTERN","ECONOMIC","ECONOMY","EDITOR","EDUCATE","EFFECT","EFFORT","EIGHT","EITHER","ELDERLY","ELECT","ELEMENT","ELSE","EMERGE","EMPHASIS","EMPLOY","ENABLE","ENCOURAGE","ENGINE","ENJOY","ENOUGH","ENSURE","ENTER","ENTIRE","ENTITLE","EQUALLY","EQUIP","ESCAPE","ESSAY","ESSENTIAL","ESTATE","ETHNIC","EVENT","EVERY","EXACTLY","EXAMINE","EXAMPLE","EXCEED","EXCEPT","EXCHANGE","EXCITE","EXCLUDE","EXCUSE","EXERCISE","EXIST","EXPECT","EXPENSE","EXPERIENCE","EXPERT","EXPLAIN","EXPLORE","EXPOSE","EXPRESS","EXTEND","EXTENT","EXTERNAL","EXTRA","EXTREME","FACTOR","FACULTY","FAILED","FAILURE","FAIRLY","FAMLIAR","FAMOUS","FARMER","FASHION","FATHER","FAVOUR","FEELING","FEMALE","FIFTEEN","FIGHT","FIGURE","FINANCE","FINALLY","FINGER","FINISH","FLIGHT","FLOWER","FOLLOW","FOOTBALL","FORCE","FOREIGN","FOREST","FORGET","FORMAL","FORMER","FORWARD","FOUND","FOURTH","FRAME","FREEDOM","FRIEND","FUNCTION","FUTURE","GARDEN","GATHER","GENERAL","GENERATION","GENTLE","GLOBAL","GOLDEN","GROUND","GROWTH","GUARD","GUILTY","HANDLE","HAPPEN","HARDLY","HEALTH","HEAVILY","HEIGHT","HENCE","HOLIDAY","HORSE","HOSPITAL","HOUSE","HOWEVER","HUMAN","HUSBAND","IMPACT","IMPLY","IMPORT","IMPOSE","IMPROVE","INCLUDE","INCREASE","INDEED","INDICATE","INDIVIDUAL","INDUSTRY","INFORM","INITIAL","INJURY","INSIDE","INSIST","INSTANCE","INSTEAD","INSTITUTE","INTEND","INTEREST","INTERNAL","INVOLVE","ISLAND","ISSUE","ITSELF","JOINT","JUDGE","JUDGMENT","JUNIOR","JUSTICE","LABOUR","LANGUAGE","LARGELY","LATTER","LAUGH","LAWYER","LEADER","LEAGUE","LEARN","LEAVE","LEGAL","LENGTH","LESSON","LETTER","LEVEL","LIBERAL","LIBRARY","LICENCE","LIMIT","LIMITED","LITTLE","LOCAL","LONDON","LONGER","MACHINE","MAJOR","MANAGE","MANAGER","MANNER","MANY","MARKET","MARRIAGE","MATCH","MATERIAL","MATTER","MEASURE","MEDIA","MEDICAL","MEETING","MEMBER","MEMORY","MENTAL","MENTION","MERELY","METHOD","MIDDLE","MIGHT","MILE","MILITARY","MINISTER","MINOR","MINORITY","MINUTE","MISSION","MISTAKE","MODEL","MODERN","MODULE","MOMENT","MONEY","MONTH","MORNING","MOTHER","MOTION","MOTOR","MOUNTAIN","MOUTH","MOVEMENT","MOVIE","MUCH","MUSIC","MYSELF","NARROW","NATION","NATIONAL","NATIVE","NATURAL","NATURE","NEARLY","NECESSARY","NEEDLE","NEITHER","NERVE","NETWORK","NEVER","NEWLY","NIGHT","NOBODY","NORMAL","NORTHERN","NOTICE","NOTION","NOWHERE","NUMBER","OBJECT","OBSERVE","OBTAIN","OBVIOUS","OCCASION","OCCUR","OFFENCE","OFFER","OFFICE","OFFICER","OFFICIAL","OFTEN","ONCE","ONLINE","ONLY","ONTO","OPENING","OPERATE","OPPORTUNITY","OPPOSE","OPPOSITE","ORDER","ORDINARY","ORGANISE","ORIGIN","ORIGINAL","OTHER","OUGHT","OUTCOME","OUTSIDE","OVERALL","OWNER","PACKAGE","PAINT","PANEL","PARENT","PARISH","PARLIAMENT","PARTLY","PARTNER","PARTY","PASSAGE","PATIENT","PATTERN","PEACE","PEOPLE","PERFORM","PERHAPS","PERIOD","PERMIT","PERSON","PERSONAL","PHONE","PHOTO","PHYSICAL","PICTURE","PIECE","PLACE","PLANNING","PLANT","PLASTIC","PLAYER","POCKET","POINT","POLICE","POLICY","POLITICAL","POLLUTION","POPULAR","POSITION","POSITIVE","POSSIBLE","POSTER","POWER","PRACTICE","PREFER","PREPARE","PRESENCE","PRESENT","PRESIDENT","PRESS","PRESSURE","PRETTY","PREVIOUS","PRICE","PRIMARY","PRINCIPLE","PRINT","PRIOR","PRIORITY","PRISON","PRIVATE","PROBABLY","PROBLEM","PROCEDURE","PROCESS","PRODUCE","PRODUCT","PROFESSION","PROFILE","PROFIT","PROGRAM","PROGRESS","PROJECT","PROMISE","PROMOTE","PROPER","PROPERTY","PROPOSE","PROTECT","PROVIDE","PUBLIC","PUBLISH","PURPOSE","PUSH","QUALITY","QUARTER","QUESTION","QUICKLY","QUITE","RAISE","RANGE","RAPIDLY","RATELY","RATHER","REACH","REACTION","READER","READING","READY","REALISE","REALLY","REASON","RECALL","RECEIVE","RECENT","RECENTLY","RECOGNISE","RECORD","RECOVER","REDUCE","REFER","REFLECT","REFORM","REFUSE","REGARD","REGION","REGIONAL","REGULAR","RELATE","RELATION","RELATIVE","RELEASE","RELEVANT","RELIEF","RELIGION","REMAIN","REMEMBER","REMOVE","REPEAT","REPLACE","REPLY","REPORT","REPRESENT","REQUEST","REQUIRE","RESEARCH","RESOURCE","RESPECT","RESPOND","RESPONSE","RESULT","RETAIN","RETURN","REVEAL","REVENUE","REVIEW","REVOLUTION","RIGHT","RING","RISE","ROAD","ROLE","ROOM","ROUND","ROUTE","ROYAL","RULE","SAFETY","SALE","SAME","SAMPLE","SAVE","SCALE","SCENE","SCHEME","SCHOOL","SCIENCE","SCORE","SCREEN","SEARCH","SECOND","SECRETARY","SECTION","SECTOR","SECURE","SEEM","SELECT","SENIOR","SENSE","SENSITIVE","SENTENCE","SEPARATE","SEQUENCE","SERIES","SERIOUS","SERVANT","SERVICE","SESSION","SETTLE","SEVEN","SEVERAL","SEVERE","SHARE","SHEET","SHOOT","SHORT","SHOT","SHOULD","SHOULDER","SHOUT","SHOW","SIDE","SIGHT","SIGN","SIGNAL","SILENCE","SIMPLE","SIMPLY","SINCE","SINGLE","SISTER","SITE","SITUATION","SIZE","SKILL","SKIN","SLEEP","SLIGHTLY","SLOWLY","SOCIAL","SOCIETY","SOLDIER","SOLUTION","SOME","SOMEHOW","SOMEONE","SOMETHING","SOMETIMES","SOMEWHAT","SOON","SORRY","SORT","SOUND","SOURCE","SOUTHERN","SPACE","SPEAK","SPECIAL","SPECIFIC","SPEECH","SPEED","SPEND","SPIRIT","SPORT","SPOT","SPREAD","SPRING","SQUARE","STAFF","STAGE","STAND","STANDARD","START","STATE","STATEMENT","STATION","STATUS","STAY","STEP","STILL","STOCK","STONE","STOP","STORE","STORY","STRAIGHT","STRANGE","STRATEGY","STREET","STRENGTH","STRESS","STRIKE","STRONG","STRUCTURE","STUDENT","STUDIO","STUDY","STYLE","SUBJECT","SUBMIT","SUCCEED","SUCCESS","SUCH","SUDDENLY","SUFFER","SUGGEST","SUMMER","SUPPORT","SUPPOSE","SURELY","SURFACE","SURVEY","SURVIVE","SWITCH","SYSTEM","TABLE","TAKE","TALK","TARGET","TASK","TEACH","TEACHER","TEAM","TECHNOLOGY","TELEPHONE","TELEVISION","TEMPERATURE","TERM","TERRIBLE","TEST","THANKS","THEATRE","THEIR","THEME","THEMSELVES","THEN","THEORY","THERE","THESE","THEY","THING","THINK","THIRD","THIRTY","THIS","THOSE","THOUGH","THOUSAND","THREAT","THREATEN","THREE","THROUGH","THROW","TICKET","TIME","TITLE","TODAY","TOGETHER","TOMORROW","TONE","TONIGHT","TOTAL","TOTALLY","TOUCH","TOUR","TOWARDS","TOWN","TRADE","TRADITION","TRAFFIC","TRAIN","TRAINING","TRANSFER","TRANSPORT","TRAVEL","TREAT","TREATMENT","TREATY","TREND","TRIAL","TRIP","TROOP","TROUBLE","TRUE","TRUST","TRUTH","TWENTY","TWICE","TYPE","UNDER","UNDERSTAND","UNION","UNIQUE","UNIT","UNITED","UNIVERSITY","UNLESS","UNLIKE","UNTIL","UPON","UPPER","URBAN","USER","USUAL","USUALLY","VALLEY","VALUE","VARIETY","VARIOUS","VEHICLE","VERSION","VERY","VIDEO","VIEW","VILLAGE","VIOLENCE","VISION","VISIT","VISITOR","VOICE","VOLUME","VOTE","WAIT","WALK","WALL","WANT","WAR","WATCH","WATER","WAY","WEALTH","WEAPON","WEAR","WEATHER","WEEK","WEEKEND","WEIGHT","WELCOME","WELL","WESTERN","WHAT","WHATEVER","WHEN","WHERE","WHETHER","WHICH","WHILE","WHITE","WHOLE","WHOM","WHOSE","WIDE","WIDELY","WIFE","WILD","WILL","WINDOW","WINE","WINTER","WISH","WITHIN","WITHOUT","WOMAN","WONDER","WOOD","WORD","WORK","WORKER","WORLD","WORRY","WORTH","WOULD","WRITE","WRITER","WRONG","YARD","YEAR","YOURSELF", "TREES", "SEASONS", "GREET", "NIFTY", "LUMPY", "GNOME", "CAROL", "FRESNEL", "NIPPY", "BRISK", "MYSTERY", "MAYBE", "MAGNETS"];
         const prizeEmojis = [ { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: '💣', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: '💰', value: 1000000, type: 'cash_money' } ];
         const nonsenseFreebies = ['🌭','🥞','🍕','🍔','🍟','🍗','🥠','🍩', '🍰', '🍭', '🍋‍🟩', '🧋', '🍷', '🍫', '☕', '🍪'];
         const puzzleLayouts = [ { length: 5, indices: [11, 12, 13, 14, 15] }, { length: 7, indices: [28, 29, 30, 31, 32, 33, 34] }, { length: 7, indices: [46, 47, 48, 49, 50, 51, 52] }, { length: 5, indices: [65, 66, 67, 68, 69] } ];
         const trades = [
             { id: 'trade001', name: '10 🌭 for 1 Food Truck', cost: { '🌭': 10 }, reward: { type: 'inventory', item: '🚚', amount: 1 } },
-            { id: 'trade002', name: '15 🥞 for 1 Diner', cost: { '🥞': 15 }, reward: { type: 'inventory', item: '🏛️', amount: 1 } },
+            { id: 'trade002', name: '15 🥞 for 1 Diner', cost: { ' ': 15 }, reward: { type: 'inventory', item: '🏛️', amount: 1 } },
             { id: 'trade003', name: '20 🍕 for 1 Pizzeria', cost: { '🍕': 20 }, reward: { type: 'inventory', item: ' ', amount: 1 } },
             { id: 'trade004', name: '25 🍔 for 1 Burger Chain', cost: { '🍔': 25 }, reward: { type: 'inventory', item: '🍔', amount: 1 } },
             { id: 'trade005', name: '30 🍟 for 1 Potato Farm', cost: { '🍟': 30 }, reward: { type: 'inventory', item: '🥔', amount: 1 } },
@@ -1123,7 +1085,6 @@
             const dropTarget = e.target.closest('#game-grid > div');
             if (!dropTarget) return;
 
-            // Reset consecutive jackpot click counter on other actions
             jackpotConsecutiveClickCount = 0;
 
             if (isDraggingBomb && draggedTile) {
@@ -1161,7 +1122,7 @@
                     if (currentWord === puzzle.word) {
                         puzzle.solved = true;
                         timeSinceLastSolve = 0;
-                        jackpotConsecutiveClickCount = 0; // Reset counter
+                        jackpotConsecutiveClickCount = 0;
                         coins += 10000;
                         updateScoreDisplay();
                         flashScore('gain');
@@ -1323,9 +1284,8 @@
             const startY = startRect.top + startRect.height / 2;
             const endX = endRect.left + endRect.width / 2;
             const endY = endRect.top + endRect.height / 2;
-            // NEW: Added randomness to Bezier curve control points
-            const controlX = startX + (endX - startX) / 2 + (Math.random() - 0.5) * 150;
-            const controlY = startY - 100 + (Math.random() - 0.5) * 50;
+            const controlX = startX + (endX - startX) / 2 + (Math.random() - 0.5) * 200;
+            const controlY = startY - 100 + (Math.random() - 0.5) * 100;
             const curve = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
 
             for (let i = 0; i < 15; i++) {
@@ -1339,13 +1299,12 @@
             }
         }
         
-        // NEW: Coin explosion animation for the 3rd jackpot click
-        function triggerCoinExplosion(startElement) {
+        function triggerCoinExplosion(startElement, count = 50, distance = 200) {
             const startRect = startElement.getBoundingClientRect();
             const startX = startRect.left + startRect.width / 2;
             const startY = startRect.top + startRect.height / 2;
 
-            for (let i = 0; i < 50; i++) { // More coins for a bigger explosion
+            for (let i = 0; i < count; i++) {
                 const coin = document.createElement('div');
                 coin.classList.add('coin');
                 coin.style.position = 'fixed';
@@ -1353,20 +1312,19 @@
                 coin.style.top = `${startY}px`;
                 
                 const angle = Math.random() * 2 * Math.PI;
-                const distance = Math.random() * 150 + 50; // Explode outwards
-                const endX = Math.cos(angle) * distance;
-                const endY = Math.sin(angle) * distance;
+                const randomDistance = Math.random() * distance + (distance / 2);
+                const endX = Math.cos(angle) * randomDistance + (Math.random() - 0.5) * 50;
+                const endY = Math.sin(angle) * randomDistance + (Math.random() - 0.5) * 50;
 
                 coin.style.setProperty('--explode-x', `${endX}px`);
                 coin.style.setProperty('--explode-y', `${endY}px`);
 
-                coin.style.animation = `coin-explosion 0.7s ease-out forwards`;
+                coin.style.animation = `coin-explosion 0.9s ease-out forwards`;
                 coin.style.animationDelay = `${Math.random() * 0.1}s`;
                 document.body.appendChild(coin);
-                setTimeout(() => coin.remove(), 800);
+                setTimeout(() => coin.remove(), 1000);
             }
         }
-
 
         function triggerBigCoinAnimation(startElement, endElement) {
             const startRect = startElement.getBoundingClientRect();
@@ -1375,8 +1333,8 @@
             const startY = startRect.top + startRect.height / 2;
             const endX = endRect.left + endRect.width / 2;
             const endY = endRect.top + endRect.height / 2;
-            const controlX = startX + (endX - startX) / 2 + (Math.random() - 0.5) * 100;
-            const controlY = startY - 100 + (Math.random() - 0.5) * 50;
+            const controlX = startX + (endX - startX) / 2 + (Math.random() - 0.5) * 150;
+            const controlY = startY - 100 + (Math.random() - 0.5) * 80;
             const curve = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
             
             const coin = document.createElement('div');
@@ -1402,8 +1360,8 @@
                 const angle = (i / 20) * (2 * Math.PI);
                 const startX = centerX + Math.cos(angle) * startRadius;
                 const startY = centerY + Math.sin(angle) * startRadius;
-                const controlX = startX + (endX - startX) / 2 + (Math.random() - 0.5) * 200;
-                const controlY = startY + (endY - startY) / 2 + (Math.random() - 0.5) * 200;
+                const controlX = startX + (endX - startX) / 2 + (Math.random() - 0.5) * 250;
+                const controlY = startY + (endY - startY) / 2 + (Math.random() - 0.5) * 250;
                 const curve = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
                 coin.style.offsetPath = `path('${curve}')`;
                 coin.style.animation = `coin-swirl-in 1s cubic-bezier(0.5, 0, 0.9, 0.5) forwards`;
@@ -1416,7 +1374,7 @@
         function onSolveButtonClick() {
             if (timeRemaining <= 0 || solveButtonCooldown > 0) return;
             GJACKVARNUM = 0;
-            jackpotConsecutiveClickCount = 0; // Reset counter
+            jackpotConsecutiveClickCount = 0;
 
             const unsolvedPuzzles = puzzles.filter(p => !p.solved);
             if (unsolvedPuzzles.length === 0) return;
@@ -1470,15 +1428,16 @@
 
             timeSinceLastSolve = 0;
             GJACKVARNUM++;
-            jackpotConsecutiveClickCount++; // Increment new counter
+            jackpotConsecutiveClickCount++;
             coins += 50000;
             updateScoreDisplay();
             flashScore('gain');
             
-            // NEW: Trigger coin explosion on 3rd consecutive click
-            if (jackpotConsecutiveClickCount === 3) {
-                triggerCoinExplosion(jackpotSquare);
-                jackpotConsecutiveClickCount = 0; // Reset after explosion
+            if (jackpotConsecutiveClickCount === 5) {
+                triggerCoinExplosion(jackpotSquare, 150, 350); // Bigger explosion
+                jackpotConsecutiveClickCount = 0; 
+            } else if (jackpotConsecutiveClickCount === 3) {
+                triggerCoinExplosion(jackpotSquare, 50, 200); // Standard explosion
             } else {
                 triggerCoinAnimation(jackpotSquare, document.getElementById('coins-display'));
             }
@@ -1487,7 +1446,7 @@
             if (GJACKVARNUM === 4) {
                 showEventText("Yep! You're Greedy!");
             } else if (GJACKVARNUM === 8) {
-                showEventText("Oh really now."); // UPDATED: Message changed
+                showEventText("Oh really now.");
             } else if (GJACKVARNUM >= 12) {
                 coins = Math.floor(coins / 2);
                 updateScoreDisplay();
@@ -1511,7 +1470,7 @@
             const currentDelay = minDelay + (maxDelay - minDelay) * Math.pow(1 - progress, 3);
 
             prizeSpawnerTimeout = setTimeout(() => {
-                if (levelGoodies.length > 0 && Math.random() < 0.1) { // 10% chance for a goodie
+                if (levelGoodies.length > 0 && Math.random() < 0.1) {
                     spawnSpecialGoodie();
                 } else {
                     spawnPrizeEmoji();
@@ -1536,7 +1495,6 @@
             if (emptyTiles.length === 0) return;
             const tile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
             
-            // Clean the tile before use
             const newTile = tile.cloneNode(false);
             tile.parentNode.replaceChild(newTile, tile);
 
@@ -1547,12 +1505,10 @@
             newTile.classList.add('prize-tile', 'cash-money-prize');
 
             const clickHandler = () => {
-                // Immediately neutralize the tile to prevent race conditions
                 newTile.textContent = '';
                 newTile.classList.remove('prize-tile', 'cash-money-prize');
                 clearTimeout(despawnTimer);
 
-                // Then, perform game logic
                 coins += 1000000;
                 updateScoreDisplay();
                 flashScore('gain');
@@ -1588,7 +1544,6 @@
                     }
                 }
             }
-            // BUG FIX: If the board is full, clear a few random tiles to make space
             if (emptyTiles.length === 0) {
                 const nonPuzzleTiles = [];
                  for(let i=0; i<81; i++) {
@@ -1606,12 +1561,11 @@
                         }
                     }
                 }
-                if (emptyTiles.length === 0) return; // Still no space, so we give up for this cycle
+                if (emptyTiles.length === 0) return;
             }
 
             const tile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
             
-            // Clean the tile before use
             const newTile = tile.cloneNode(false);
             tile.parentNode.replaceChild(newTile, tile);
             
@@ -1634,9 +1588,8 @@
             const clickHandler = () => {
                 GJACKVARNUM = 0;
                 timeSinceLastSolve = 0;
-                jackpotConsecutiveClickCount = 0; // Reset counter
+                jackpotConsecutiveClickCount = 0;
                 
-                // Immediately clear the despawn timer
                 clearTimeout(despawnTimer);
 
                 if (newTile.dataset.prizeType === 'game_over') { 
@@ -1664,7 +1617,6 @@
                         showEventText("Oh Yeah!");
                     }
                 }
-                // Clean up the tile after processing, unless it's a dragged bomb
                 if (newTile.dataset.prizeType !== 'green_bomb' || !isDraggingBomb) {
                     newTile.textContent = '';
                     newTile.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
@@ -1874,14 +1826,13 @@
         }
 
         function startGreenBombSequence(bombTile) {
-            playerData.greenBombsUsed++; // Increment badge counter
+            playerData.greenBombsUsed++;
             const bombIndex = parseInt(bombTile.id.split('-')[1]);
             const adjacentIndices = getAdjacentIndices(bombIndex);
             
             adjacentIndices.forEach(index => {
                 const adjTile = document.getElementById(`tile-${index}`);
                 if (adjTile) {
-                    // NEW: Check for special goodie tiles
                     if (adjTile.classList.contains('special-goodie-tile')) {
                         handleSpecialGoodieCollection(adjTile);
                     } else if (adjTile.classList.contains('prize-tile')) {
@@ -1922,7 +1873,7 @@
             setTimeout(() => {
                 updateScoreDisplay();
                 checkAllPuzzles();
-                savePlayerProfile(); // Save after using the bomb
+                savePlayerProfile();
             }, 100);
         }
 
@@ -1981,16 +1932,16 @@
             if (jackpotSquare) {
                 jackpotSquare.classList.remove('endgame-pulse');
             }
-            saveGameResult(); // This now increments gamesPlayed
-            checkAndAwardBadges(coins); // Check for new badges at the end of the game
+            saveGameResult();
+            checkAndAwardBadges(coins);
             clearInterval(mainTimerInterval);
             clearTimeout(prizeSpawnerTimeout);
             clearTimeout(diamondSequenceTimeout);
             clearInterval(scoreDecayInterval);
             clearTimeout(impTimeout);
-            clearTimeout(goodieSpawnTimer); // NEW: Clear goodie spawn timer
-            endFreeze(); // Ensure freeze effect is cleared
-            endHeartAnimation(); // Ensure heart effect is cleared
+            clearTimeout(goodieSpawnTimer);
+            endFreeze();
+            endHeartAnimation();
             clearInterval(solveButtonPulseManager);
             timeRemaining = 0;
             document.getElementById('timer-display').textContent = "00:00";
@@ -2029,12 +1980,13 @@
             });
         }
 
-        function showGameOverModal() {
-            // NEW: Populate the game summary panel
+        async function showGameOverModal() {
             document.getElementById('summary-final-score').textContent = coins.toLocaleString();
             document.getElementById('summary-high-score').textContent = (playerData.highScore || 0).toLocaleString();
             document.getElementById('summary-bags-earned').textContent = bagsOfMoney.toLocaleString();
             document.getElementById('summary-level-reached').textContent = currentLevel;
+
+            await populateLeaderboard();
 
             const gameOverModal = document.getElementById('game-over-modal');
             gameOverModal.classList.remove('hidden');
@@ -2064,13 +2016,54 @@
             }, 200);
         }
         
+        async function populateLeaderboard() {
+            const listContainer = document.getElementById('leaderboard-list');
+            listContainer.innerHTML = '<p class="text-slate-400">Loading...</p>';
+
+            if (!isFirebaseConnected || !db) {
+                listContainer.innerHTML = '<p class="text-slate-400">Leaderboard offline.</p>';
+                return;
+            }
+
+            try {
+                const playersRef = collection(db, "players");
+                const q = query(playersRef, orderBy("highScore", "desc"), limit(5));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    listContainer.innerHTML = '<p class="text-slate-400">No scores yet. Be the first!</p>';
+                    return;
+                }
+
+                listContainer.innerHTML = '';
+                let rank = 1;
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const entry = document.createElement('div');
+                    entry.className = 'leaderboard-entry';
+                    entry.innerHTML = `
+                        <div>
+                            <span class="leaderboard-rank">#${rank}</span>
+                            <span class="leaderboard-name ml-2">${data.name || 'Player'}</span>
+                        </div>
+                        <span class="leaderboard-score">${(data.highScore || 0).toLocaleString()}</span>
+                    `;
+                    listContainer.appendChild(entry);
+                    rank++;
+                });
+            } catch (error) {
+                console.error("Error fetching leaderboard:", error);
+                listContainer.innerHTML = '<p class="text-red-400">Error loading leaderboard.</p>';
+            }
+        }
+
         function pauseGame() {
             isGamePaused = true;
             clearInterval(mainTimerInterval);
             clearTimeout(prizeSpawnerTimeout);
             clearInterval(scoreDecayInterval);
             clearTimeout(impTimeout);
-            clearTimeout(goodieSpawnTimer); // NEW: Pause goodie spawn timer
+            clearTimeout(goodieSpawnTimer);
             document.querySelectorAll('.ice-block').forEach(block => block.style.display = 'none');
         }
 
@@ -2082,7 +2075,7 @@
                 scheduleNextPrizeSpawn();
             }
             scoreDecayInterval = setInterval(handleScoreDecay, 1000);
-            scheduleGoodieSpawn(); // NEW: Resume goodie spawn timer
+            scheduleGoodieSpawn();
             if (isFrozen) {
                 document.querySelectorAll('.ice-block').forEach(block => block.style.display = 'block');
             }
@@ -2105,9 +2098,8 @@
             isFrozen = true;
             clearTimeout(prizeSpawnerTimeout);
             clearTimeout(impTimeout);
-            clearTimeout(goodieSpawnTimer); // NEW: Pause goodie spawn timer
+            clearTimeout(goodieSpawnTimer);
             
-            // Clear any existing freeze animation before starting a new one
             clearInterval(freezeAnimationInterval);
 
             freezeAnimationInterval = setInterval(() => {
@@ -2172,7 +2164,7 @@
         }
         
         function spawnHeartAnimation() {
-            if (heartAnimationInterval) return; // Don't start if already running
+            if (heartAnimationInterval) return;
             heartAnimationInterval = setInterval(() => {
                 const heart = document.createElement('div');
                 heart.classList.add('falling-heart');
@@ -2183,7 +2175,7 @@
                 document.body.appendChild(heart);
                 setTimeout(() => heart.remove(), 9000);
             }, 500);
-            setTimeout(endHeartAnimation, 8000); // Let it run for 8 seconds
+            setTimeout(endHeartAnimation, 8000);
         }
 
         function endHeartAnimation() {
@@ -2218,7 +2210,7 @@
             mainTimerInterval = setInterval(updateTimer, 1000);
             scoreDecayInterval = setInterval(handleScoreDecay, 1000);
             scheduleNextPrizeSpawn();
-            scheduleGoodieSpawn(); // NEW: Start the goodie spawn timer
+            scheduleGoodieSpawn();
             clearInterval(solveButtonPulseManager); 
             solveButtonPulseManager = setInterval(() => {
                 if (isGamePaused || isGameOver) return;
@@ -2255,7 +2247,7 @@
             jackpotEventAvailable = true;
             specialCashEmojiSpawned = false;
             timedEvents = { sixMin: true, threeMin: true, heartEvent1: true, heartEvent2: true };
-            isSpecialAnimationActive = false; // BUG FIX: Reset this state on restart
+            isSpecialAnimationActive = false;
             endgameJackpotActive = false;
             
             clearInterval(mainTimerInterval);
@@ -2469,10 +2461,9 @@
             originalUserPlaylist = [...userPlaylist];
         }
         
-        // --- Player Data & Store Logic (LocalStorage with Firebase Sync) ---
         function getDefaultPlayerData() {
             return {
-                userId: userId || 'local', // Use 'local' if no userId yet
+                userId: userId || 'local',
                 name: 'Player',
                 moneyBags: 0,
                 highScore: 0,
@@ -2496,7 +2487,6 @@
                  if (!playerData.unlockedBadges) playerData.unlockedBadges = [];
                  if (!playerData.gamesPlayed) playerData.gamesPlayed = 0;
                  if (!playerData.greenBombsUsed) playerData.greenBombsUsed = 0;
-                 // Ensure nonsenseFreebiesCollected is an object
                  if (typeof playerData.nonsenseFreebiesCollected !== 'object' || playerData.nonsenseFreebiesCollected === null) {
                     playerData.nonsenseFreebiesCollected = {};
                  }
@@ -2505,7 +2495,7 @@
             }
             applyTheme(playerData.activeSkin);
             populateSetupModal();
-            displayBadges(); // Display badges on load
+            displayBadges();
         }
         
         async function syncWithFirebase() {
@@ -2516,21 +2506,18 @@
                 const docSnap = await getDoc(playerDocRef);
                 if (docSnap.exists()) {
                     const cloudData = docSnap.data();
-                    // Simple merge: cloud data takes precedence for scores and bags
                     playerData.highScore = Math.max(playerData.highScore || 0, cloudData.highScore || 0);
                     playerData.moneyBags = Math.max(playerData.moneyBags || 0, cloudData.moneyBags || 0);
                     playerData.gamesPlayed = Math.max(playerData.gamesPlayed || 0, cloudData.gamesPlayed || 0);
                     playerData.greenBombsUsed = Math.max(playerData.greenBombsUsed || 0, cloudData.greenBombsUsed || 0);
-                    // Merge badges
                     const localBadges = new Set(playerData.unlockedBadges || []);
                     const cloudBadges = new Set(cloudData.unlockedBadges || []);
                     playerData.unlockedBadges = Array.from(new Set([...localBadges, ...cloudBadges]));
                     
                     console.log("Player data synced with Firebase.");
                 }
-                // Always save the latest (potentially merged) data back to Firebase
                 await savePlayerProfile();
-                displayBadges(); // Re-display badges after sync
+                displayBadges();
             } catch (error) {
                 console.error("Error syncing with Firestore:", error);
             }
@@ -2549,7 +2536,6 @@
             }
         }
 
-        // --- Trading Post & Riches Logic ---
         function canAffordAnyTrade() {
             return trades.some(trade => {
                 const costItem = Object.keys(trade.cost)[0];
@@ -2576,6 +2562,7 @@
             document.getElementById('trading-post-modal').classList.remove('hidden');
         }
 
+```javascript
         function populateTradingPost() {
             const container = document.getElementById('available-trades-container');
             container.innerHTML = '';
@@ -2755,38 +2742,32 @@
                 document.body.classList.add(`theme-${themeId}`);
             }
         }
-        
-        // NEW: Updated themes array with new prices and new themes
+
         const themes = [
             { id: 'default', name: 'Purple Haze', cost: 0, colors: ['#a78bfa', '#8b5cf6'] },
-            { id: 'blue', name: 'Ocean Blue', cost: 2200000, colors: ['#60a5fa', '#3b82f6'] },
-            { id: 'green', name: 'Emerald City', cost: 4200000, colors: ['#4ade80', '#22c55e'] },
-            { id: 'red', name: 'Ruby Rush', cost: 6200000, colors: ['#f87171', '#ef4444'] },
-            { id: 'christmas', name: 'Christmas', cost: 8200000, colors: ['#dc2626', '#166534'] },
-            { id: 'halloween', name: 'Halloween', cost: 10200000, colors: ['#f97316', '#4a044e'] },
-            { id: 'winter', name: 'Winter', cost: 12200000, colors: ['#67e8f9', '#0c4a6e'] },
-            { id: 'beach', name: 'Beach', cost: 14200000, colors: ['#fde047', '#2dd4bf'] },
-            { id: 'grove', name: 'Grove Palms', cost: 16200000, colors: ['#22c55e', '#f59e0b'] },
-            { id: 'dark-purple', name: 'Dark Purples', cost: 21200000, colors: ['#5b21b6', '#4c1d95'] },
-            { id: 'grayscale', name: 'Grayscale', cost: 26200000, colors: ['#6b7280', '#374151'] },
-            { id: 'stage-lights', name: 'Stage Lights', cost: 31200000, colors: ['#ec4899', '#8b5cf6'] },
-            { id: 'dark-aqua', name: 'Dark Aqua', cost: 36200000, colors: ['#2dd4bf', '#0d9488'] },
-            { id: 'brownstone', name: 'Brownstone', cost: 41200000, colors: ['#a16207', '#854d0e'] },
-            // --- NEW THEMES START HERE ---
-            { id: 'burlap', name: 'Burlap', cost: 56200000, colors: ['#d2b48c', '#a0522d'] },
-            { id: 'sapphire-ritz', name: 'Sapphire Ritz', cost: 71200000, colors: ['#0f52ba', '#003366'] },
-            { id: 'vegan-dinner', name: 'Vegan Dinner', cost: 86200000, colors: ['#2e8b57', '#006400'] },
-            { id: 'paper-day', name: 'Paper Day', cost: 101200000, colors: ['#e6e6fa', '#d8bfd8'] },
-            { id: 'lily-sunday', name: 'Lily Sunday', cost: 116200000, colors: ['#ffb6c1', '#ff69b4'] },
-            { id: 'neon-ice', name: 'Neon Ice', cost: 131200000, colors: ['#00ffff', '#00ced1'] },
-            { id: 'winter-nights', name: 'Winter Nights', cost: 146200000, colors: ['#4682b4', '#4169e1'] },
-            { id: 'melancholy', name: 'Melancholy', cost: 161200000, colors: ['#6a5acd', '#483d8b'] },
-            { id: 'patterno', name: 'Patterno', cost: 176200000, colors: ['#ff6347', '#ff4500'] },
-            { id: 'splashy', name: 'Splashy', cost: 191200000, colors: ['#00fa9a', '#00ff7f'] },
-            { id: 'sunflower', name: 'Sunflower', cost: 206200000, colors: ['#ffd700', '#ffc700'] },
-            { id: 'rosy-petals', name: 'Rosy Petals', cost: 221200000, colors: ['#ffc0cb', '#ffb6c1'] },
-            { id: 'limerick', name: 'Limerick', cost: 236200000, colors: ['#32cd32', '#228b22'] },
-            { id: 'rich-colors', name: 'Rich Colors', cost: 251200000, colors: ['#800080', '#4b0082'] },
+            { id: 'blue', name: 'Ocean Blue', cost: 1000000, colors: ['#60a5fa', '#3b82f6'] },
+            { id: 'green', name: 'Emerald City', cost: 3000000, colors: ['#4ade80', '#22c55e'] },
+            { id: 'red', name: 'Ruby Rush', cost: 5000000, colors: ['#f87171', '#ef4444'] },
+            { id: 'christmas', name: 'Christmas', cost: 7000000, colors: ['#dc2626', '#166534'] },
+            { id: 'halloween', name: 'Halloween', cost: 9000000, colors: ['#f97316', '#4a044e'] },
+            { id: 'winter', name: 'Winter', cost: 11000000, colors: ['#67e8f9', '#0c4a6e'] },
+            { id: 'beach', name: 'Beach', cost: 13000000, colors: ['#fde047', '#2dd4bf'] },
+            { id: 'grove', name: 'Grove Palms', cost: 15000000, colors: ['#22c55e', '#f59e0b'] },
+            { id: 'dark-purple', name: 'Dark Purples', cost: 20000000, colors: ['#5b21b6', '#4c1d95'] },
+            { id: 'grayscale', name: 'Grayscale', cost: 25000000, colors: ['#6b7280', '#374151'] },
+            { id: 'stage-lights', name: 'Stage Lights', cost: 30000000, colors: ['#ec4899', '#8b5cf6'] },
+            { id: 'dark-aqua', name: 'Dark Aqua', cost: 35000000, colors: ['#2dd4bf', '#0d9488'] },
+            { id: 'brownstone', name: 'Brownstone', cost: 40000000, colors: ['#a16207', '#854d0e'] },
+            { id: 'burlap', name: 'Burlap', cost: 46200000, colors: ['#d2b48c', '#8b4513'] },
+            { id: 'sapphire-ritz', name: 'Sapphire Ritz', cost: 61200000, colors: ['#0f52ba', '#000080'] },
+            { id: 'candy-apple', name: 'Candy Apple', cost: 76200000, colors: ['#ff0800', '#8b0000'] },
+            { id: 'cosmic-latte', name: 'Cosmic Latte', cost: 91200000, colors: ['#fff8e7', '#d2b48c'] },
+            { id: 'forest-fern', name: 'Forest Fern', cost: 106200000, colors: ['#556b2f', '#006400'] },
+            { id: 'royal-purple', name: 'Royal Purple', cost: 121200000, colors: ['#7851a9', '#483d8b'] },
+            { id: 'sunny-delight', name: 'Sunny Delight', cost: 136200000, colors: ['#f9a602', '#f47a2d'] },
+            { id: 'blushing-bride', name: 'Blushing Bride', cost: 151200000, colors: ['#ffefef', '#ffe4e1'] },
+
+            { id: 'rich-colors', name: 'Rich Colors', cost: 251200000, colors: ['#ffd700', '#daa520'] },
             { id: 'mahogany', name: 'Mahogany', cost: 266200000, colors: ['#c04000', '#800000'] },
             { id: 'chic', name: 'Chic', cost: 281200000, colors: ['#f5f5dc', '#d3d3d3'] },
             { id: 'fashion-model', name: 'Fashion Model', cost: 296200000, colors: ['#ff69b4', '#ff1493'] },
