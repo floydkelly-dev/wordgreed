@@ -138,24 +138,25 @@
         @keyframes start-button-pulse { 0%, 100% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 10px #60a5fa, 0 0 20px #60a5fa; } 5% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 20px #3b82f6, 0 0 40px #3b82f6; } 15% { box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 10px #60a5fa, 0 0 20px #60a5fa; } }
         #start-game-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; animation: start-button-pulse 15s infinite; }
         #claim-bonus-button { background: linear-gradient(145deg, #16a34a, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
-        #play-again-button, #close-leaderboard-button { background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af; border-bottom: 4px solid #1f2937; }
-        #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button, #close-daily-rewards-button, #close-trading-post-button, #close-riches-button, #close-tips-button, #close-privacy-button, #close-giving-button, #close-badges-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
+        #play-again-button { background: linear-gradient(145deg, #6b7280, #4b5563); border-color: #9ca3af; border-bottom: 4px solid #1f2937; }
+        #close-help-button, #close-about-button, #close-playlist-button, #close-setup-button, #close-daily-rewards-button, #close-trading-post-button, #close-riches-button, #close-tips-button, #close-privacy-button, #close-giving-button, #close-badges-button, #close-give-all-button { background: linear-gradient(145deg, #5c97f5, #3b82f6); border-color: #93c5fd; border-bottom: 4px solid #1e3a8a; }
         #about-button, #privacy-policy-button { background: linear-gradient(145deg, #8b5cf6, #7c3aed); border-color: #a78bfa; border-bottom: 4px solid #5b21b6; }
         #setup-button { background: linear-gradient(145deg, #22c55e, #15803d); border-color: #4ade80; border-bottom: 4px solid #14532d; }
         #daily-rewards-button { background: linear-gradient(145deg, #f59e0b, #d97706); border-color: #fbbf24; border-bottom: 4px solid #92400e; }
         #tips-button, #badges-button { background: linear-gradient(145deg, #f97316, #ea580c); border-color: #fb923c; border-bottom: 4px solid #c2410c; }
         #confirm-reset-button { background: linear-gradient(145deg, #f87171, #ef4444); border-color: #fca5a5; border-bottom: 4px solid #7f1d1d; }
-        .theme-button { width: 2.5rem; height: 2.5rem; border-radius: 50%; background-color: var(--panel-bg); border: 1px solid var(--panel-border); color: white; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; padding: 0; position: relative; }
+        .theme-button { width: 3rem; height: 3rem; border-radius: 50%; background-color: var(--panel-bg); border: 1px solid var(--panel-border); color: white; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; padding: 0; position: relative; }
         .theme-button:hover .tooltip { opacity: 1; visibility: visible; }
         .theme-button.difficulty-active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.6); transform: translateY(1px); }
-        .theme-button svg { transform: scale(0.9); }
+        .theme-button svg { transform: scale(0.9); opacity: 0.8; }
         .tooltip { visibility: hidden; opacity: 0; width: 120px; background-color: black; color: #fff; text-align: center; border-radius: 6px; padding: 5px 0; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -60px; transition: opacity 0.3s; font-size: 0.75rem; }
         .tooltip::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: black transparent transparent transparent; }
         #help-button { font-size: 1.25rem; font-weight: bold; }
         #difficulty-default .orb { fill: #8B5CF6; } #difficulty-easy .orb { fill: #3B82F6; } #difficulty-medium .orb { fill: #F59E0B; } #difficulty-hard .orb { fill: #EF4444; }
         /* NEW: Orb glowing animation */
-        @keyframes orb-glow { 0%, 100% { box-shadow: 0 0 5px var(--glow-color), 0 0 10px var(--glow-color); } 50% { box-shadow: 0 0 15px var(--glow-color), 0 0 25px var(--glow-color); } }
+        @keyframes orb-glow { 0%, 100% { filter: drop-shadow(0 0 8px var(--glow-color)) brightness(1.2); opacity: 0.8; } 50% { filter: drop-shadow(0 0 16px var(--glow-color)) brightness(1.5); opacity: 1; } }
         .glowing-orb { animation: orb-glow 1.5s infinite ease-in-out; }
+        .orb { transition: all 0.3s ease; }
         .score-decay { color: #ef4444 !important; }
         .greed-icon {
             width: 3rem; height: 3rem; background-color: var(--primary-color); border-radius: 50%; display: flex;
@@ -280,12 +281,32 @@
             grid-template-columns: repeat(8, 1fr);
             gap: 0.5rem;
         }
-        .freebie-item { text-align: center; font-size: 1.25rem; }
+        .freebie-item { text-align: center; font-size: 1.25rem; position: relative; cursor: pointer; }
         .freebie-count { font-size: 0.75rem; font-weight: bold; color: var(--primary-color-light); }
         .freebie-item.tradable {
             animation: pulse-glow-amber 1.5s infinite ease-in-out;
             border-radius: 0.5rem;
         }
+        /* NEW: Special Collector Freebie Styles */
+        .freebie-item.special-collector {
+            background-color: #000;
+            border-radius: 0.5rem;
+            position: relative;
+        }
+        .freebie-item.special-collector::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 10px;
+            background: conic-gradient(from 180deg at 50% 50%, #fbbf24, #f59e0b, #d97706, #fbbf24);
+            animation: spin 3s linear infinite;
+            z-index: -1;
+        }
+        @keyframes emoji-flyout {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--flyout-x), var(--flyout-y)) scale(0.5); opacity: 0; }
+        }
+
         /* Help Modal Footer Layout */
         #help-modal-footer {
             display: flex; flex-direction: column; align-items: center; width: 100%; gap: 0.75rem;
@@ -525,6 +546,33 @@
             flex-shrink: 0;
         }
 
+        /* Give It All Away Modal */
+        #give-all-inventory {
+            max-height: 30vh;
+            overflow-y: auto;
+            background-color: rgba(0,0,0,0.2);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+        .give-all-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+        .give-all-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        .give-all-item.selected {
+            background-color: var(--primary-color-dark);
+        }
+        #give-all-leaderboard {
+            max-height: 20vh;
+            overflow-y: auto;
+        }
+
     </style>
 </head>
 <body class="text-white flex items-center justify-center min-h-screen p-4">
@@ -619,7 +667,7 @@
             </h1>
             <p class="text-lg text-slate-300">Drag and drop letters to solve jumbled words. Grab Big Prizes and Get Greedy!</p>
             <button id="start-game-button" class="glassy-button text-white font-bold py-3 px-8 rounded-lg text-2xl">Start Game</button>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.4</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.5</div>
         </div>
     </div>
 
@@ -648,11 +696,15 @@
                     <span class="font-semibold text-slate-300">Level Reached:</span>
                     <span id="summary-level-reached" class="font-bold text-white text-right">1</span>
                 </div>
+                <hr class="border-slate-600 my-3">
+                <h4 class="text-xl font-bold text-amber-200 mb-2">Leaderboard</h4>
+                <div id="leaderboard-container" class="text-left">
+                    <!-- Leaderboard content will be injected here -->
+                </div>
             </div>
 
             <div class="flex items-center gap-4 mt-4">
                 <button id="play-again-button" class="glassy-button text-white font-bold py-3 px-6 rounded-lg text-xl">Play Again</button>
-                <button id="close-leaderboard-button" class="glassy-button text-white font-bold py-3 px-6 rounded-lg text-xl">Close</button>
             </div>
         </div>
     </div>
@@ -693,7 +745,7 @@
                     <button id="close-help-button" class="glassy-button text-white font-bold py-2 px-3 rounded-lg text-sm">Close</button>
                 </div>
             </div>
-            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.4</div>
+            <div class="absolute bottom-2 right-4 text-xs text-slate-500">v3.5</div>
         </div>
     </div>
 
@@ -731,7 +783,7 @@
                 <p>Created by: <span class="font-bold text-white">Floyd Kelly</span></p>
                 <p>Music by: <span class="font-bold text-white">Floyd Kelly and Udio</span></p>
                 <p><span class="font-bold text-white">Concept:</span> Floyd Kelly, <span class="font-bold text-white">Code:</span> Google Gemini</p>
-                <p>Version: <span class="font-bold text-white">3.4</span></p>
+                <p>Version: <span class="font-bold text-white">3.5</span></p>
                 <p>Build Date: <span class="font-bold text-white">August 12, 2025</span></p>
                 <p><a href="https://floydkellycreates.wordpress.com/contact-me/" target="_blank" class="text-purple-300 hover:text-purple-200">Contact the Developer</a></p>
             </div>
@@ -894,10 +946,37 @@
             </div>
             <div class="flex justify-center mt-4 gap-4">
                 <button id="execute-give-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg" style="background: linear-gradient(145deg, #a78bfa, #8b5cf6); border-color: #c4b5fd;" disabled>Give Selected Item</button>
+                <button id="give-it-all-away-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg" style="background: linear-gradient(145deg, #166534, #14532d); border-color: #22c55e;">Give It All Away</button>
                 <button id="close-giving-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
             </div>
         </div>
     </div>
+
+    <!-- Give It All Away Modal -->
+    <div id="give-all-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[80] p-4">
+        <div class="glass-panel p-8 rounded-2xl flex flex-col gap-4 w-full max-w-2xl relative">
+            <h2 class="text-2xl font-bold text-amber-300 text-center">Give It All Away</h2>
+            <div class="flex gap-4">
+                <div class="w-1/2">
+                    <h3 class="text-lg font-bold">Your Inventory</h3>
+                    <div id="give-all-inventory" class="mt-2">
+                        <!-- Inventory list will be injected here -->
+                    </div>
+                </div>
+                <div class="w-1/2">
+                    <h3 class="text-lg font-bold">Leaderboard</h3>
+                    <div id="give-all-leaderboard" class="mt-2">
+                        <!-- Leaderboard will be injected here -->
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center mt-4 gap-4">
+                <button id="confirm-give-all-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg" style="background: linear-gradient(145deg, #166534, #14532d); border-color: #22c55e;" disabled>Confirm Gift</button>
+                <button id="close-give-all-button" class="glassy-button text-white font-bold py-2 px-6 rounded-lg text-lg">Close</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Riches Modal -->
     <div id="riches-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
@@ -918,7 +997,7 @@
         // --- Firebase Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, limit, getDocs, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DOM Elements ---
         const gridContainer = document.getElementById('game-grid');
@@ -928,6 +1007,7 @@
         // --- Firebase State ---
         let auth, db, userId;
         let isFirebaseConnected = false;
+        let gameStartTimeout = null; // Failsafe timer
 
         // --- Game Data & State ---
         let coins = 0, bagsOfMoney = 0, draggedTile = null, playerData = {}, currentLevel = 1;
@@ -949,9 +1029,9 @@
         let levelGoodies = [];
         let selectedTrade = null;
         let selectedDonation = null;
-        let jackpotConsecutiveClickCount = 0; // NEW: Counter for jackpot consecutive clicks
-        let goodieSpawnTimer = null; // NEW: Timer for the special goodie spawn
-        let orbGlowInterval = null; // NEW: Timer for orb glowing effect
+        let jackpotConsecutiveClickCount = 0;
+        let collectorGoodieSpawnTimer = null;
+        let orbGlowInterval = null;
 
         // --- Playlist Data ---
         const songDatabase = [
@@ -964,7 +1044,7 @@
             { id: '007', title: 'Rich Shadows', filename: 'wordgreed007.mp3' },
             { id: '008', title: 'Reversal of Fortune', filename: 'wordgreed008.mp3' },
             { id: '009', title: 'Ascending Choices', filename: 'wordgreed009.mp3' },
-            { id: '010', title: 'Soul Beyond Desires', filename: 'wordgreed010.mp3' } // NEW: Added new song
+            { id: '010', title: 'Soul Beyond Desires', filename: 'wordgreed010.mp3' }
         ];
         let verifiedPlaylist = [], userPlaylist = [], originalUserPlaylist = [];
         let currentTrackIndex = 0, isShuffled = false;
@@ -974,10 +1054,10 @@
         const speakerIconHref = `data:image/svg+xml,${encodeURIComponent(speakerSVG)}`;
 
         // --- Word Bank & Prize Data ---
-        // UPDATED: Word bank with additions and removals
         const wordBank = ["ABROAD","ACCEPT","ACCESS","ACROSS","ACTION","ACTIVE","ADMIRE","ADVICE","AFFAIR","AFFECT","AFFORD","AGENCY","AGENDA","ALMOST","ALWAYS","AMOUNT","ANIMAL","ANNUAL","ANSWER","ANYONE","ANYWAY","APART","APPEAL","APPEAR","APPLY","APPROVE","AROUND","ARRIVE","ARTIST","ASLEEP","ASPECT","ASSESS","ASSIST","ASSUME","ATTACK","ATTEND","ATTRACT","AUTHOR","AWARD","BALANCE","BECOME","BEHAVE","BELIEF","BELONG","BENEATH","BENEFIT","BESIDE","BEYOND","BISHOP","BORDER","BOTTLE","BOTTOM","BRANCH","BREATH","BRIDGE","BRIEFLY","BRIGHT","BROKEN","BUDGET","BURDEN","CAMERA","CANCEL","CANCER","CANDLE","CAPITAL","CAREER","CAREFUL","CENTRAL","CENTURY","CERTAIN","CHAIR","CHALLENGE","CHANCE","CHANGE","CHARGE","CHOICE","CHOOSE","CHURCH","CIRCLE","CLIENT","CLIMB","CLOSELY","CLOSER","COFFEE","COLLECT","COLLEGE","COLUMN","COMBINE","COMFORT","COMMAND","COMMENT","COMMIT","COMMON","COMPARE","COMPETE","COMPLEX","CONCEPT","CONCERN","CONFIRM","CONFLICT","CONNECT","CONSENT","CONSIST","CONTACT","CONTAIN","CONTENT","CONTEST","CONTEXT","CONTROL","CONVERT","CORNER","COUNCIL","COUNTY","COUPLE","COVER","CREATE","CREDIT","CRISIS","CRITERION","CRITIC","CROWD","CULTURE","CURRENT","CUSTOM","DAMAGE","DANGER","DEALER","DEBATE","DECADE","DECIDE","DECLARE","DECREASE","DEEPLY","DEFAULT","DEFENCE","DEFEND","DEFINE","DEGREE","DELAY","DELIVER","DEMAND","DEPEND","DEPICT","DEPOSIT","DEPUTY","DERIVE","DESIGN","DESIRE","DESPITE","DESTROY","DETAIL","DETECT","DEVELOP","DEVICE","DEVOTE","DIFFER","DIFFICULT","DINNER","DIRECT","DISCUSS","DISEASE","DISMISS","DISPLAY","DISTANT","DIVIDE","DIVISION","DOCTOR","DOCUMENT","DOUBLE","DOUBT","DOZEN","DREAM","DRINK","DRIVE","EAGER","EARLY","EARTH","EASTERN","ECONOMIC","ECONOMY","EDITOR","EDUCATE","EFFECT","EFFORT","EIGHT","EITHER","ELDERLY","ELECT","ELEMENT","ELSE","EMERGE","EMPHASIS","EMPLOY","ENABLE","ENCOURAGE","ENGINE","ENJOY","ENOUGH","ENSURE","ENTER","ENTIRE","ENTITLE","EQUALLY","EQUIP","ESCAPE","ESSAY","ESSENTIAL","ESTATE","ETHNIC","EVENT","EVERY","EXACTLY","EXAMINE","EXAMPLE","EXCEED","EXCEPT","EXCHANGE","EXCITE","EXCLUDE","EXCUSE","EXERCISE","EXIST","EXPECT","EXPENSE","EXPERIENCE","EXPERT","EXPLAIN","EXPLORE","EXPOSE","EXPRESS","EXTEND","EXTENT","EXTERNAL","EXTRA","EXTREME","FACTOR","FACULTY","FAILED","FAILURE","FAIRLY","FAMLIAR","FAMOUS","FARMER","FASHION","FATHER","FAVOUR","FEELING","FEMALE","FIFTEEN","FIGHT","FIGURE","FINANCE","FINALLY","FINGER","FINISH","FLIGHT","FLOWER","FOLLOW","FOOTBALL","FORCE","FOREIGN","FOREST","FORGET","FORMAL","FORMER","FORWARD","FOUND","FOURTH","FRAME","FREEDOM","FRIEND","FUNCTION","FUTURE","GARDEN","GATHER","GENERAL","GENERATION","GENTLE","GLOBAL","GOLDEN","GROUND","GROWTH","GUARD","GUILTY","HANDLE","HAPPEN","HARDLY","HEALTH","HEAVILY","HEIGHT","HENCE","HOLIDAY","HORSE","HOSPITAL","HOUSE","HOWEVER","HUMAN","HUSBAND","IMPACT","IMPLY","IMPORT","IMPOSE","IMPROVE","INCLUDE","INCREASE","INDEED","INDICATE","INDIVIDUAL","INDUSTRY","INFORM","INITIAL","INJURY","INSIDE","INSIST","INSTANCE","INSTEAD","INSTITUTE","INTEND","INTEREST","INTERNAL","INVOLVE","ISLAND","ISSUE","ITSELF","JOINT","JUDGE","JUDGMENT","JUNIOR","JUSTICE","LABOUR","LANGUAGE","LARGELY","LATTER","LAUGH","LAWYER","LEADER","LEAGUE","LEARN","LEAVE","LEGAL","LENGTH","LESSON","LETTER","LEVEL","LIBERAL","LIBRARY","LICENCE","LIMIT","LIMITED","LITTLE","LOCAL","LONDON","LONGER","MACHINE","MAJOR","MANAGE","MANAGER","MANNER","MANY","MARKET","MARRIAGE","MATCH","MATERIAL","MATTER","MEASURE","MEDIA","MEDICAL","MEETING","MEMBER","MEMORY","MENTAL","MENTION","MERELY","METHOD","MIDDLE","MIGHT","MILE","MILITARY","MINISTER","MINOR","MINORITY","MINUTE","MISSION","MISTAKE","MODEL","MODERN","MODULE","MOMENT","MONEY","MONTH","MORNING","MOTHER","MOTION","MOTOR","MOUNTAIN","MOUTH","MOVEMENT","MOVIE","MUCH","MUSIC","MYSELF","NARROW","NATION","NATIONAL","NATIVE","NATURAL","NATURE","NEARLY","NECESSARY","NEEDLE","NEITHER","NERVE","NETWORK","NEVER","NEWLY","NIGHT","NOBODY","NORMAL","NORTHERN","NOTICE","NOTION","NOWHERE","NUMBER","OBJECT","OBSERVE","OBTAIN","OBVIOUS","OCCASION","OCCUR","OFFENCE","OFFER","OFFICE","OFFICER","OFFICIAL","OFTEN","ONCE","ONLINE","ONLY","ONTO","OPENING","OPERATE","OPPORTUNITY","OPPOSE","OPPOSITE","ORDER","ORDINARY","ORGANISE","ORIGIN","ORIGINAL","OTHER","OUGHT","OUTCOME","OUTSIDE","OVERALL","OWNER","PACKAGE","PAINT","PANEL","PARENT","PARISH","PARLIAMENT","PARTLY","PARTNER","PARTY","PASSAGE","PATIENT","PATTERN","PEACE","PEOPLE","PERFORM","PERHAPS","PERIOD","PERMIT","PERSON","PERSONAL","PHONE","PHOTO","PHYSICAL","PICTURE","PIECE","PLACE","PLANNING","PLANT","PLASTIC","PLAYER","POCKET","POINT","POLICE","POLICY","POLITICAL","POLLUTION","POPULAR","POSITION","POSITIVE","POSSIBLE","POSTER","POWER","PRACTICE","PREFER","PREPARE","PRESENCE","PRESENT","PRESIDENT","PRESS","PRESSURE","PRETTY","PREVIOUS","PRICE","PRIMARY","PRINCIPLE","PRINT","PRIOR","PRIORITY","PRISON","PRIVATE","PROBABLY","PROBLEM","PROCEDURE","PROCESS","PRODUCE","PRODUCT","PROFESSION","PROFILE","PROFIT","PROGRAM","PROGRESS","PROJECT","PROMISE","PROMOTE","PROPER","PROPERTY","PROPOSE","PROTECT","PROVIDE","PUBLIC","PUBLISH","PURPOSE","PUSH","QUALITY","QUARTER","QUESTION","QUICKLY","QUITE","RAISE","RANGE","RAPIDLY","RATELY","RATHER","REACH","REACTION","READER","READING","READY","REALISE","REALLY","REASON","RECALL","RECEIVE","RECENT","RECENTLY","RECOGNISE","RECORD","RECOVER","REDUCE","REFER","REFLECT","REFORM","REFUSE","REGARD","REGION","REGIONAL","REGULAR","RELATE","RELATION","RELATIVE","RELEASE","RELEVANT","RELIEF","RELIGION","REMAIN","REMEMBER","REMOVE","REPEAT","REPLACE","REPLY","REPORT","REPRESENT","REQUEST","REQUIRE","RESEARCH","RESOURCE","RESPECT","RESPOND","RESPONSE","RESULT","RETAIN","RETURN","REVEAL","REVENUE","REVIEW","REVOLUTION","RIGHT","RING","RISE","ROAD","ROLE","ROOM","ROUND","ROUTE","ROYAL","RULE","SAFETY","SALE","SAME","SAMPLE","SAVE","SCALE","SCENE","SCHEME","SCHOOL","SCIENCE","SCORE","SCREEN","SEARCH","SECOND","SECRETARY","SECTION","SECTOR","SECURE","SEEM","SELECT","SENIOR","SENSE","SENSITIVE","SENTENCE","SEPARATE","SEQUENCE","SERIES","SERIOUS","SERVANT","SERVICE","SESSION","SETTLE","SEVEN","SEVERAL","SEVERE","SHARE","SHEET","SHOOT","SHORT","SHOT","SHOULD","SHOULDER","SHOUT","SHOW","SIDE","SIGHT","SIGN","SIGNAL","SILENCE","SIMPLE","SIMPLY","SINCE","SINGLE","SISTER","SITE","SITUATION","SIZE","SKILL","SKIN","SLEEP","SLIGHTLY","SLOWLY","SOCIAL","SOCIETY","SOLDIER","SOLUTION","SOME","SOMEHOW","SOMEONE","SOMETHING","SOMETIMES","SOMEWHAT","SOON","SORRY","SORT","SOUND","SOURCE","SOUTHERN","SPACE","SPEAK","SPECIAL","SPECIFIC","SPEECH","SPEED","SPEND","SPIRIT","SPORT","SPOT","SPREAD","SPRING","SQUARE","STAFF","STAGE","STAND","STANDARD","START","STATE","STATEMENT","STATION","STATUS","STAY","STEP","STILL","STOCK","STONE","STOP","STORE","STORY","STRAIGHT","STRANGE","STRATEGY","STREET","STRENGTH","STRESS","STRIKE","STRONG","STRUCTURE","STUDENT","STUDIO","STUDY","STYLE","SUBJECT","SUBMIT","SUCCEED","SUCCESS","SUCH","SUDDENLY","SUFFER","SUGGEST","SUMMER","SUPPORT","SUPPOSE","SURELY","SURFACE","SURVEY","SURVIVE","SWITCH","SYSTEM","TABLE","TAKE","TALK","TARGET","TASK","TEACH","TEACHER","TEAM","TECHNOLOGY","TELEPHONE","TELEVISION","TEMPERATURE","TERM","TERRIBLE","TEST","THANKS","THEATRE","THEIR","THEME","THEMSELVES","THEN","THEORY","THERE","THESE","THEY","THING","THINK","THIRD","THIRTY","THIS","THOSE","THOUGH","THOUSAND","THREAT","THREATEN","THREE","THROUGH","THROW","TICKET","TIME","TITLE","TODAY","TOGETHER","TOMORROW","TONE","TONIGHT","TOTAL","TOTALLY","TOUCH","TOUR","TOWARDS","TOWN","TRADE","TRADITION","TRAFFIC","TRAIN","TRAINING","TRANSFER","TRANSPORT","TRAVEL","TREAT","TREATMENT","TREATY","TREND","TRIAL","TRIP","TROOP","TROUBLE","TRUE","TRUST","TRUTH","TWENTY","TWICE","TYPE","UNDER","UNDERSTAND","UNION","UNIQUE","UNIT","UNITED","UNIVERSITY","UNLESS","UNLIKE","UNTIL","UPON","UPPER","URBAN","USER","USUAL","USUALLY","VALLEY","VALUE","VARIETY","VARIOUS","VEHICLE","VERSION","VERY","VIDEO","VIEW","VILLAGE","VIOLENCE","VISION","VISIT","VISITOR","VOICE","VOLUME","VOTE","WAIT","WALK","WALL","WANT","WAR","WATCH","WATER","WAY","WEALTH","WEAPON","WEAR","WEATHER","WEEK","WEEKEND","WEIGHT","WELCOME","WELL","WESTERN","WHAT","WHATEVER","WHEN","WHERE","WHETHER","WHICH","WHILE","WHITE","WHOLE","WHOM","WHOSE","WIDE","WIDELY","WIFE","WILD","WILL","WINDOW","WINE","WINTER","WISH","WITHIN","WITHOUT","WOMAN","WONDER","WOOD","WORD","WORK","WORKER","WORLD","WORRY","WORTH","WOULD","WRITE","WRITER","WRONG","YARD","YEAR","YOURSELF", "TREES", "SEASONS", "GREET", "NIFTY", "LUMPY", "GNOME", "CAROL", "FRESNEL", "NIPPY", "BRISK", "MYSTERY", "MAYBE", "MAGNETS"];
         const prizeEmojis = [ { emoji: '🎁', value: 1500000, type: 'coins' }, { emoji: '🏆', value: 3500000, type: 'trophy' }, { emoji: '💎', value: 20000000, type: 'diamond' }, { emoji: '💣', value: 0, type: 'game_over' }, { emoji: '💣', value: 0, type: 'green_bomb' }, { emoji: '⭐', value: 5000, type: 'coins' }, { emoji: '⚡', value: 20000, type: 'lightning' }, { emoji: '❄️', value: 0, type: 'freeze' }, { emoji: '🔥', value: 400, type: 'fire_column'}, { emoji: '💰', value: 1000000, type: 'cash_money' } ];
         const nonsenseFreebies = ['🌭','🥞','🍕','🍔','🍟','🍗','🥠','🍩', '🍰', '🍭', '🍋‍🟩', '🧋', '🍷', '🍫', '☕', '🍪'];
+        const specialCollectorGoodies = ['🍩', '🍰', '🍭', '🍋‍🟩', '🧋', '🍷', '🍫', '☕'];
         const puzzleLayouts = [ { length: 5, indices: [11, 12, 13, 14, 15] }, { length: 7, indices: [28, 29, 30, 31, 32, 33, 34] }, { length: 7, indices: [46, 47, 48, 49, 50, 51, 52] }, { length: 5, indices: [65, 66, 67, 68, 69] } ];
         const trades = [
             { id: 'trade001', name: '10 🌭 for 1 Food Truck', cost: { '🌭': 10 }, reward: { type: 'inventory', item: '🚚', amount: 1 } },
@@ -999,7 +1079,7 @@
         ];
         const inventoryItemNames = {
             '🚚': 'Food Truck', '🏛️': 'Diner', '🍕': 'Pizzeria', '🍔': 'Burger Chain',
-            '🥔': 'Potato Farm', '🐔': 'Chicken Farm', '💽': 'Chip Plant', '🍩': 'Donut Shop',
+            ' ': 'Potato Farm', '🐔': 'Chicken Farm', '💽': 'Chip Plant', '🍩': 'Donut Shop',
             '📺': 'TV Show', '🍬': 'Candy Vendor', '🍷': 'Restaurant', '🏭': 'Candy Factory',
             '🤕': 'Headache', '⛏️': 'Gold Mine'
         };
@@ -1316,36 +1396,37 @@
             jackpotSquare.addEventListener('click', endgameJackpotHandler, { once: true });
         }
 
-        function triggerCoinAnimation(startElement, endElement) {
+        function triggerCoinAnimation(startElement, endElement, numCoins = 15, duration = 0.8) {
             const startRect = startElement.getBoundingClientRect();
             const endRect = endElement.getBoundingClientRect();
             const startX = startRect.left + startRect.width / 2;
             const startY = startRect.top + startRect.height / 2;
             const endX = endRect.left + endRect.width / 2;
             const endY = endRect.top + endRect.height / 2;
-            // NEW: Added randomness to Bezier curve control points
-            const controlX = startX + (endX - startX) / 2 + (Math.random() - 0.5) * 150;
-            const controlY = startY - 100 + (Math.random() - 0.5) * 50;
-            const curve = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
+            
+            for (let i = 0; i < numCoins; i++) {
+                const controlX1 = startX + (Math.random() - 0.5) * 200;
+                const controlY1 = startY + (Math.random() - 0.5) * 200;
+                const controlX2 = endX + (Math.random() - 0.5) * 200;
+                const controlY2 = endY + (Math.random() - 0.5) * 200;
+                const curve = `M ${startX} ${startY} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${endX} ${endY}`;
 
-            for (let i = 0; i < 15; i++) {
                 const coin = document.createElement('div');
                 coin.classList.add('coin');
-                coin.style.animation = `fly-along-path 0.8s cubic-bezier(0.4, 0, 0.9, 0.5) forwards`;
+                coin.style.animation = `fly-along-path ${duration}s cubic-bezier(0.4, 0, 0.9, 0.5) forwards`;
                 coin.style.offsetPath = `path('${curve}')`;
                 coin.style.animationDelay = `${Math.random() * 0.3}s`;
                 document.body.appendChild(coin);
-                setTimeout(() => coin.remove(), 1100);
+                setTimeout(() => coin.remove(), (duration + 0.3) * 1000);
             }
         }
         
-        // NEW: Coin explosion animation for the 3rd jackpot click
-        function triggerCoinExplosion(startElement) {
+        function triggerCoinExplosion(startElement, numCoins = 50, distance = 150) {
             const startRect = startElement.getBoundingClientRect();
             const startX = startRect.left + startRect.width / 2;
             const startY = startRect.top + startRect.height / 2;
 
-            for (let i = 0; i < 50; i++) { // More coins for a bigger explosion
+            for (let i = 0; i < numCoins; i++) {
                 const coin = document.createElement('div');
                 coin.classList.add('coin');
                 coin.style.position = 'fixed';
@@ -1353,9 +1434,9 @@
                 coin.style.top = `${startY}px`;
                 
                 const angle = Math.random() * 2 * Math.PI;
-                const distance = Math.random() * 150 + 50; // Explode outwards
-                const endX = Math.cos(angle) * distance;
-                const endY = Math.sin(angle) * distance;
+                const randomDistance = Math.random() * distance + 50;
+                const endX = Math.cos(angle) * randomDistance + (Math.random() - 0.5) * 40; // Brownian motion
+                const endY = Math.sin(angle) * randomDistance + (Math.random() - 0.5) * 40; // Brownian motion
 
                 coin.style.setProperty('--explode-x', `${endX}px`);
                 coin.style.setProperty('--explode-y', `${endY}px`);
@@ -1470,15 +1551,15 @@
 
             timeSinceLastSolve = 0;
             GJACKVARNUM++;
-            jackpotConsecutiveClickCount++; // Increment new counter
+            jackpotConsecutiveClickCount++;
             coins += 50000;
             updateScoreDisplay();
             flashScore('gain');
             
-            // NEW: Trigger coin explosion on 3rd consecutive click
-            if (jackpotConsecutiveClickCount === 3) {
+            if (jackpotConsecutiveClickCount === 5) {
+                triggerCoinExplosion(jackpotSquare, 100, 250); // Bigger explosion
+            } else if (jackpotConsecutiveClickCount === 3) {
                 triggerCoinExplosion(jackpotSquare);
-                jackpotConsecutiveClickCount = 0; // Reset after explosion
             } else {
                 triggerCoinAnimation(jackpotSquare, document.getElementById('coins-display'));
             }
@@ -1487,7 +1568,7 @@
             if (GJACKVARNUM === 4) {
                 showEventText("Yep! You're Greedy!");
             } else if (GJACKVARNUM === 8) {
-                showEventText("Oh really now."); // UPDATED: Message changed
+                showEventText("Oh really now.");
             } else if (GJACKVARNUM >= 12) {
                 coins = Math.floor(coins / 2);
                 updateScoreDisplay();
@@ -1511,7 +1592,7 @@
             const currentDelay = minDelay + (maxDelay - minDelay) * Math.pow(1 - progress, 3);
 
             prizeSpawnerTimeout = setTimeout(() => {
-                if (levelGoodies.length > 0 && Math.random() < 0.1) { // 10% chance for a goodie
+                if (levelGoodies.length > 0 && Math.random() < 0.1) {
                     spawnSpecialGoodie();
                 } else {
                     spawnPrizeEmoji();
@@ -1536,7 +1617,6 @@
             if (emptyTiles.length === 0) return;
             const tile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
             
-            // Clean the tile before use
             const newTile = tile.cloneNode(false);
             tile.parentNode.replaceChild(newTile, tile);
 
@@ -1547,12 +1627,10 @@
             newTile.classList.add('prize-tile', 'cash-money-prize');
 
             const clickHandler = () => {
-                // Immediately neutralize the tile to prevent race conditions
                 newTile.textContent = '';
                 newTile.classList.remove('prize-tile', 'cash-money-prize');
                 clearTimeout(despawnTimer);
 
-                // Then, perform game logic
                 coins += 1000000;
                 updateScoreDisplay();
                 flashScore('gain');
@@ -1588,7 +1666,6 @@
                     }
                 }
             }
-            // BUG FIX: If the board is full, clear a few random tiles to make space
             if (emptyTiles.length === 0) {
                 const nonPuzzleTiles = [];
                  for(let i=0; i<81; i++) {
@@ -1606,12 +1683,11 @@
                         }
                     }
                 }
-                if (emptyTiles.length === 0) return; // Still no space, so we give up for this cycle
+                if (emptyTiles.length === 0) return;
             }
 
             const tile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
             
-            // Clean the tile before use
             const newTile = tile.cloneNode(false);
             tile.parentNode.replaceChild(newTile, tile);
             
@@ -1634,9 +1710,8 @@
             const clickHandler = () => {
                 GJACKVARNUM = 0;
                 timeSinceLastSolve = 0;
-                jackpotConsecutiveClickCount = 0; // Reset counter
+                jackpotConsecutiveClickCount = 0;
                 
-                // Immediately clear the despawn timer
                 clearTimeout(despawnTimer);
 
                 if (newTile.dataset.prizeType === 'game_over') { 
@@ -1664,7 +1739,6 @@
                         showEventText("Oh Yeah!");
                     }
                 }
-                // Clean up the tile after processing, unless it's a dragged bomb
                 if (newTile.dataset.prizeType !== 'green_bomb' || !isDraggingBomb) {
                     newTile.textContent = '';
                     newTile.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
@@ -1874,16 +1948,15 @@
         }
 
         function startGreenBombSequence(bombTile) {
-            playerData.greenBombsUsed++; // Increment badge counter
+            playerData.greenBombsUsed++;
             const bombIndex = parseInt(bombTile.id.split('-')[1]);
             const adjacentIndices = getAdjacentIndices(bombIndex);
             
             adjacentIndices.forEach(index => {
                 const adjTile = document.getElementById(`tile-${index}`);
                 if (adjTile) {
-                    // NEW: Check for special goodie tiles
-                    if (adjTile.classList.contains('special-goodie-tile')) {
-                        handleSpecialGoodieCollection(adjTile);
+                    if (adjTile.classList.contains('collector-goodie-tile')) {
+                        handleCollectorGoodieCollection(adjTile);
                     } else if (adjTile.classList.contains('prize-tile')) {
                         const prizeValue = parseInt(adjTile.dataset.prizeValue) || 0;
                         if (prizeValue > 0) {
@@ -1922,7 +1995,7 @@
             setTimeout(() => {
                 updateScoreDisplay();
                 checkAllPuzzles();
-                savePlayerProfile(); // Save after using the bomb
+                savePlayerProfile();
             }, 100);
         }
 
@@ -1934,8 +2007,8 @@
             for (let i = column; i < 81; i += 9) {
                 const tileInColumn = document.getElementById(`tile-${i}`);
                 if (tileInColumn && tileInColumn !== fireTile) { 
-                    if (tileInColumn.classList.contains('special-goodie-tile')) {
-                        handleSpecialGoodieCollection(tileInColumn);
+                    if (tileInColumn.classList.contains('collector-goodie-tile')) {
+                        handleCollectorGoodieCollection(tileInColumn);
                     }
                     else if (tileInColumn.classList.contains('prize-tile')) {
                         const prizeValue = parseInt(tileInColumn.dataset.prizeValue) || 0;
@@ -1975,22 +2048,22 @@
             checkAllPuzzles();
         }
 
-        function endGame(isBomb = false) {
+        async function endGame(isBomb = false) {
             isGameOver = true;
             const jackpotSquare = document.getElementById('jackpot-square');
             if (jackpotSquare) {
                 jackpotSquare.classList.remove('endgame-pulse');
             }
-            saveGameResult(); // This now increments gamesPlayed
-            checkAndAwardBadges(coins); // Check for new badges at the end of the game
+            await saveGameResult();
+            checkAndAwardBadges(coins);
             clearInterval(mainTimerInterval);
             clearTimeout(prizeSpawnerTimeout);
             clearTimeout(diamondSequenceTimeout);
             clearInterval(scoreDecayInterval);
             clearTimeout(impTimeout);
-            clearTimeout(goodieSpawnTimer); // NEW: Clear goodie spawn timer
-            endFreeze(); // Ensure freeze effect is cleared
-            endHeartAnimation(); // Ensure heart effect is cleared
+            clearTimeout(collectorGoodieSpawnTimer);
+            endFreeze();
+            endHeartAnimation();
             clearInterval(solveButtonPulseManager);
             timeRemaining = 0;
             document.getElementById('timer-display').textContent = "00:00";
@@ -2029,12 +2102,13 @@
             });
         }
 
-        function showGameOverModal() {
-            // NEW: Populate the game summary panel
+        async function showGameOverModal() {
             document.getElementById('summary-final-score').textContent = coins.toLocaleString();
             document.getElementById('summary-high-score').textContent = (playerData.highScore || 0).toLocaleString();
             document.getElementById('summary-bags-earned').textContent = bagsOfMoney.toLocaleString();
             document.getElementById('summary-level-reached').textContent = currentLevel;
+
+            await fetchLeaderboard();
 
             const gameOverModal = document.getElementById('game-over-modal');
             gameOverModal.classList.remove('hidden');
@@ -2070,7 +2144,7 @@
             clearTimeout(prizeSpawnerTimeout);
             clearInterval(scoreDecayInterval);
             clearTimeout(impTimeout);
-            clearTimeout(goodieSpawnTimer); // NEW: Pause goodie spawn timer
+            clearTimeout(collectorGoodieSpawnTimer);
             document.querySelectorAll('.ice-block').forEach(block => block.style.display = 'none');
         }
 
@@ -2082,7 +2156,7 @@
                 scheduleNextPrizeSpawn();
             }
             scoreDecayInterval = setInterval(handleScoreDecay, 1000);
-            scheduleGoodieSpawn(); // NEW: Resume goodie spawn timer
+            scheduleCollectorGoodieSpawn();
             if (isFrozen) {
                 document.querySelectorAll('.ice-block').forEach(block => block.style.display = 'block');
             }
@@ -2105,9 +2179,8 @@
             isFrozen = true;
             clearTimeout(prizeSpawnerTimeout);
             clearTimeout(impTimeout);
-            clearTimeout(goodieSpawnTimer); // NEW: Pause goodie spawn timer
+            clearTimeout(collectorGoodieSpawnTimer);
             
-            // Clear any existing freeze animation before starting a new one
             clearInterval(freezeAnimationInterval);
 
             freezeAnimationInterval = setInterval(() => {
@@ -2166,13 +2239,13 @@
             if (!isGamePaused && !isGameOver) {
                 setTimeout(() => {
                     scheduleNextPrizeSpawn();
-                    scheduleGoodieSpawn();
+                    scheduleCollectorGoodieSpawn();
                 }, 500);
             }
         }
         
         function spawnHeartAnimation() {
-            if (heartAnimationInterval) return; // Don't start if already running
+            if (heartAnimationInterval) return;
             heartAnimationInterval = setInterval(() => {
                 const heart = document.createElement('div');
                 heart.classList.add('falling-heart');
@@ -2183,7 +2256,7 @@
                 document.body.appendChild(heart);
                 setTimeout(() => heart.remove(), 9000);
             }, 500);
-            setTimeout(endHeartAnimation, 8000); // Let it run for 8 seconds
+            setTimeout(endHeartAnimation, 8000);
         }
 
         function endHeartAnimation() {
@@ -2192,6 +2265,7 @@
         }
 
         function startGame() {
+            clearTimeout(gameStartTimeout); // Clear the failsafe timer
             musicPlayer.muted = true;
             playTrack(currentTrackIndex);
             musicPlayer.play().catch(e => console.error("Audio play failed on initial click:", e));
@@ -2205,6 +2279,8 @@
         }
 
         function actuallyStartGame() {
+            if (document.getElementById('start-modal').classList.contains('hidden')) return; // Prevent multiple starts
+
             musicPlayer.muted = false;
             musicPlayer.volume = lastVolume;
             document.getElementById('volume-slider').value = lastVolume;
@@ -2218,7 +2294,7 @@
             mainTimerInterval = setInterval(updateTimer, 1000);
             scoreDecayInterval = setInterval(handleScoreDecay, 1000);
             scheduleNextPrizeSpawn();
-            scheduleGoodieSpawn(); // NEW: Start the goodie spawn timer
+            scheduleCollectorGoodieSpawn();
             clearInterval(solveButtonPulseManager); 
             solveButtonPulseManager = setInterval(() => {
                 if (isGamePaused || isGameOver) return;
@@ -2255,7 +2331,7 @@
             jackpotEventAvailable = true;
             specialCashEmojiSpawned = false;
             timedEvents = { sixMin: true, threeMin: true, heartEvent1: true, heartEvent2: true };
-            isSpecialAnimationActive = false; // BUG FIX: Reset this state on restart
+            isSpecialAnimationActive = false;
             endgameJackpotActive = false;
             
             clearInterval(mainTimerInterval);
@@ -2265,7 +2341,7 @@
             clearInterval(scoreDecayInterval);
             clearTimeout(impTimeout);
             clearTimeout(thawTimeout);
-            clearTimeout(goodieSpawnTimer);
+            clearTimeout(collectorGoodieSpawnTimer);
             clearInterval(solveButtonPulseManager);
             endFreeze();
             endHeartAnimation();
@@ -2282,7 +2358,7 @@
             mainTimerInterval = setInterval(updateTimer, 1000);
             scoreDecayInterval = setInterval(handleScoreDecay, 1000);
             scheduleNextPrizeSpawn();
-            scheduleGoodieSpawn();
+            scheduleCollectorGoodieSpawn();
             
             solveButtonPulseManager = setInterval(() => {
                 if (isGamePaused || isGameOver) return;
@@ -2472,7 +2548,7 @@
         // --- Player Data & Store Logic (LocalStorage with Firebase Sync) ---
         function getDefaultPlayerData() {
             return {
-                userId: userId || 'local', // Use 'local' if no userId yet
+                userId: userId || 'local',
                 name: 'Player',
                 moneyBags: 0,
                 highScore: 0,
@@ -2496,7 +2572,6 @@
                  if (!playerData.unlockedBadges) playerData.unlockedBadges = [];
                  if (!playerData.gamesPlayed) playerData.gamesPlayed = 0;
                  if (!playerData.greenBombsUsed) playerData.greenBombsUsed = 0;
-                 // Ensure nonsenseFreebiesCollected is an object
                  if (typeof playerData.nonsenseFreebiesCollected !== 'object' || playerData.nonsenseFreebiesCollected === null) {
                     playerData.nonsenseFreebiesCollected = {};
                  }
@@ -2505,7 +2580,7 @@
             }
             applyTheme(playerData.activeSkin);
             populateSetupModal();
-            displayBadges(); // Display badges on load
+            displayBadges();
         }
         
         async function syncWithFirebase() {
@@ -2516,21 +2591,18 @@
                 const docSnap = await getDoc(playerDocRef);
                 if (docSnap.exists()) {
                     const cloudData = docSnap.data();
-                    // Simple merge: cloud data takes precedence for scores and bags
                     playerData.highScore = Math.max(playerData.highScore || 0, cloudData.highScore || 0);
                     playerData.moneyBags = Math.max(playerData.moneyBags || 0, cloudData.moneyBags || 0);
                     playerData.gamesPlayed = Math.max(playerData.gamesPlayed || 0, cloudData.gamesPlayed || 0);
                     playerData.greenBombsUsed = Math.max(playerData.greenBombsUsed || 0, cloudData.greenBombsUsed || 0);
-                    // Merge badges
                     const localBadges = new Set(playerData.unlockedBadges || []);
                     const cloudBadges = new Set(cloudData.unlockedBadges || []);
                     playerData.unlockedBadges = Array.from(new Set([...localBadges, ...cloudBadges]));
                     
                     console.log("Player data synced with Firebase.");
                 }
-                // Always save the latest (potentially merged) data back to Firebase
                 await savePlayerProfile();
-                displayBadges(); // Re-display badges after sync
+                displayBadges();
             } catch (error) {
                 console.error("Error syncing with Firestore:", error);
             }
@@ -2541,11 +2613,43 @@
             if (isFirebaseConnected && userId) {
                 const playerDocRef = doc(db, "players", userId);
                 try {
-                    const dataToSave = JSON.parse(JSON.stringify(playerData));
+                    const dataToSave = {
+                        name: playerData.name || 'Player',
+                        highScore: playerData.highScore || 0,
+                        moneyBags: playerData.moneyBags || 0,
+                        gamesPlayed: playerData.gamesPlayed || 0,
+                        lastUpdate: new Date().toISOString()
+                    };
                     await setDoc(playerDocRef, dataToSave, { merge: true });
                 } catch (error) {
                     console.error("Error saving player profile to Firestore:", error);
                 }
+            }
+        }
+
+        async function fetchLeaderboard() {
+            const leaderboardContainer = document.getElementById('leaderboard-container');
+            leaderboardContainer.innerHTML = '<p>Loading...</p>';
+            if (!isFirebaseConnected) {
+                leaderboardContainer.innerHTML = '<p>Connect to see leaderboard.</p>';
+                return;
+            }
+            try {
+                const q = query(collection(db, "players"), orderBy("highScore", "desc"), limit(5));
+                const querySnapshot = await getDocs(q);
+                let leaderboardHTML = '<ol class="list-decimal list-inside">';
+                let rank = 1;
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const isCurrentUser = doc.id === userId;
+                    leaderboardHTML += `<li class="${isCurrentUser ? 'font-bold text-amber-300' : ''}">${rank}. ${data.name || 'Anonymous'}: ${data.highScore.toLocaleString()}</li>`;
+                    rank++;
+                });
+                leaderboardHTML += '</ol>';
+                leaderboardContainer.innerHTML = leaderboardHTML;
+            } catch (error) {
+                console.error("Error fetching leaderboard: ", error);
+                leaderboardContainer.innerHTML = '<p>Could not load leaderboard.</p>';
             }
         }
 
@@ -2704,7 +2808,7 @@
             return `<h3 class="text-lg font-bold text-amber-300">Net Worth Analysis</h3><p class="text-slate-300 mt-2">${description}</p>`;
         }
         
-        function populateSetupModal() {
+function populateSetupModal() {
             const nameInput = document.getElementById('player-name-input');
             nameInput.value = playerData.name || 'Player';
             nameInput.classList.toggle('invalid-input', !playerData.name?.trim());
@@ -2730,6 +2834,12 @@
                 const count = playerData.nonsenseFreebiesCollected?.[freebie] || 0;
                 const item = document.createElement('div');
                 item.className = 'freebie-item';
+                item.dataset.emoji = freebie;
+
+                if (specialCollectorGoodies.includes(freebie)) {
+                    item.classList.add('special-collector');
+                    item.addEventListener('click', onSpecialFreebieClick);
+                }
                 
                 const isTradable = trades.some(trade => {
                     const costItem = Object.keys(trade.cost)[0];
@@ -2737,7 +2847,7 @@
                     return freebie === costItem && count >= costAmount;
                 });
 
-                if (isTradable) {
+                if (isTradable && !specialCollectorGoodies.includes(freebie)) {
                     item.classList.add('tradable');
                 }
 
@@ -2756,7 +2866,6 @@
             }
         }
         
-        // NEW: Updated themes array with new prices and new themes
         const themes = [
             { id: 'default', name: 'Purple Haze', cost: 0, colors: ['#a78bfa', '#8b5cf6'] },
             { id: 'blue', name: 'Ocean Blue', cost: 2200000, colors: ['#60a5fa', '#3b82f6'] },
@@ -2772,7 +2881,6 @@
             { id: 'stage-lights', name: 'Stage Lights', cost: 31200000, colors: ['#ec4899', '#8b5cf6'] },
             { id: 'dark-aqua', name: 'Dark Aqua', cost: 36200000, colors: ['#2dd4bf', '#0d9488'] },
             { id: 'brownstone', name: 'Brownstone', cost: 41200000, colors: ['#a16207', '#854d0e'] },
-            // --- NEW THEMES START HERE ---
             { id: 'burlap', name: 'Burlap', cost: 56200000, colors: ['#d2b48c', '#a0522d'] },
             { id: 'sapphire-ritz', name: 'Sapphire Ritz', cost: 71200000, colors: ['#0f52ba', '#003366'] },
             { id: 'vegan-dinner', name: 'Vegan Dinner', cost: 86200000, colors: ['#2e8b57', '#006400'] },
@@ -2972,13 +3080,13 @@
             populateCalendar();
         }
         
-        function saveGameResult() {
+        async function saveGameResult() {
             playerData.moneyBags += bagsOfMoney;
             if (coins > playerData.highScore) {
                 playerData.highScore = coins;
             }
             playerData.gamesPlayed++;
-            savePlayerProfile();
+            await savePlayerProfile();
         }
 
         // --- Tips Carousel Logic ---
@@ -3021,6 +3129,7 @@
             { id: 'expert', name: 'Expert', emoji: '💜', score: 1000000000, description: 'Score 1 billion coins in a single game.' },
             { id: 'demolitionist', name: 'Drag-n-Drop', emoji: '💚', condition: (p) => p.greenBombsUsed >= 1000, description: 'Use 1,000 green bombs.' },
             { id: 'philanthropist', name: 'Caring', emoji: '💖', condition: (p) => p.unlockedBadges.includes('philanthropist'), description: 'Donate a rich to charity.' },
+            { id: 'ultimate_giver', name: 'Ultimate Giver', emoji: '🌟', condition: (p) => p.unlockedBadges.includes('ultimate_giver'), description: 'Donate your entire inventory of an item.' }
         ];
 
         function checkAndAwardBadges(finalScore) {
@@ -3050,7 +3159,7 @@
             const panel = document.getElementById('badges-panel');
             panel.innerHTML = ''; // Clear previous badges
             
-            const badgeOrder = ['first_play', 'frequent_player', 'veteran_player', 'expert', 'demolitionist', 'philanthropist'];
+            const badgeOrder = ['first_play', 'frequent_player', 'veteran_player', 'expert', 'demolitionist', 'philanthropist', 'ultimate_giver'];
             const unlockedBadgeSet = new Set(playerData.unlockedBadges || []);
             
             badgeOrder.forEach(badgeId => {
@@ -3158,19 +3267,20 @@
             }
         }
         
-        // NEW: Schedule a special goodie to spawn every 30-60 seconds
-        function scheduleGoodieSpawn() {
+        function scheduleCollectorGoodieSpawn() {
             if (isGamePaused || isGameOver || isFrozen) return;
-            const delay = Math.random() * 30000 + 30000; // 30-60 seconds
-            goodieSpawnTimer = setTimeout(() => {
-                spawnSpecialGoodieTile();
-                scheduleGoodieSpawn();
+            const delay = 60000; // Every minute
+            collectorGoodieSpawnTimer = setTimeout(() => {
+                spawnCollectorGoodieTile();
+                scheduleCollectorGoodieSpawn();
             }, delay);
         }
 
-        // NEW: Spawn a special, high-value goodie tile
-        function spawnSpecialGoodieTile() {
+        function spawnCollectorGoodieTile() {
             if (isGamePaused || isGameOver || isFrozen) return;
+
+            const awardedCollectorGoodies = specialCollectorGoodies.filter(g => (playerData.nonsenseFreebiesCollected[g] || 0) > 0);
+            if (awardedCollectorGoodies.length === 0) return;
 
             const allPuzzleIndices = puzzles.flatMap(p => p.indices);
             const emptyTiles = Array.from(document.querySelectorAll('#game-grid > div')).filter(tile => 
@@ -3182,53 +3292,86 @@
             if (emptyTiles.length === 0) return;
 
             const tile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
-            const goodieEmoji = nonsenseFreebies[Math.floor(Math.random() * nonsenseFreebies.length)];
+            const goodieEmoji = awardedCollectorGoodies[Math.floor(Math.random() * awardedCollectorGoodies.length)];
             
             tile.textContent = goodieEmoji;
-            tile.classList.add('special-goodie-tile');
+            tile.classList.add('collector-goodie-tile');
             
-            const clickHandler = () => handleSpecialGoodieCollection(tile);
+            const clickHandler = () => handleCollectorGoodieCollection(tile);
             
             const despawnTimer = setTimeout(() => {
                 tile.textContent = '';
                 tile.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
                 tile.removeEventListener('click', clickHandler);
-            }, 10000); // 10-second lifespan
+            }, 10000);
 
             tile.addEventListener('click', clickHandler, { once: true });
         }
         
-        // NEW: Handle collection of the special goodie
-        function handleSpecialGoodieCollection(tile) {
+        function handleCollectorGoodieCollection(tile) {
             const goodieEmoji = tile.textContent;
             
-            // Immediately clear the tile
             tile.textContent = '';
             tile.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
 
-            // Add to player's collection
-            if (!playerData.nonsenseFreebiesCollected[goodieEmoji]) {
-                playerData.nonsenseFreebiesCollected[goodieEmoji] = 0;
-            }
-            playerData.nonsenseFreebiesCollected[goodieEmoji]++;
+            playerData.nonsenseFreebiesCollected[goodieEmoji] = (playerData.nonsenseFreebiesCollected[goodieEmoji] || 0) + 25;
             
-            // Give a coin bonus
-            coins += 250000;
-            updateScoreDisplay();
-            flashScore('gain');
-            triggerCoinAnimation(tile, document.getElementById('coins-display'));
-            showEventText(`+1 ${goodieEmoji}!`, true);
+            showEventText(`+25 ${goodieEmoji}!`, true);
             
             savePlayerProfile();
-            populateSetupModal(); // Update the goodies display
+            populateSetupModal();
         }
 
-        // NEW: Add glowing effect to difficulty orbs
+        function onSpecialFreebieClick(event) {
+            const freebieItem = event.currentTarget;
+            const emoji = freebieItem.dataset.emoji;
+
+            playerData.nonsenseFreebiesCollected[emoji] = (playerData.nonsenseFreebiesCollected[emoji] || 0) + 25;
+            
+            const startRect = freebieItem.getBoundingClientRect();
+            const startX = startRect.left + startRect.width / 2;
+            const startY = startRect.top + startRect.height / 2;
+
+            for (let i = 0; i < 8; i++) {
+                const flyout = document.createElement('div');
+                flyout.textContent = emoji;
+                flyout.style.position = 'fixed';
+                flyout.style.left = `${startX}px`;
+                flyout.style.top = `${startY}px`;
+                flyout.style.fontSize = '1.5rem';
+                flyout.style.pointerEvents = 'none';
+                flyout.style.zIndex = '100';
+
+                const angle = (i / 8) * 2 * Math.PI;
+                const distance = 100;
+                const endX = Math.cos(angle) * distance;
+                const endY = Math.sin(angle) * distance;
+
+                flyout.style.setProperty('--flyout-x', `${endX}px`);
+                flyout.style.setProperty('--flyout-y', `${endY}px`);
+
+                flyout.style.animation = `emoji-flyout 0.7s ease-out forwards`;
+                document.body.appendChild(flyout);
+                setTimeout(() => flyout.remove(), 700);
+            }
+
+            savePlayerProfile();
+            populateNonsenseFreebies();
+        }
+
         function startOrbGlow() {
             const orbs = document.querySelectorAll('.difficulty-button .orb');
             let currentOrbIndex = 0;
             
             orbGlowInterval = setInterval(() => {
+                if (isGamePaused) {
+                    orbs.forEach(orb => {
+                        orb.classList.remove('glowing-orb');
+                        orb.style.removeProperty('--glow-color');
+                    });
+                    return;
+                }
+
                 orbs.forEach(orb => {
                     orb.classList.remove('glowing-orb');
                     orb.style.removeProperty('--glow-color');
@@ -3262,7 +3405,7 @@
             setupAudioControls();
             populatePlaylistModal();
             populateTipsCarousel();
-            startOrbGlow(); // NEW: Start orb glowing effect
+            startOrbGlow();
             startModalAnimationInterval = setInterval(() => { 
                 const startModal = document.getElementById('start-modal');
                 if (!startModal || startModal.classList.contains('hidden')) {
@@ -3325,10 +3468,6 @@
             // --- Global Event Listeners ---
             document.getElementById('start-game-button').addEventListener('click', startGame);
             document.getElementById('play-again-button').addEventListener('click', restartGame);
-            document.getElementById('close-leaderboard-button').addEventListener('click', () => {
-                document.getElementById('game-over-modal').classList.add('hidden');
-                clearInterval(gameOverAnimationInterval);
-            });
             document.getElementById('help-button').addEventListener('click', () => {
                 pauseGame();
                 document.getElementById('help-modal').classList.remove('hidden');
@@ -3490,10 +3629,14 @@
             document.getElementById('give-button').addEventListener('click', openGivingModal);
             document.getElementById('close-giving-button').addEventListener('click', () => {
                 document.getElementById('giving-modal').classList.add('hidden');
-                populateTradingPost(); // Refresh trading post on close
                 document.getElementById('trading-post-modal').classList.remove('hidden');
             });
             document.getElementById('execute-give-button').addEventListener('click', executeGive);
+            document.getElementById('give-it-all-away-button').addEventListener('click', openGiveAllModal);
+            document.getElementById('close-give-all-button').addEventListener('click', () => {
+                document.getElementById('give-all-modal').classList.add('hidden');
+                document.getElementById('giving-modal').classList.remove('hidden');
+            });
         }
         
         window.onload = initGame;
