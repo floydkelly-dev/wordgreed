@@ -3235,6 +3235,17 @@ Of course. My apologies for the previous issues. Here is the remainder of the co
 
         // --- Init & Event Listeners ---
         function init() {
+        setTimeout(() => {
+                const startButton = document.getElementById('start-game-button');
+                // If the button is still disabled after 5 seconds, force it to enable.
+                if (startButton && startButton.disabled) {
+                    console.warn("Game loading timed out. Forcing start button to enable.");
+                    startButton.disabled = false;
+                    startButton.textContent = 'Start Game';
+                }
+            }, 5000); // 5-second timeout
+            //
+            
             initializeFirebase();
             setupAllModals();
             setupAudioControls();
