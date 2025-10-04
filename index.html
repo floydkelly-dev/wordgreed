@@ -897,463 +897,6 @@
         let badgesModalAnimationInterval = null;
         let endgameJackpotActive = false;
         let levelGoodies = [];
-
-        const PhysicsEngine = (() => {
-            const particles = [];
-            let animationFrameId = null;
-            let lastTime = performance.now();
-
-            const PHYSICS = {
-                COIN_MASS: 0.5,
-                GRAVITY: 980,
-                AIR_RESISTANCE: 0.02,
-                MAGNETIC_STRENGTH: 1200,
-                MAGNETIC_THRESHOLD: 300,
-                BROWNIAN_INTENSITY: 15,
-                INITIAL_BURST_SPEED: 400,
-                VELOCITY_DAMPING: 0.98,
-                ROTATION_FRICTION: 0.99
-            };
-
-            class Vector2 {
-                constructor(x = 0, y = 0) {
-                    this.x = x;
-                    this.y = y;
-                }
-                add(v) {
-                    this.x += v.x;
-                    this.y += v.y;
-                    return this;
-                }
-                mult(scalar) {
-                    this.x *= scalar;
-                    this.y *= scalar;
-                    return this;
-                }
-                mag() {
-                    return Math.sqrt(this.x * this.x + this.y * this.y);
-                }
-                normalize() {
-                    const m = this.mag();
-                    if (m > 0) this.mult(1 / m);
-                    return this;
-                }
-                limit(max) {
-                    const m = this.mag();
-                    if (m > max) {
-                        this.normalize();
-                        this.mult(max);
-                    }
-                    return this;
-                }
-                copy() {
-                    return new Vector2(this.x, this.y);
-                }
-            }
-
-            class CoinParticle {
-                constructor(startX, startY, targetX, targetY, size = 20, lifespan = 2000, isBig = false) {
-                    this.position = new Vector2(startX, startY);
-                    this.target = new Vector2(targetX, targetY);
-
-                    const angle = Math.random() * Math.PI * 2;
-                    const speed = PHYSICS.INITIAL_BURST_SPEED * (0.7 + Math.random() * 0.6);
-                    this.velocity = new Vector2(
-                        Math.cos(angle) * speed,
-                        Math.sin(angle) * speed - 150
-                    );
-
-                    this.acceleration = new Vector2(0, 0);
-                    this.rotation = Math.random() * 360;
-                    this.rotationSpeed = (Math.random() - 0.5) * 720;
-                    this.size = size;
-                    this.baseSize = size;
-                    this.opacity = 1;
-                    this.scale = isBig ? 2.5 : 1;
-                    this.lifespan = lifespan;
-                    this.age = 0;
-                    this.phase = 'burst';
-                    this.wobblePhase = Math.random() * Math.PI * 2;
-                    this.isBig = isBig;
-
-                    this.element = document.createElement('div');
-                    this.element.className = 'coin';
-                    this.element.style.willChange = 'transform';
-                    document.body.appendChild(this.element);
-                }
-
-                applyForce(force) {
-                    const f = force.copy();
-                    f.mult(1 / PHYSICS.COIN_MASS);
-                    this.acceleration.add(f);
-                }
-
-                update(deltaTime) {
-                    const dt = deltaTime / 1000;
-                    this.age += deltaTime;
-
-                    const gravityForce = new Vector2(0, PHYSICS.GRAVITY * PHYSICS.COIN_MASS);
-                    this.applyForce(gravityForce);
-
-                    const distanceToTarget = Math.sqrt(
-                        Math.pow(this.target.x - this.position.x, 2) +
-                        Math.pow(this.target.y - this.position.y, 2)
-                    );
-
-                    if (distanceToTarget < PHYSICS.MAGNETIC_THRESHOLD || this.age > this.lifespan * 0.4) {
-                        this.phase = 'magnetic';
-                        const toTarget = new Vector2(
-                            this.target.x - this.position.x,
-                            this.target.y - this.position.y
-                        );
-                        const magneticStrength = PHYSICS.MAGNETIC_STRENGTH * (1 - distanceToTarget / PHYSICS.MAGNETIC_THRESHOLD);
-                        toTarget.normalize().mult(Math.max(magneticStrength, 0));
-                        this.applyForce(toTarget);
-                    }
-
-                    const brownianForce = new Vector2(
-                        (Math.random() - 0.5) * PHYSICS.BROWNIAN_INTENSITY,
-                        (Math.random() - 0.5) * PHYSICS.BROWNIAN_INTENSITY * 0.5
-                    );
-                    this.applyForce(brownianForce);
-
-                    this.velocity.add(this.acceleration.copy().mult(dt));
-
-                    const speed = this.velocity.mag();
-                    const drag = speed * PHYSICS.AIR_RESISTANCE;
-                    const dragForce = this.velocity.copy().normalize().mult(-drag);
-                    this.velocity.add(dragForce);
-
-                    if (this.phase === 'magnetic') {
-                        this.velocity.mult(PHYSICS.VELOCITY_DAMPING);
-                    }
-
-                    this.position.add(this.velocity.copy().mult(dt));
-                    this.acceleration.mult(0);
-
-                    const horizontalSpeed = Math.abs(this.velocity.x);
-                    this.rotationSpeed += (horizontalSpeed * 0.5 - this.rotationSpeed) * 0.1;
-                    this.rotationSpeed *= PHYSICS.ROTATION_FRICTION;
-                    this.rotation += this.rotationSpeed * dt;
-
-                    this.wobblePhase += dt * 8;
-                    const wobble = Math.sin(this.wobblePhase) * 3;
-
-                    const progress = this.age / this.lifespan;
-                    if (progress > 0.8) {
-                        this.opacity = 1 - (progress - 0.8) / 0.2;
-                    }
-
-                    if (distanceToTarget < 30) {
-                        this.opacity = Math.max(0, distanceToTarget / 30);
-                    }
-
-                    const scaleVariation = this.isBig ?
-                        2.5 - progress * 1.5 :
-                        1 + Math.sin(progress * Math.PI) * 0.1;
-
-                    this.element.style.transform = `
-                        translate(${this.position.x}px, ${this.position.y}px)
-                        rotate(${this.rotation + wobble}deg)
-                        scale(${scaleVariation})
-                    `;
-                    this.element.style.opacity = this.opacity;
-
-                    return this.age < this.lifespan && this.opacity > 0.01 && distanceToTarget > 10;
-                }
-
-                destroy() {
-                    if (this.element && this.element.parentNode) {
-                        this.element.remove();
-                    }
-                }
-            }
-
-            function animate() {
-                const currentTime = performance.now();
-                const deltaTime = Math.min(currentTime - lastTime, 32);
-                lastTime = currentTime;
-
-                for (let i = particles.length - 1; i >= 0; i--) {
-                    const particle = particles[i];
-                    const alive = particle.update(deltaTime);
-
-                    if (!alive) {
-                        particle.destroy();
-                        particles.splice(i, 1);
-                    }
-                }
-
-                if (particles.length > 0) {
-                    animationFrameId = requestAnimationFrame(animate);
-                } else {
-                    animationFrameId = null;
-                }
-            }
-
-            function startAnimation() {
-                if (!animationFrameId) {
-                    lastTime = performance.now();
-                    animationFrameId = requestAnimationFrame(animate);
-                }
-            }
-
-            function createCoinBurst(startX, startY, targetX, targetY, count = 15, isBig = false) {
-                for (let i = 0; i < count; i++) {
-                    const particle = new CoinParticle(
-                        startX,
-                        startY,
-                        targetX,
-                        targetY,
-                        isBig ? 32 : 20,
-                        isBig ? 1200 : 1400,
-                        isBig
-                    );
-                    particles.push(particle);
-                }
-                startAnimation();
-            }
-
-            function createCoinImplosion(originX, originY, targetX, targetY, count = 20) {
-                const startRadius = 120;
-                for (let i = 0; i < count; i++) {
-                    const angle = (i / count) * Math.PI * 2;
-                    const startX = originX + Math.cos(angle) * startRadius;
-                    const startY = originY + Math.sin(angle) * startRadius;
-
-                    const particle = new CoinParticle(startX, startY, targetX, targetY, 20, 1600);
-                    particle.velocity = new Vector2(
-                        Math.cos(angle) * PHYSICS.INITIAL_BURST_SPEED * 0.5,
-                        Math.sin(angle) * PHYSICS.INITIAL_BURST_SPEED * 0.5
-                    );
-                    particle.phase = 'burst';
-                    particles.push(particle);
-                }
-                startAnimation();
-            }
-
-            class VortexParticle {
-                constructor(startX, startY, targetX, targetY, emoji, lifespan = 1200) {
-                    this.position = new Vector2(startX, startY);
-                    this.target = new Vector2(targetX, targetY);
-                    this.startPosition = new Vector2(startX, startY);
-
-                    this.velocity = new Vector2(0, 0);
-                    this.acceleration = new Vector2(0, 0);
-                    this.rotation = 0;
-                    this.rotationSpeed = 0;
-                    this.opacity = 1;
-                    this.scale = 1;
-                    this.lifespan = lifespan;
-                    this.age = 0;
-                    this.angle = 0;
-                    this.angularVelocity = 0;
-
-                    this.element = document.createElement('div');
-                    this.element.textContent = emoji;
-                    this.element.style.position = 'absolute';
-                    this.element.style.fontSize = '2rem';
-                    this.element.style.zIndex = '200';
-                    this.element.style.pointerEvents = 'none';
-                    this.element.style.willChange = 'transform';
-                    document.body.appendChild(this.element);
-                }
-
-                update(deltaTime) {
-                    const dt = deltaTime / 1000;
-                    this.age += deltaTime;
-                    const progress = this.age / this.lifespan;
-
-                    const dx = this.target.x - this.position.x;
-                    const dy = this.target.y - this.position.y;
-                    const distanceToTarget = Math.sqrt(dx * dx + dy * dy);
-
-                    const currentAngle = Math.atan2(dy, dx);
-                    const spiralOffset = (1 - progress) * Math.PI * 4;
-                    this.angle = currentAngle + spiralOffset;
-
-                    const spiralRadius = distanceToTarget * (1 - progress * 0.95);
-                    const desiredX = this.target.x + Math.cos(this.angle) * spiralRadius;
-                    const desiredY = this.target.y + Math.sin(this.angle) * spiralRadius;
-
-                    const toDesired = new Vector2(desiredX - this.position.x, desiredY - this.position.y);
-                    const attractionStrength = 1200 + progress * 2400;
-                    toDesired.normalize().mult(attractionStrength);
-                    this.applyForce(toDesired);
-
-                    const brownian = new Vector2(
-                        (Math.random() - 0.5) * 20 * (1 - progress),
-                        (Math.random() - 0.5) * 20 * (1 - progress)
-                    );
-                    this.applyForce(brownian);
-
-                    this.velocity.add(this.acceleration.copy().mult(dt));
-                    this.velocity.mult(0.92);
-                    this.position.add(this.velocity.copy().mult(dt));
-                    this.acceleration.mult(0);
-
-                    this.angularVelocity += dt * 720 * progress;
-                    this.rotation += this.angularVelocity * dt;
-
-                    this.scale = Math.max(0, 1 - progress * 0.95);
-                    this.opacity = distanceToTarget < 50 ? distanceToTarget / 50 : 1;
-
-                    this.element.style.transform = `
-                        translate(${this.position.x}px, ${this.position.y}px)
-                        rotate(${this.rotation}deg)
-                        scale(${this.scale})
-                    `;
-                    this.element.style.opacity = this.opacity;
-
-                    return this.age < this.lifespan && this.scale > 0.05 && distanceToTarget > 10;
-                }
-
-                applyForce(force) {
-                    this.acceleration.add(force);
-                }
-
-                destroy() {
-                    if (this.element && this.element.parentNode) {
-                        this.element.remove();
-                    }
-                }
-            }
-
-            function createVortex(tiles, targetX, targetY) {
-                tiles.forEach(tile => {
-                    if (!tile || !document.body.contains(tile)) return;
-                    const startRect = tile.getBoundingClientRect();
-                    const startX = startRect.left + startRect.width / 2;
-                    const startY = startRect.top + startRect.height / 2;
-                    const emoji = tile.textContent;
-
-                    const particle = new VortexParticle(startX, startY, targetX, targetY, emoji, 1200);
-                    particles.push(particle);
-                });
-                startAnimation();
-            }
-
-            function createGameOverSwirl(elements, targetX, targetY) {
-                elements.forEach(el => {
-                    if (!el.textContent) return;
-                    const startRect = el.getBoundingClientRect();
-                    const startX = startRect.left + startRect.width / 2;
-                    const startY = startRect.top + startRect.height / 2;
-                    const emoji = el.textContent;
-
-                    const particle = new VortexParticle(startX, startY, targetX, targetY, emoji, 1500);
-                    particle.angularVelocity = -180;
-                    particles.push(particle);
-                });
-                startAnimation();
-            }
-
-            class FallingParticle {
-                constructor(emoji, startX, mass = 1, swayIntensity = 1) {
-                    this.emoji = emoji;
-                    this.position = new Vector2(startX, -50);
-                    this.velocity = new Vector2(0, 0);
-                    this.acceleration = new Vector2(0, 0);
-                    this.mass = mass;
-                    this.rotation = Math.random() * 360;
-                    this.rotationSpeed = (Math.random() - 0.5) * 180 * mass;
-                    this.swayPhase = Math.random() * Math.PI * 2;
-                    this.swayFrequency = 0.8 + Math.random() * 0.4;
-                    this.swayIntensity = swayIntensity;
-                    this.age = 0;
-                    this.terminalVelocity = 300 + mass * 150;
-                    this.airResistance = 0.003 / mass;
-
-                    this.element = document.createElement('div');
-                    this.element.textContent = emoji;
-                    this.element.style.position = 'fixed';
-                    this.element.style.fontSize = `${1 + Math.random() * 0.5}rem`;
-                    this.element.style.zIndex = '55';
-                    this.element.style.pointerEvents = 'none';
-                    this.element.style.willChange = 'transform';
-                    document.body.appendChild(this.element);
-                }
-
-                update(deltaTime) {
-                    const dt = deltaTime / 1000;
-                    this.age += deltaTime;
-
-                    const gravityForce = new Vector2(0, 980 * this.mass);
-                    this.applyForce(gravityForce);
-
-                    this.swayPhase += dt * this.swayFrequency * 2;
-                    const swayForce = new Vector2(
-                        Math.sin(this.swayPhase) * 100 * this.swayIntensity,
-                        0
-                    );
-                    this.applyForce(swayForce);
-
-                    const brownian = new Vector2(
-                        (Math.random() - 0.5) * 30,
-                        (Math.random() - 0.5) * 10
-                    );
-                    this.applyForce(brownian);
-
-                    this.velocity.add(this.acceleration.copy().mult(dt));
-                    this.acceleration.mult(0);
-
-                    const speed = this.velocity.mag();
-                    if (speed > this.terminalVelocity) {
-                        this.velocity.normalize().mult(this.terminalVelocity);
-                    }
-
-                    const drag = speed * speed * this.airResistance;
-                    const dragForce = this.velocity.copy().normalize().mult(-drag);
-                    this.velocity.add(dragForce);
-
-                    this.position.add(this.velocity.copy().mult(dt));
-
-                    const horizontalSpeed = Math.abs(this.velocity.x);
-                    const verticalSpeed = this.velocity.y;
-                    this.rotationSpeed += (horizontalSpeed * 0.3 - Math.abs(this.rotationSpeed)) * 0.05;
-                    if (this.velocity.x < 0) this.rotationSpeed = -Math.abs(this.rotationSpeed);
-                    else this.rotationSpeed = Math.abs(this.rotationSpeed);
-                    this.rotation += this.rotationSpeed * dt;
-
-                    const tilt = Math.sin(this.swayPhase) * 15;
-
-                    this.element.style.transform = `
-                        translate(${this.position.x}px, ${this.position.y}px)
-                        rotate(${this.rotation + tilt}deg)
-                    `;
-
-                    return this.position.y < window.innerHeight + 100;
-                }
-
-                applyForce(force) {
-                    const f = force.copy();
-                    f.mult(1 / this.mass);
-                    this.acceleration.add(f);
-                }
-
-                destroy() {
-                    if (this.element && this.element.parentNode) {
-                        this.element.remove();
-                    }
-                }
-            }
-
-            function createFallingParticle(emoji, mass = 1, swayIntensity = 1) {
-                const startX = Math.random() * window.innerWidth;
-                const particle = new FallingParticle(emoji, startX, mass, swayIntensity);
-                particles.push(particle);
-                startAnimation();
-            }
-
-            return {
-                createCoinBurst,
-                createCoinImplosion,
-                createVortex,
-                createGameOverSwirl,
-                createFallingParticle,
-                getParticleCount: () => particles.length
-            };
-        })();
         let selectedTrade = null;
         let selectedDonation = null;
         
@@ -1720,8 +1263,19 @@
             const startY = startRect.top + startRect.height / 2;
             const endX = endRect.left + endRect.width / 2;
             const endY = endRect.top + endRect.height / 2;
+            const controlX = startX + (endX - startX) / 2;
+            const controlY = startY - 100;
+            const curve = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
 
-            PhysicsEngine.createCoinBurst(startX, startY, endX, endY, 15, false);
+            for (let i = 0; i < 15; i++) {
+                const coin = document.createElement('div');
+                coin.classList.add('coin');
+                coin.style.animation = `fly-along-path 0.8s cubic-bezier(0.4, 0, 0.9, 0.5) forwards`;
+                coin.style.offsetPath = `path('${curve}')`;
+                coin.style.animationDelay = `${Math.random() * 0.3}s`;
+                document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 1100);
+            }
         }
 
         function triggerBigCoinAnimation(startElement, endElement) {
@@ -1731,8 +1285,16 @@
             const startY = startRect.top + startRect.height / 2;
             const endX = endRect.left + endRect.width / 2;
             const endY = endRect.top + endRect.height / 2;
-
-            PhysicsEngine.createCoinBurst(startX, startY, endX, endY, 1, true);
+            const controlX = startX + (endX - startX) / 2;
+            const controlY = startY - 100;
+            const curve = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
+            
+            const coin = document.createElement('div');
+            coin.classList.add('coin');
+            coin.style.animation = `big-coin-tumble 0.8s ease-out forwards, fly-along-path 0.8s ease-out forwards`;
+            coin.style.offsetPath = `path('${curve}')`;
+            document.body.appendChild(coin);
+            setTimeout(() => coin.remove(), 800);
         }
 
         function triggerCoinImplosion(originElement) {
@@ -1742,8 +1304,23 @@
             const centerY = originRect.top + originRect.height / 2;
             const endX = endRect.left + endRect.width / 2;
             const endY = endRect.top + endRect.height / 2;
+            const startRadius = 100;
 
-            PhysicsEngine.createCoinImplosion(centerX, centerY, endX, endY, 20);
+            for (let i = 0; i < 20; i++) {
+                const coin = document.createElement('div');
+                coin.classList.add('coin');
+                const angle = (i / 20) * (2 * Math.PI);
+                const startX = centerX + Math.cos(angle) * startRadius;
+                const startY = centerY + Math.sin(angle) * startRadius;
+                const controlX = startX + (endX - startX) / 2 + (Math.random() - 0.5) * 200;
+                const controlY = startY + (endY - startY) / 2 + (Math.random() - 0.5) * 200;
+                const curve = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
+                coin.style.offsetPath = `path('${curve}')`;
+                coin.style.animation = `coin-swirl-in 1s cubic-bezier(0.5, 0, 0.9, 0.5) forwards`;
+                coin.style.animationDelay = `${Math.random() * 0.3}s`;
+                document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 1300);
+            }
         }
 
         function onSolveButtonClick() {
@@ -2146,13 +1723,29 @@
             const endX = vortexCenter.left + vortexCenter.width / 2;
             const endY = vortexCenter.top + vortexCenter.height / 2;
 
-            PhysicsEngine.createVortex(diamondTiles, endX, endY);
-
             diamondTiles.forEach(tile => {
-                if (!tile || !document.body.contains(tile)) {
-                    tile.textContent = '';
-                    tile.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
-                }
+                if (!tile || !document.body.contains(tile)) return;
+                const startRect = tile.getBoundingClientRect();
+                const startX = startRect.left;
+                const startY = startRect.top;
+
+                const flyingDiamond = document.createElement('div');
+                flyingDiamond.textContent = '💎';
+                flyingDiamond.classList.add('temp-diamond');
+                flyingDiamond.style.position = 'absolute';
+                flyingDiamond.style.left = `${startX}px`;
+                flyingDiamond.style.top = `${startY}px`;
+                flyingDiamond.style.zIndex = '200';
+                flyingDiamond.style.setProperty('--start-x', `0px`);
+                flyingDiamond.style.setProperty('--start-y', `0px`);
+                flyingDiamond.style.setProperty('--end-x', `${endX - startX}px`);
+                flyingDiamond.style.setProperty('--end-y', `${endY - startY}px`);
+                flyingDiamond.style.animation = `diamond-vortex 1s ease-in forwards`;
+                document.body.appendChild(flyingDiamond);
+
+                tile.textContent = '';
+                tile.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
+                setTimeout(() => { flyingDiamond.remove(); }, 1000);
             });
 
             setTimeout(() => {
@@ -2303,11 +1896,26 @@
             const endX = vortexCenter.left + vortexCenter.width / 2;
             const endY = vortexCenter.top + vortexCenter.height / 2;
 
-            PhysicsEngine.createGameOverSwirl(Array.from(elementsToSwirl), endX, endY);
-
             elementsToSwirl.forEach(el => {
-                el.textContent = '';
-                el.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
+                if (el.textContent) {
+                    const startRect = el.getBoundingClientRect();
+                    const startX = startRect.left;
+                    const startY = startRect.top;
+                    const flyingEl = el.cloneNode(true);
+                    flyingEl.style.position = 'absolute';
+                    flyingEl.style.left = `${startX}px`;
+                    flyingEl.style.top = `${startY}px`;
+                    flyingEl.style.zIndex = '200';
+                    flyingEl.style.margin = '0';
+                    flyingEl.style.setProperty('--start-x', `0px`);
+                    flyingEl.style.setProperty('--start-y', `0px`);
+                    flyingEl.style.setProperty('--end-x', `${endX - startX}px`);
+                    flyingEl.style.setProperty('--end-y', `${endY - startY}px`);
+                    flyingEl.style.animation = `game-over-swirl 1.5s ease-in forwards`;
+                    document.body.appendChild(flyingEl);
+                    el.textContent = '';
+                    el.className = 'w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-2xl font-bold rounded-lg select-none bg-slate-900/50 border border-slate-800/50';
+                }
             });
         }
 
@@ -2319,14 +1927,26 @@
 
             const animationContainer = document.body;
 
-            gameOverAnimationInterval = setInterval(() => {
-                const animations = [
-                    { emoji: '🪙', mass: 1.2, sway: 0.8 },
-                    { emoji: '❄️', mass: 0.3, sway: 1.5 },
-                    { emoji: '❤️', mass: 0.6, sway: 1.2 }
-                ];
-                const anim = animations[Math.floor(Math.random() * animations.length)];
-                PhysicsEngine.createFallingParticle(anim.emoji, anim.mass, anim.sway);
+            gameOverAnimationInterval = setInterval(() => { 
+                const animations = ['🪙', '❄️', '❤️'];
+                const animationChar = animations[Math.floor(Math.random() * animations.length)];
+                
+                const el = document.createElement('div');
+                el.textContent = animationChar;
+                el.style.left = `${Math.random() * 100}%`;
+                el.style.animationDuration = `${Math.random() * 2 + 3}s`;
+                el.style.fontSize = `${Math.random() * 1 + 0.5}rem`;
+                el.style.position = 'fixed';
+                el.style.top = '-5%';
+                el.style.zIndex = '100';
+
+                if (animationChar === '🪙') el.classList.add('falling-coin');
+                else if (animationChar === '❄️') el.classList.add('falling-snowflake');
+                else if (animationChar === '❤️') el.classList.add('falling-heart');
+
+                animationContainer.appendChild(el);
+                setTimeout(() => el.remove(), 5000);
+
             }, 200);
         }
         
@@ -2374,7 +1994,14 @@
             clearInterval(freezeAnimationInterval);
 
             freezeAnimationInterval = setInterval(() => {
-                PhysicsEngine.createFallingParticle('❄️', 0.3, 1.5);
+                const snowflake = document.createElement('div');
+                snowflake.classList.add('falling-snowflake');
+                snowflake.textContent = '❄️';
+                snowflake.style.left = `${Math.random() * 100}%`;
+                snowflake.style.animationDuration = `${Math.random() * 3 + 4}s`;
+                snowflake.style.fontSize = `${Math.random() * 1 + 0.75}rem`;
+                document.body.appendChild(snowflake);
+                setTimeout(() => snowflake.remove(), 7000);
             }, 200);
 
             const frozenTiles = [];
@@ -2425,11 +2052,18 @@
         }
         
         function spawnHeartAnimation() {
-            if (heartAnimationInterval) return;
+            if (heartAnimationInterval) return; // Don't start if already running
             heartAnimationInterval = setInterval(() => {
-                PhysicsEngine.createFallingParticle('❤️', 0.6, 1.2);
+                const heart = document.createElement('div');
+                heart.classList.add('falling-heart');
+                heart.textContent = '❤️';
+                heart.style.left = `${Math.random() * 100}%`;
+                heart.style.animationDuration = `${Math.random() * 4 + 5}s`;
+                heart.style.fontSize = `${Math.random() * 1 + 0.75}rem`;
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 9000);
             }, 500);
-            setTimeout(endHeartAnimation, 8000);
+            setTimeout(endHeartAnimation, 8000); // Let it run for 8 seconds
         }
 
         function endHeartAnimation() {
@@ -3403,13 +3037,20 @@
             setupAudioControls();
             populatePlaylistModal();
             populateTipsCarousel();
-            startModalAnimationInterval = setInterval(() => {
+            startModalAnimationInterval = setInterval(() => { 
                 const startModal = document.getElementById('start-modal');
                 if (!startModal || startModal.classList.contains('hidden')) {
                     clearInterval(startModalAnimationInterval);
                     return;
-                }
-                PhysicsEngine.createFallingParticle('🪙', 1.2, 0.8);
+                };
+                const coin = document.createElement('div');
+                coin.classList.add('falling-coin');
+                coin.textContent = '🪙';
+                coin.style.left = `${Math.random() * 100}%`;
+                coin.style.animationDuration = `${Math.random() * 2 + 3}s`;
+                coin.style.fontSize = `${Math.random() * 1 + 0.5}rem`;
+                startModal.appendChild(coin);
+                setTimeout(() => coin.remove(), 5000);
              }, 300);
 
             try {
@@ -3563,8 +3204,15 @@
                 badgesModal.classList.remove('hidden');
                 
                 clearInterval(badgesModalAnimationInterval);
-                badgesModalAnimationInterval = setInterval(() => {
-                    PhysicsEngine.createFallingParticle('🏆', 0.9, 1.0);
+                badgesModalAnimationInterval = setInterval(() => { 
+                    const trophy = document.createElement('div');
+                    trophy.classList.add('falling-trophy');
+                    trophy.textContent = '🏆';
+                    trophy.style.left = `${Math.random() * 100}%`;
+                    trophy.style.animationDuration = `${Math.random() * 2 + 3}s`;
+                    trophy.style.fontSize = `${Math.random() * 1 + 0.5}rem`;
+                    badgesModal.querySelector('.glass-panel').appendChild(trophy);
+                    setTimeout(() => trophy.remove(), 5000);
                 }, 300);
             });
             document.getElementById('close-badges-button').addEventListener('click', () => {
